@@ -1,0 +1,63 @@
+---
+title: "Errors"
+description: "One shape for every refusal, the HTTP status that goes with it, and every code your program can branch on."
+---
+
+Every refusal looks the same, whatever refused it:
+
+```json
+{
+  "error": {
+    "code": "invalid_request",
+    "message": "Give “phone” as a number with its country code, like +919876543210.",
+    "field": "phone"
+  }
+}
+```
+
+- `code` is the contract: stable, safe to branch on.
+- `message` is for people. It may be improved; don't parse it.
+- `field` names the part of the request at fault, when there is one.
+
+Every answer, refused or not, carries an `X-Request-Id` header. Quote it to
+support@fireflo.au and we can find the request. You can send your own `X-Request-Id`
+and it is used instead.
+
+## Codes
+
+| Status | Code | What happened, and what to do |
+| :--- | :--- | :--- |
+| 400 | `invalid_request` | A value is missing or wrong; `field` names it |
+| 400 | `invalid_json` | The body isn't valid JSON |
+| 400 | `invalid_idempotency_key` | An `Idempotency-Key` is at most 255 characters |
+| 401 | `key_required` | Send a key: `Authorization: Bearer ff_live_…` |
+| 401 | `invalid_key` | The key is wrong, has expired, or was revoked |
+| 403 | `account_suspended` | The account is suspended |
+| 403 | `plan_excludes_api` | The account's plan doesn't include the API |
+| 403 | `address_not_allowed` | The key only works from the addresses it was given |
+| 403 | `scope_missing` | The key may not do this; the message names the scope |
+| 404 | `not_found` | No such record in this account |
+| 404 | `channel_off` | The account doesn't have that channel on |
+| 405 | `method_not_allowed` | That method isn't allowed on this path |
+| 409 | `contact_exists` | Another contact already has that number; the message names them |
+| 409 | `name_taken` | Another route or template already has that name |
+| 409 | `already_finished` | The message is no longer being tried, so it can't be cancelled |
+| 409 | `not_permitted` | The person's consent doesn't allow it |
+| 409 | `channel_closed` | The channel can't take typed text now, e.g. WhatsApp outside its 24 hours |
+| 409 | `channel_refused` | The channel's provider turned it down; the message says why |
+| 409 | `provider_refused` | A channel's provider refused the request (templates, registrations) |
+| 409 | `call_refused` | The call couldn't be placed |
+| 409 | `calls_unavailable` | The account has no channel that places calls |
+| 409 | `idempotency_mismatch` | The same `Idempotency-Key` came with a different request |
+| 409 | `idempotency_in_progress` | A request with that `Idempotency-Key` is still being answered |
+| 429 | `rate_limited` | Too many requests from this key; wait for `Retry-After` seconds |
+
+Some sending endpoints add codes of their own — for example `no_channel` when a message
+has nowhere to go. Each [API reference](/api-reference/overview) page lists the codes it
+can return.
+
+<Tip>
+A provider's own words are passed on when they help ("the template isn't approved").
+When a provider couldn't be reached at all, you get a plain sentence instead — retry
+shortly.
+</Tip>

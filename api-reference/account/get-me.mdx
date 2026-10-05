@@ -1,0 +1,81 @@
+---
+title: "GET /v1/me"
+description: "Which account and plan a key belongs to, and what the key may do."
+---
+
+The first call an integration makes: it answers with the key's account and plan, and the key itself — its scopes, its allowed addresses and when it expires. The key's secret is never shown again; `prefix` is the start of it, to tell keys apart.
+
+<Note>Any valid key can call this: it needs no scope.</Note>
+
+## Request
+
+<CodeGroup>
+
+```bash cURL
+curl https://api.fireflo.au/v1/me \
+  -H "Authorization: Bearer $OMNI_API_KEY"
+```
+
+```python Python
+import os
+
+import requests
+
+response = requests.get(
+    "https://api.fireflo.au/v1/me",
+    headers={"Authorization": f"Bearer {os.environ['OMNI_API_KEY']}"},
+)
+print(response.status_code, response.json())
+```
+
+```javascript Node
+const response = await fetch("https://api.fireflo.au/v1/me", {
+  headers: {
+    Authorization: `Bearer ${process.env.OMNI_API_KEY}`,
+  },
+});
+console.log(response.status, await response.json());
+```
+
+</CodeGroup>
+
+## Response
+
+`200 OK` — `test` is true for an `ff_test_` key: messages sent with it never reach a channel.
+
+```json
+{
+  "account": {
+    "name": "Acme Retail",
+    "plan": "Business"
+  },
+  "key": {
+    "id": "5d7f9b1c-3e2a-4c6d-8f0e-a2b4c6d8e0f1",
+    "name": "Order service",
+    "prefix": "ff_live_9QeT",
+    "test": false,
+    "scopes": [
+      "messages:send",
+      "messages:read",
+      "contacts:read"
+    ],
+    "allowed_ips": [
+      "203.0.113.0/24"
+    ],
+    "expires_at": null,
+    "created": "2026-09-01T04:30:11.902Z",
+    "last_used_at": "2026-10-05T09:14:22.413Z",
+    "revoked_at": null,
+    "created_by": "Priya Nair"
+  }
+}
+```
+
+## Errors
+
+Every refusal is `{"error": {"code", "message", "field"}}`; `field` is there when one input is at fault.
+
+| Status | Error code | When |
+| :--- | :--- | :--- |
+
+Any request can also be refused for its key, its account or its rate (`key_required`, `invalid_key`, `account_suspended`, `plan_excludes_api`, `address_not_allowed`, `rate_limited`); see [the overview](/api-reference/overview).

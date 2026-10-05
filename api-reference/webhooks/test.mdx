@@ -1,0 +1,78 @@
+---
+title: "POST /v1/webhooks/{endpoint_id}/test"
+description: "Send a webhook.test event to an endpoint now, and answer how it went."
+---
+
+Sends a `webhook.test` event to this endpoint now, and answers with the delivery: whether your server answered 2xx, and with what. Its `data` is `{"endpoint": "<the endpoint's id>"}`. A test that isn't answered 2xx stays `pending` and is tried again like any delivery.
+
+<Note>Needs the `webhooks:write` scope.</Note>
+
+## Path parameters
+
+| Field | Type | Required | Notes |
+| :--- | :--- | :--- | :--- |
+| `endpoint_id` | string | Yes | The endpoint's id. |
+
+The delivery: `status` is `pending` (waiting for its next try, at `next_at`), `delivered` or `failed` (given up). `response_status` is the HTTP status your server answered, and `error` says what went wrong (`Answered 500`, or that it couldn't be reached).
+
+## Request
+
+<CodeGroup>
+
+```bash cURL
+curl -X POST https://api.fireflo.au/v1/webhooks/c4e8f2a6-1b3d-4c5e-9f7a-8b6d4e2c0a19/test \
+  -H "Authorization: Bearer $OMNI_API_KEY"
+```
+
+```python Python
+import os
+
+import requests
+
+response = requests.post(
+    "https://api.fireflo.au/v1/webhooks/c4e8f2a6-1b3d-4c5e-9f7a-8b6d4e2c0a19/test",
+    headers={"Authorization": f"Bearer {os.environ['OMNI_API_KEY']}"},
+)
+print(response.status_code, response.json())
+```
+
+```javascript Node
+const response = await fetch("https://api.fireflo.au/v1/webhooks/c4e8f2a6-1b3d-4c5e-9f7a-8b6d4e2c0a19/test", {
+  method: "POST",
+  headers: {
+    Authorization: `Bearer ${process.env.OMNI_API_KEY}`,
+  },
+});
+console.log(response.status, await response.json());
+```
+
+</CodeGroup>
+
+## Response
+
+`200 OK`
+
+```json
+{
+  "id": "e9a1c3b5-7d2f-4e6a-8b0c-1f3d5e7a9c24",
+  "event": "webhook.test",
+  "status": "delivered",
+  "attempts": 1,
+  "response_status": 200,
+  "error": "",
+  "next_at": null,
+  "delivered_at": "2026-10-05T09:14:23.108Z",
+  "created": "2026-10-05T09:14:22.413Z"
+}
+```
+
+## Errors
+
+Every refusal is `{"error": {"code", "message", "field"}}`; `field` is there when one input is at fault.
+
+| Status | Error code | When |
+| :--- | :--- | :--- |
+| 404 | `not_found` | No webhook endpoint has that id on this account. |
+| 403 | `scope_missing` | The key doesn't have the `webhooks:write` scope. |
+
+Any request can also be refused for its key, its account or its rate (`key_required`, `invalid_key`, `account_suspended`, `plan_excludes_api`, `address_not_allowed`, `rate_limited`); see [the overview](/api-reference/overview).

@@ -1,0 +1,63 @@
+---
+title: "The Inbox through the API"
+description: "Reading conversations, replying, and organising them — closed, assigned, prioritised, labelled — as your team does in the Inbox."
+---
+
+The Inbox keeps **one conversation per person**, across every channel. Through the API
+your systems see the same threads and can act on them — a CRM showing the latest
+messages, a help desk replying, a rule assigning urgent threads.
+
+A conversation is named by its person's **contact id**.
+
+## Reading
+
+- `GET /v1/conversations` — the most recently active first. `state` is `open` (the
+  default), `snoozed` or `closed`; also `channel`, `unassigned=true`, `unread=true`, and
+  `q` for a name, a number or words from a message.
+- `GET /v1/conversations/{contact_id}` — the thread, **which channels can take a typed
+  reply right now** (and when WhatsApp's window closes), and where a reply goes by default.
+- `GET /v1/conversations/{contact_id}/messages` — its messages on every channel, newest
+  first, each as the `channel_message` webhooks show it.
+
+## Replying
+
+```bash
+curl https://api.fireflo.au/v1/conversations/$CONTACT_ID/reply \
+  -H "Authorization: Bearer $OMNI_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"text": "It ships today."}'
+```
+
+The reply goes on the channel you name, or by default on the one the person last wrote
+on. It is checked as a reply typed in the Inbox would be:
+
+| Refusal | Why |
+| :--- | :--- |
+| `channel_closed` | The channel can't take typed text now — WhatsApp outside 24 hours since they last wrote. Send a template with `POST /v1/messages` instead |
+| `not_permitted` | Their consent doesn't allow it |
+| `channel_refused` | The channel's provider turned it down |
+
+It appears in the Inbox as written by **API · your key's name**. If an AI agent was
+answering the thread, it steps back, as it does when a person replies.
+
+## Organising
+
+`PATCH /v1/conversations/{contact_id}`:
+
+```json
+{
+  "state": "closed",
+  "assignee": "asha@acme.in",
+  "priority": "high",
+  "labels": ["Billing"],
+  "snoozed_until": null
+}
+```
+
+- `assignee` is a team member's email, or `null` for nobody. Assigning to a person makes
+  an AI agent on the thread step back.
+- `labels` are names of labels your team already has; an unknown name is refused.
+- Each change is in the thread's history, as done by your key.
+
+`POST /v1/conversations/{contact_id}/read` clears the unread count and sends read
+receipts where the channel has them (WhatsApp's blue ticks).

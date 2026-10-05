@@ -1,0 +1,89 @@
+---
+title: "Resellers"
+description: "How resellers work from the operator's side: turning an account into one, funding it, and what it can do for its own customers with credit, markup, products and suspension."
+---
+
+A **reseller** is one of your customers that sells OMNI on to customers of its own. Its
+customers are ordinary OMNI accounts that sit **under** the reseller. The reseller sets
+them up, funds them from its own balance, and sets the markup they pay on top of your
+prices. With a [domain of its own](/operators/domains-and-email#domains), it can present
+the panel under its own brand.
+
+This page is the operator's view. For what a reseller sees, see
+[Resellers](/using/resellers).
+
+## Make an account a reseller
+
+<Steps>
+  <Step title="Open the account">
+    Find it under [Platform → Customers](/operators/customers) and open its page.
+  </Step>
+  <Step title="Turn reselling on">
+    On **Overview**, select **Edit**, tick **They resell to their own customers** and
+    select **Save**.
+  </Step>
+</Steps>
+
+The account now shows a **Reseller** badge. Its people with the **Owner** or
+**Reseller** role get a **Customers** page in their menu. Those roles carry the
+permissions to manage customer accounts and to give them credit.
+
+You can't turn reselling off while the account still has customers of its own. A
+reseller's customers can't run customers of their own.
+
+## Fund a reseller
+
+A reseller funds its customers by moving credit from its own wallet. It can't create
+credit itself. Only staff add credit to a wallet. Top up the reseller's wallet from
+**Billing → Wallet** on its page. See [Customers](/operators/customers#billing).
+
+## See a reseller's customers
+
+- On the reseller's page, the **Customers** tab lists the accounts under it.
+- On Platform → Customers, the **Under** column names each account's reseller, and
+  **Any reseller** narrows the list to one reseller's customers.
+- The **Resellers** chip lists every reseller.
+
+A reseller's customer is a full account on its own page. You can change it, top it up or
+suspend it like any other.
+
+## What a reseller does for its customers
+
+From its **Customers** page, a reseller can:
+
+- **Set up a customer.** It enters the company, the owner's email and name, the
+  product, the trial length (0 for none) and an opening credit. The owner is invited by
+  email. Opening credit comes from the reseller's balance.
+- **Put a customer on a product.** Resellers can choose any of your active products,
+  including hidden ones, at your price. When a reseller moves a customer to a dearer
+  product, time already paid for is worth less of it, so the paid-until date moves in to
+  match.
+- **Add credit**, moving it from the reseller's balance to the customer's. It can't move
+  more than it holds.
+- **Set the markup and a note** for each customer, under **Your terms**.
+- **Decide about SMS** (see below).
+- **Suspend** a customer, and let them back in.
+
+The customer runs its own team. The reseller can see who can sign in, but can't change
+them.
+
+### Markup
+
+The markup is a percentage, from 0 to 1,000%, set per customer. It is added to every
+per-message price the customer's [price list](/operators/pricing) gives. A reseller's
+customer with a 20% markup pays 1.20 where a price list says 1.00. Your prices and the
+customer's list decide the base. The reseller decides only the markup.
+
+### Their own SMS gateway
+
+When it sets a customer up, and later on that customer's page, a reseller decides whether
+the customer **May connect their own SMS gateway**. Turned off, the customer stays on the
+SMS connection the reseller provides, and can't connect a gateway of their own. Other
+channels aren't affected.
+
+### Suspension
+
+A reseller can suspend one of its customers. Nobody there can sign in until the reseller
+lets them back in, and anything still running stops. Their data, settings and credit are
+kept. This is the reseller's own switch. It is separate from **Suspend** on the
+customer's page under Platform → Customers, which only staff use.

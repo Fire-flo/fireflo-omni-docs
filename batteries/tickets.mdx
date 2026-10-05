@@ -1,0 +1,133 @@
+---
+title: "Tickets"
+description: "How OMNI turns Inbox conversations into tickets — one per problem — with status, priority, categories and settings."
+---
+
+A person has one thread in the Inbox across every channel. The **Tickets** battery splits
+that thread into **tickets**, one for each problem. When the customer writes and there is
+no live ticket, a new one opens. The Inbox then shows where one problem ended and the next
+began.
+
+Tickets are deliberately light: a status, a priority, an assignee, a category and notes.
+
+<Note>
+Your plan must include **Tickets**.
+</Note>
+
+Tickets work on SMS, WhatsApp and RCS conversations alike.
+
+## How a ticket moves
+
+| Status | Meaning |
+|---|---|
+| **Open** | The customer wrote and is waiting on you. |
+| **Pending** | You're waiting on the customer. |
+| **Solved** | The problem is settled. A reply soon after reopens it. |
+| **Closed** | Done for good. The customer's next message starts a new ticket, which links back to this one. |
+
+A ticket opens when the customer writes, when someone on your team starts one, or when an
+AI agent does. A reply to a broadcast can open one too; a broadcast itself never does.
+
+On its own, OMNI also:
+
+- **solves** a pending ticket when the customer hasn't replied for a while;
+- **closes** a solved ticket after a while, so it can no longer reopen.
+
+The times are set in [Settings](#settings).
+
+## Tickets in the Inbox
+
+In a conversation, a bar above the thread shows the live ticket: its number, subject,
+status (**Open**, **Pending**, **Solve**) and category. Change any of them there, or start
+a new ticket — which solves the current one first. The ticket's assignee and priority are
+the thread's own, set in the conversation's header.
+
+The thread is divided into its tickets, with earlier ones folded away.
+
+- **Send & pending** sends your reply, then sets the open ticket to pending.
+- **Internal note** adds a note only your team sees.
+
+When **Keep the thread and its ticket in step** is on, closing the thread solves its
+ticket, and solving the ticket closes the thread.
+
+A contact's page shows their tickets, with **See all** for the full list.
+
+## The tickets list
+
+**Tickets** lists every ticket, a view at a time. A row opens the person's thread in the
+Inbox.
+
+<Frame caption="The tickets list">
+  <img src="/images/batteries/tickets.png" alt="The tickets list with open and pending tickets, priority, category and assignee" />
+</Frame>
+
+Tiles at the top show:
+
+- **Open** — with how many are unassigned and yours;
+- **Pending customer** — waiting on a reply;
+- **Solved** in the last days — and how many of them by AI;
+- **First reply · median** — over the last 7 days, and for people only.
+
+Views: **Open & pending**, **Mine**, **Unassigned**, **Handed off by AI**, **Solved by AI**
+and **All**. Search by number or subject, and filter by priority (**Normal**, **High**,
+**Urgent**), category, assignee, who handled it (**AI**, **A person**, **AI → person**)
+and status. You can hide columns you don't need.
+
+## Settings
+
+**Tickets → Settings** sets how threads are split into tickets.
+
+| Setting | What it does |
+|---|---|
+| **Tickets on** | Turns tickets on or off for the account. |
+| **Reopen window** | A reply within this many days reopens a solved ticket. Later, a new ticket starts and links to it. Default 3 days. |
+| **Solve pending tickets** | A pending ticket the customer hasn't answered in this many days is solved. Default 3 days. |
+| **Close solved tickets** | A solved ticket closes after this many days and can't reopen. Default 7 days. |
+| **Keep the thread and its ticket in step** | Closing an Inbox thread solves its ticket, and solving a ticket closes the thread. On by default. |
+| **Replies to broadcasts open tickets** | Whether a reply to a broadcast opens a ticket. On by default. |
+
+### Categories
+
+Categories are optional. Use them to filter and report tickets by what they're about —
+"Returns & refunds", say. Give each a name and a colour. Deleting a category keeps its
+tickets; they just lose the category.
+
+### Earlier conversations
+
+Conversations from before you had Tickets can be split into tickets once, by quiet gaps.
+
+<Steps>
+  <Step title="Choose the gap">
+    Say how many hours of quiet start a new ticket.
+  </Step>
+  <Step title="See how many">
+    **See how many** tells you how many tickets would be made from how many conversations.
+  </Step>
+  <Step title="Split">
+    **Split earlier conversations** runs in the background. Past tickets are marked closed,
+    and you get a notice when it's done.
+  </Step>
+</Steps>
+
+## With AI agents
+
+When your plan also includes [AI Agents](/batteries/ai-agents):
+
+- An agent gives the live ticket a clear subject, priority and category, and solves it
+  once the customer's problem is really settled. Support agents do this on their own by
+  default.
+- When an agent hands a conversation to a person, it writes a short summary on the ticket
+  as a note, and the hand-over goes to whoever you chose with the fewest open tickets.
+- Workflows gain **Ticket is** (new, reopened, ongoing or no ticket), **Set ticket** and
+  **Add ticket note** blocks.
+- Solved tickets can suggest new FAQs for [Knowledge](/batteries/knowledge#suggested-faqs).
+
+## Who may use Tickets
+
+| Permission | Lets someone | Roles that have it by default |
+|---|---|---|
+| See tickets | Open the tickets list and see tickets in the Inbox | Owner, Admin, Support, Viewer |
+| Change tickets, notes and ticket settings | Change status, priority, category and subject, add notes, and change settings and categories | Owner, Admin, Support |
+
+An Owner or Admin can change these on the **Roles** screen. See
+[Team and roles](/using/team-and-roles).

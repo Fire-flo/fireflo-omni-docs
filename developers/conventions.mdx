@@ -1,0 +1,62 @@
+---
+title: "Conventions"
+description: "Idempotency, paging, rate limits, times and versions — the rules every endpoint follows."
+---
+
+## Idempotency: retrying safely
+
+Send an `Idempotency-Key` header on any `POST`, and a retry of the same request can't do
+the work twice. Use something unique to the action, such as your order id:
+
+```bash
+curl https://api.fireflo.au/v1/messages \
+  -H "Authorization: Bearer $OMNI_API_KEY" \
+  -H "Idempotency-Key: order-A-1043-shipped" \
+  -H "Content-Type: application/json" \
+  -d '{"to": "+919876543210", "template": "order_shipped", "values": {"order": "A-1043"}}'
+```
+
+| You send | You get |
+| :--- | :--- |
+| The same key, the same request, again | The first answer again, with `Idempotent-Replayed: true` |
+| The same key, a different request | `409 idempotency_mismatch` |
+| The same key while the first is still running | `409 idempotency_in_progress` — retry in a moment |
+| A request that was refused | Nothing is kept: the same key may be used again |
+
+Keys are remembered for 24 hours, are per account, and are at most 255 characters.
+
+## Paging
+
+Lists answer newest first, a page at a time:
+
+```json
+{ "data": [ … ], "has_more": true, "next": "c5a1e2b4-…" }
+```
+
+| Parameter | |
+| :--- | :--- |
+| `limit` | How many, 1 to 100; 50 when left out |
+| `starting_after` | The `next` of the page before |
+
+Keep asking with `starting_after=<next>` until `has_more` is `false`.
+
+## Rate limits
+
+Each key may make **600 requests a minute**. Past that, requests are refused with
+`429 rate_limited` and a `Retry-After` header saying how many seconds to wait. Separate
+systems should have separate keys, each with its own allowance.
+
+## Times, numbers and ids
+
+- Times are ISO 8601 with their offset (`2026-10-05T11:42:07.081Z`). Days you send, as in
+  `/v1/usage?from=2026-10-01`, are in your account's time zone.
+- Phone numbers are answered with their country code (`+919876543210`). You may send a
+  national number; it is read in your account's country.
+- Ids are opaque strings. Messages are `msg_…`, messages on a channel `cm_…`, events
+  `evt_…`; contacts, routes, templates and webhook endpoints are UUIDs.
+
+## Versions
+
+Everything here is `/v1`. Within `/v1`, changes only add: new endpoints, new fields in
+answers, new event types, new optional parameters. Ignore fields you don't know. Anything
+that would break an integration would come as `/v2`, alongside.

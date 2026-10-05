@@ -1,0 +1,105 @@
+---
+title: "POST /v1/channels/sms/senders"
+description: "Ask for an SMS sender ID; it is pending until the gateway decides."
+---
+
+Asks for a sender ID. It is `pending` until the gateway decides.
+
+<Note>Needs the `sms.senders:write` scope.</Note>
+
+## Body
+
+| Field | Type | Required | Notes |
+| :--- | :--- | :--- | :--- |
+| `sender_id` | string | Yes | Exactly as the operator registered it: printable characters, no spaces at either end, up to 64 characters. |
+| `label` | string | No | A name for it, up to 120 characters. |
+| `note` | string | No | A note for whoever decides, up to 500 characters. |
+| `tlvs` | string | No | Stamps to ask for, `tag=value` pairs separated by commas (up to 500 characters). The gateway decides what is attached. |
+
+Send an `Idempotency-Key` header to make a retry safe: the same key with the same body is answered once, and the first answer repeated (with `Idempotent-Replayed: true`).
+
+## Request
+
+<CodeGroup>
+
+```bash cURL
+curl -X POST https://api.fireflo.au/v1/channels/sms/senders \
+  -H "Authorization: Bearer $OMNI_API_KEY" \
+  -H "Content-Type: application/json" \
+  -H "Idempotency-Key: sms-sender-acmein" \
+  -d '{
+    "sender_id": "ACMEIN",
+    "label": "Acme orders",
+    "note": "Order updates"
+  }'
+```
+
+```python Python
+import os
+
+import requests
+
+response = requests.post(
+    "https://api.fireflo.au/v1/channels/sms/senders",
+    headers={
+        "Authorization": f"Bearer {os.environ['OMNI_API_KEY']}",
+        "Idempotency-Key": "sms-sender-acmein",
+    },
+    json={
+        "sender_id": "ACMEIN",
+        "label": "Acme orders",
+        "note": "Order updates",
+    },
+)
+print(response.status_code, response.json())
+```
+
+```javascript Node
+const response = await fetch("https://api.fireflo.au/v1/channels/sms/senders", {
+  method: "POST",
+  headers: {
+    Authorization: `Bearer ${process.env.OMNI_API_KEY}`,
+    "Content-Type": "application/json",
+    "Idempotency-Key": "sms-sender-acmein",
+  },
+  body: JSON.stringify({
+    "sender_id": "ACMEIN",
+    "label": "Acme orders",
+    "note": "Order updates"
+  }),
+});
+console.log(response.status, await response.json());
+```
+
+</CodeGroup>
+
+## Response
+
+`201 Created`
+
+```json
+{
+  "id": "4182",
+  "status": "pending",
+  "note": "Order updates",
+  "requested_tlvs": "",
+  "reason": "",
+  "updated_at": "2026-10-05T09:14:22Z",
+  "sender_id": "ACMEIN",
+  "label": "Acme orders"
+}
+```
+
+## Errors
+
+Every refusal is `{"error": {"code", "message", "field"}}`; `field` is there when one input is at fault.
+
+| Status | Error code | When |
+| :--- | :--- | :--- |
+| 400 | `invalid_request` | An input is wrong: a sender ID with spaces at its ends or unprintable characters, a `tlvs` pair that isn't `tag=value` (`field` names it). |
+| 404 | `channel_off` | The account doesn't have SMS on. |
+| 409 | `provider_refused` | The SMS gateway refused it or couldn't be asked; the message says why. |
+| 400 | `invalid_json` | The body isn't valid JSON. |
+| 403 | `scope_missing` | The key doesn't have the `sms.senders:write` scope. |
+
+Any request can also be refused for its key, its account or its rate (`key_required`, `invalid_key`, `account_suspended`, `plan_excludes_api`, `address_not_allowed`, `rate_limited`); see [the overview](/api-reference/overview).

@@ -1,0 +1,139 @@
+---
+title: "Messages with failover"
+description: "One message to one person, tried on each channel of a route until one gets there — with routes, unified templates and every outcome told back."
+---
+
+`POST /v1/messages` reaches one person. You say who, what, and — through a **route** —
+which channels to try in which order and what counts as getting there on each. OMNI tries
+the first; if it can't take the message, doesn't deliver it in time, or the person
+doesn't read it in time, the next one goes.
+
+```bash
+curl https://api.fireflo.au/v1/messages \
+  -H "Authorization: Bearer $OMNI_API_KEY" \
+  -H "Idempotency-Key: order-A-1043-shipped" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "to": "+919876543210",
+    "template": "order_shipped",
+    "values": {"name": "Ravi", "order": "A-1043"},
+    "route": "whatsapp-then-sms",
+    "reference": "order-A-1043"
+  }'
+```
+
+The answer is `202 Accepted` with the message as it stands — usually its first attempt
+already made. What happens next arrives as [webhooks](/developers/webhooks), and
+`GET /v1/messages/{message_id}` tells the whole story at any time.
+
+## Routes: which channels, in what order
+
+A route is a list of up to six **steps**. Each step names a channel, what counts as
+done on it, and how long to wait:
+
+```json
+{
+  "name": "whatsapp-then-sms",
+  "steps": [
+    { "channel": "whatsapp", "succeed_on": "read", "within": 14400 },
+    { "channel": "sms", "succeed_on": "delivered", "within": 600 }
+  ]
+}
+```
+
+| `succeed_on` | Done when | Channels that can report it |
+| :--- | :--- | :--- |
+| `sent` | the channel took it | every channel |
+| `delivered` | it reached the phone | SMS, WhatsApp |
+| `read` | the person read it | WhatsApp |
+
+`within` is in seconds, from 30 to 7 days; 15 minutes when left out. A step can only wait
+for what its channel reports — asking SMS for `read` is refused.
+
+Save routes with `POST /v1/routes` and name them in a message, or give `steps` in the
+message itself. One route can be the **default**, used when a message names none.
+Without a default, a message is tried on your channels in their usual order (WhatsApp,
+then SMS), each done when delivered, within 15 minutes.
+
+## The four ways a step hands over
+
+| Trigger | What happens | Attempt status |
+| :--- | :--- | :--- |
+| **Refused** — the channel can't take it now | The next step runs at once | `refused`, with a code |
+| **Failed** — the channel reports it couldn't deliver | The next step runs at once | `failed` |
+| **Not delivered in time** | When `within` passes, the next step runs | `timed_out` |
+| **Not read in time** | Delivered isn't enough for a `read` step; when `within` passes, the next runs | `timed_out` |
+
+A step is refused, for example, when WhatsApp's 24-hour window is closed and no
+approved template was given (`window_closed`), when an SMS's text fills in none of your
+registered DLT templates (`no_dlt_match`), when nothing was written for that channel
+(`no_content`), when the channel is off (`channel_off`), or when the provider says no
+(`provider_refused`).
+
+If a channel gets there after its step has timed out, that is recorded on its attempt
+— but nothing is sent again.
+
+## What to send: templates and content
+
+A **unified template** is one message written once per channel, with `{{values}}`:
+
+```json
+{
+  "name": "order_shipped",
+  "variants": {
+    "whatsapp": { "text": "Hi {{name}}, order {{order}} is on its way 🚚",
+              "template": "order_update", "language": "en", "params": ["{{name}}", "{{order}}"] },
+    "sms": { "text": "Hi {{name}}, your order {{order}} has shipped." }
+  }
+}
+```
+
+Send it with `"template": "order_shipped"` and its `"values"`. A message missing a value
+the template needs is refused before anything is sent. You can also give `content` per
+channel instead of a template — or as well, to change one part of it:
+
+```json
+"content": { "sms": { "text": "Your order has shipped." } }
+```
+
+| Channel | What `content` may hold |
+| :--- | :--- |
+| SMS | `text` |
+| WhatsApp | `text` (sent inside the 24-hour window), and `template`, `language`, `params` — an approved WhatsApp template, sent outside it |
+
+## Consent and quiet hours
+
+Every attempt is screened like any message OMNI sends:
+
+- Someone who asked **never to be contacted**, or opted out of everything, is never
+  tried on any channel: the message fails with `not_permitted`.
+- A channel they opted out of is skipped: that step is refused with `not_permitted`.
+- During their **quiet hours** the message waits (`postponed`) and is tried when they end.
+- `"purpose": "marketing"` applies marketing consent; `transactional` (the default)
+  applies the rules for messages people expect.
+
+## How a message ends
+
+| Status | Meaning | Webhook |
+| :--- | :--- | :--- |
+| `delivering` | A step is waiting for its goal | `message.attempted`, `message.failed_over` |
+| `postponed` | Waiting for the person's quiet hours to end | |
+| `succeeded` | A step reached its goal; `outcome` says which channel and how far | `message.succeeded` |
+| `failed` | Every step was tried, or the person may not be reached | `message.failed` |
+| `expired` | The `expires_in` you gave (60 seconds to 7 days) passed first. Without one, a message is tried until its steps run out | `message.expired` |
+| `canceled` | You stopped it with `POST /v1/messages/{message_id}/cancel` | `message.canceled` |
+
+Each attempt points at the message it sent on its channel (`cm_…`), whose own deliveries
+arrive as `channel_message.*` events.
+
+<Note>
+**Charging.** Every attempt a channel actually took is a message sent on that channel
+and is charged like one. Refused steps cost nothing. A test key's messages reach no
+channel and cost nothing.
+</Note>
+
+## Test keys
+
+With an `ff_test_…` key, a message succeeds at once on its first step with the code
+`test`, and nothing reaches any phone — so you can build the whole flow, webhooks
+included, before going live.

@@ -1,0 +1,103 @@
+---
+title: "PATCH /v1/webhooks/{endpoint_id}"
+description: "Change an endpoint's address, events or note, or pause it."
+---
+
+Changes an endpoint. Only what the body gives changes; `events`, when given, replaces the list. Set `enabled` to false to pause it, or true to switch back on an endpoint that was switched off after failing.
+
+<Note>Needs the `webhooks:write` scope.</Note>
+
+## Path parameters
+
+| Field | Type | Required | Notes |
+| :--- | :--- | :--- | :--- |
+| `endpoint_id` | string | Yes | The endpoint's id. |
+
+## Body
+
+| Field | Type | Required | Notes |
+| :--- | :--- | :--- | :--- |
+| `url` | string | No | An `https://` address, up to 500 characters, reachable on the public internet. |
+| `events` | array | No | Event names from [GET /v1/events](/api-reference/account/list-event-types), or `"*"` for every event. |
+| `description` | string | No | A note, up to 200 characters. |
+| `enabled` | boolean | No | False pauses it. Setting it true again clears `failing_since` and `disabled_reason`. |
+
+## Request
+
+<CodeGroup>
+
+```bash cURL
+curl -X PATCH https://api.fireflo.au/v1/webhooks/c4e8f2a6-1b3d-4c5e-9f7a-8b6d4e2c0a19 \
+  -H "Authorization: Bearer $OMNI_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "events": [
+      "*"
+    ]
+  }'
+```
+
+```python Python
+import os
+
+import requests
+
+response = requests.patch(
+    "https://api.fireflo.au/v1/webhooks/c4e8f2a6-1b3d-4c5e-9f7a-8b6d4e2c0a19",
+    headers={"Authorization": f"Bearer {os.environ['OMNI_API_KEY']}"},
+    json={
+        "events": ["*"],
+    },
+)
+print(response.status_code, response.json())
+```
+
+```javascript Node
+const response = await fetch("https://api.fireflo.au/v1/webhooks/c4e8f2a6-1b3d-4c5e-9f7a-8b6d4e2c0a19", {
+  method: "PATCH",
+  headers: {
+    Authorization: `Bearer ${process.env.OMNI_API_KEY}`,
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({
+    "events": [
+      "*"
+    ]
+  }),
+});
+console.log(response.status, await response.json());
+```
+
+</CodeGroup>
+
+## Response
+
+`200 OK`
+
+```json
+{
+  "id": "c4e8f2a6-1b3d-4c5e-9f7a-8b6d4e2c0a19",
+  "url": "https://hooks.acme.in/omni",
+  "description": "Order service",
+  "events": [
+    "*"
+  ],
+  "enabled": true,
+  "failing_since": null,
+  "disabled_reason": "",
+  "created": "2026-09-12T08:02:51.774Z"
+}
+```
+
+## Errors
+
+Every refusal is `{"error": {"code", "message", "field"}}`; `field` is there when one input is at fault.
+
+| Status | Error code | When |
+| :--- | :--- | :--- |
+| 404 | `not_found` | No webhook endpoint has that id on this account. |
+| 400 | `invalid_request` | An input is wrong: not an `https://` address, an address that isn't public, an unknown event, an empty `events` (`field` names it). |
+| 400 | `invalid_json` | The body isn't valid JSON. |
+| 403 | `scope_missing` | The key doesn't have the `webhooks:write` scope. |
+
+Any request can also be refused for its key, its account or its rate (`key_required`, `invalid_key`, `account_suspended`, `plan_excludes_api`, `address_not_allowed`, `rate_limited`); see [the overview](/api-reference/overview).

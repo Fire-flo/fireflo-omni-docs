@@ -1,0 +1,1291 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "FireFlo OMNI API",
+    "version": "1.0.0",
+    "description": "One API for every channel and service in FireFlo OMNI."
+  },
+  "paths": {
+    "/v1/calls": {
+      "get": {
+        "operationId": "list_calls",
+        "description": "The account's calls, newest first, whichever way they went. Filter by direction (inbound or outbound), status (dialling, started, ended, failed or missed), kind, or contact (a contact's id).",
+        "tags": [
+          "calls"
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "post": {
+        "operationId": "place_call",
+        "description": "Ring someone into one of your IVRs or have a voice agent call them (target from GET /v1/calls/targets). Screened like any message: refused with not_permitted when their consent doesn't allow it. Answers 202 with the call; its status moves on as it is answered and ends.",
+        "tags": [
+          "calls"
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/calls/{call_id}": {
+      "get": {
+        "operationId": "get_call",
+        "description": "One call: who, which way, how it ended and how long it lasted, and for a voice agent's call what was said and its summary.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "call_id",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "tags": [
+          "calls"
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/calls/targets": {
+      "get": {
+        "operationId": "list_call_targets",
+        "description": "What a call can be placed into: your published IVRs, and on your own voice organisation your voice agents.",
+        "tags": [
+          "calls"
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/channels/sms/balance": {
+      "get": {
+        "operationId": "sms_balance",
+        "description": "Your own SMS gateway's balance. On FireFlo's shared gateway there is none of yours to show: see /v1/usage for your account's.",
+        "tags": [
+          "channels"
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/channels/sms/senders": {
+      "get": {
+        "operationId": "sms_list_senders",
+        "description": "Your SMS sender IDs as registered at the gateway, with their status: approved, pending, rejected or withdrawn.",
+        "tags": [
+          "channels"
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "post": {
+        "operationId": "sms_request_sender",
+        "description": "Ask for a sender ID: sender_id (as the operator registered it), and optional label, note and tlvs (tag=value, comma separated). It is pending until the gateway decides.",
+        "tags": [
+          "channels"
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/channels/sms/senders/{registration_id}": {
+      "delete": {
+        "operationId": "sms_withdraw_sender",
+        "description": "Withdraw a sender ID request nobody has decided yet.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "registration_id",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "tags": [
+          "channels"
+        ],
+        "responses": {
+          "204": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/channels/sms/templates": {
+      "get": {
+        "operationId": "sms_list_templates",
+        "description": "Your DLT templates as registered at the gateway, with their status. An SMS's text must fill one in where the gateway enforces them.",
+        "tags": [
+          "channels"
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "post": {
+        "operationId": "sms_request_template",
+        "description": "Ask for a DLT template: name, and body with {#var#} blanks where the text changes; optional note and tlvs. Pending until decided.",
+        "tags": [
+          "channels"
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/channels/sms/templates/{registration_id}": {
+      "delete": {
+        "operationId": "sms_withdraw_template",
+        "description": "Withdraw a template request nobody has decided yet.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "registration_id",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "tags": [
+          "channels"
+        ],
+        "responses": {
+          "204": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/channels/whatsapp/templates": {
+      "get": {
+        "operationId": "whatsapp_list_templates",
+        "description": "Your WhatsApp message templates with Meta's approval status. Filter by status: approved, pending, rejected, paused or disabled.",
+        "tags": [
+          "channels"
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "post": {
+        "operationId": "whatsapp_submit_template",
+        "description": "Submit a template for Meta's approval: name (lower case, digits and underscores), category (utility, marketing or authentication), language, body with {{1}}-style values, and optional header_text and footer. It is pending until Meta decides.",
+        "tags": [
+          "channels"
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/channels/whatsapp/templates/{template_id}": {
+      "get": {
+        "operationId": "whatsapp_get_template",
+        "description": "One WhatsApp template, its parts and its approval status.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "template_id",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "tags": [
+          "channels"
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "patch": {
+        "operationId": "whatsapp_edit_template",
+        "description": "Change a template's body, footer or category. Meta reviews every edit: it is pending, and can't be sent, until approved again.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "template_id",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "tags": [
+          "channels"
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "delete": {
+        "operationId": "whatsapp_delete_template",
+        "description": "Delete a template in this one language.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "template_id",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "tags": [
+          "channels"
+        ],
+        "responses": {
+          "204": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/contacts": {
+      "get": {
+        "operationId": "list_contacts",
+        "description": "Contacts, newest first; find one by phone (any number they have had), or filter by name, number or tag.",
+        "tags": [
+          "contacts"
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "post": {
+        "operationId": "create_contact",
+        "description": "Add a contact. A number another contact already has is refused with contact_exists, naming that contact.",
+        "tags": [
+          "contacts"
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/contacts/{contact_id}": {
+      "get": {
+        "operationId": "get_contact",
+        "description": "One contact, with every number and identifier, their fields, tags and consent.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "contact_id",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "tags": [
+          "contacts"
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "patch": {
+        "operationId": "update_contact",
+        "description": "Change a contact. Fields given are set (null clears one); tags given replace theirs; a new phone keeps the old one as theirs.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "contact_id",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "tags": [
+          "contacts"
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/contacts/{contact_id}/consent": {
+      "post": {
+        "operationId": "set_contact_consent",
+        "description": "Mark a contact never to be contacted (until a time, or for good), or lift it. Nothing is sent to them on any channel while it stands.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "contact_id",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "tags": [
+          "contacts"
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/conversations": {
+      "get": {
+        "operationId": "list_conversations",
+        "description": "Conversations, the most recently active first. Filter by state (open, snoozed or closed; open by default), channel, unassigned=true, unread=true, or q (a name, a number or words from a message).",
+        "tags": [
+          "conversations"
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/conversations/{contact_id}": {
+      "get": {
+        "operationId": "get_conversation",
+        "description": "One conversation, with which channels may take a typed reply now (a WhatsApp conversation is open for 24 hours after the person last wrote) and where a reply goes if no channel is named.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "contact_id",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "tags": [
+          "conversations"
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "patch": {
+        "operationId": "update_conversation",
+        "description": "Close or reopen a conversation, snooze it, assign it to a team member by email (or null for nobody), set its priority, or set its labels by name.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "contact_id",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "tags": [
+          "conversations"
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/conversations/{contact_id}/messages": {
+      "get": {
+        "operationId": "list_conversation_messages",
+        "description": "A conversation's messages on every channel, newest first.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "contact_id",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "tags": [
+          "conversations"
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/conversations/{contact_id}/read": {
+      "post": {
+        "operationId": "mark_conversation_read",
+        "description": "Mark a conversation read, sending read receipts on the channels that have them (WhatsApp's blue ticks).",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "contact_id",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "tags": [
+          "conversations"
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/conversations/{contact_id}/reply": {
+      "post": {
+        "operationId": "reply_in_conversation",
+        "description": "Reply in a conversation, on the channel named or where a reply goes by default. Screened like a reply typed in the Inbox: refused with not_permitted when the person's consent doesn't allow it, and with channel_closed when the channel can't take typed text now. An AI agent on the conversation steps back, as when a person replies.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "contact_id",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "tags": [
+          "conversations"
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/events": {
+      "get": {
+        "operationId": "list_event_types",
+        "description": "Every event a webhook endpoint can ask for, with what each means.",
+        "tags": [
+          "events"
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/me": {
+      "get": {
+        "operationId": "get_me",
+        "description": "The key's account and plan, and what the key may do: what an integration checks first.",
+        "tags": [
+          "me"
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/messages": {
+      "get": {
+        "operationId": "list_messages",
+        "description": "Messages sent through the API, newest first; filter by reference or status.",
+        "tags": [
+          "messages"
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "post": {
+        "operationId": "send_message",
+        "description": "Send one message to one person, trying each channel of a route in turn until one gets there. Answers 202: what happens next arrives as message.* events.",
+        "tags": [
+          "messages"
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/messages/{message_id}": {
+      "get": {
+        "operationId": "get_message",
+        "description": "One message, with every attempt on every channel.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "message_id",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "tags": [
+          "messages"
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/messages/{message_id}/cancel": {
+      "post": {
+        "operationId": "cancel_message",
+        "description": "Stop a message still being tried: no further channel is tried.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "message_id",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "tags": [
+          "messages"
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/routes": {
+      "get": {
+        "operationId": "list_routes",
+        "description": "Your routes, and what a message that names none is tried on.",
+        "tags": [
+          "routes"
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "post": {
+        "operationId": "create_route",
+        "description": "Add a route: the channels a message is tried on, in order, and what counts as done on each.",
+        "tags": [
+          "routes"
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/routes/{route_id}": {
+      "get": {
+        "operationId": "get_route",
+        "description": "One route.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "route_id",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "required": true
+          }
+        ],
+        "tags": [
+          "routes"
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "patch": {
+        "operationId": "update_route",
+        "description": "Change a route's name, steps or whether it is the default.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "route_id",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "required": true
+          }
+        ],
+        "tags": [
+          "routes"
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "delete": {
+        "operationId": "delete_route",
+        "description": "Remove a route.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "route_id",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "required": true
+          }
+        ],
+        "tags": [
+          "routes"
+        ],
+        "responses": {
+          "204": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/senders": {
+      "get": {
+        "operationId": "list_senders",
+        "description": "Everything your messages and calls can come from, on every channel you have: SMS sender IDs (with their registration status), your WhatsApp number, RCS bots and voice numbers. Filter by channel or status. A channel whose provider can't be asked right now is named in unavailable, and the rest are still listed.",
+        "tags": [
+          "senders"
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/templates": {
+      "get": {
+        "operationId": "list_templates",
+        "description": "Your templates, with the values each needs.",
+        "tags": [
+          "templates"
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "post": {
+        "operationId": "create_template",
+        "description": "Add a template: one message, written once per channel, with {{values}}.",
+        "tags": [
+          "templates"
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/templates/{template_id}": {
+      "get": {
+        "operationId": "get_template",
+        "description": "One template.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "template_id",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "required": true
+          }
+        ],
+        "tags": [
+          "templates"
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "patch": {
+        "operationId": "update_template",
+        "description": "Change a template's name, note or channel versions.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "template_id",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "required": true
+          }
+        ],
+        "tags": [
+          "templates"
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "delete": {
+        "operationId": "delete_template",
+        "description": "Remove a template.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "template_id",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "required": true
+          }
+        ],
+        "tags": [
+          "templates"
+        ],
+        "responses": {
+          "204": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/usage": {
+      "get": {
+        "operationId": "get_usage",
+        "description": "What the account sent and received on each channel (messages, and SMS parts), its calls and minutes, its API requests, its balance and what was charged — for this month, or from and to (YYYY-MM-DD, in the account's time zone, up to a year). by=day adds a row per day and channel.",
+        "tags": [
+          "usage"
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/webhooks": {
+      "get": {
+        "operationId": "list_webhooks",
+        "description": "Your webhook endpoints.",
+        "tags": [
+          "webhooks"
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "post": {
+        "operationId": "create_webhook",
+        "description": "Add a webhook endpoint. The answer carries its signing secret, shown this once.",
+        "tags": [
+          "webhooks"
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/webhooks/{endpoint_id}": {
+      "get": {
+        "operationId": "get_webhook",
+        "description": "One webhook endpoint.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "endpoint_id",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "required": true
+          }
+        ],
+        "tags": [
+          "webhooks"
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "patch": {
+        "operationId": "update_webhook",
+        "description": "Change an endpoint's address, events, note, or pause it.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "endpoint_id",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "required": true
+          }
+        ],
+        "tags": [
+          "webhooks"
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "delete": {
+        "operationId": "delete_webhook",
+        "description": "Remove an endpoint. Nothing more is sent to it.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "endpoint_id",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "required": true
+          }
+        ],
+        "tags": [
+          "webhooks"
+        ],
+        "responses": {
+          "204": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/webhooks/{endpoint_id}/deliveries": {
+      "get": {
+        "operationId": "list_webhook_deliveries",
+        "description": "The latest deliveries to an endpoint: each event, its answer and its tries.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "endpoint_id",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "required": true
+          }
+        ],
+        "tags": [
+          "webhooks"
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/webhooks/{endpoint_id}/rotate-secret": {
+      "post": {
+        "operationId": "rotate_webhook_secret",
+        "description": "Make a new signing secret for an endpoint; deliveries are signed with it from now on.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "endpoint_id",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "required": true
+          }
+        ],
+        "tags": [
+          "webhooks"
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/webhooks/{endpoint_id}/test": {
+      "post": {
+        "operationId": "test_webhook",
+        "description": "Send a webhook.test event to an endpoint now, and answer how it went.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "endpoint_id",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "required": true
+          }
+        ],
+        "tags": [
+          "webhooks"
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearer": {
+        "type": "http",
+        "scheme": "bearer",
+        "description": "An OMNI API key: ff_live_… or ff_test_…"
+      }
+    }
+  },
+  "servers": [
+    {
+      "url": "https://api.fireflo.au",
+      "description": "FireFlo OMNI"
+    }
+  ],
+  "security": [
+    {
+      "bearer": []
+    }
+  ]
+}

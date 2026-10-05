@@ -1,0 +1,118 @@
+---
+title: "RCS templates"
+description: "How to write an RCS template — text, rich card, carousel or a message with a file — add buttons and variables, and get it approved by each bot you send through."
+---
+
+Every RCS message is a **template**. You write it once in OMNI, then submit it to each
+bot you send through; **each bot approves it separately**. A number can only be sent a
+template the bot routed to its country has approved.
+
+**RCS → Templates** lists your templates with their type, their variables and their
+**Approval by bot**. Filter by **Waiting for approval**, **Approved somewhere** or
+**Rejected**, or search by name.
+
+<Note>
+  With no bots yet, templates can be written but not submitted. Set up bots and routes in
+  [RCS settings](/channels/rcs#how-you-connect) first.
+</Note>
+
+## Write a template
+
+<Steps>
+  <Step title="Start a template">
+    In **RCS → Templates**, choose **New template**.
+  </Step>
+  <Step title="Name, type and category">
+    The **name** uses letters, numbers and underscores. The **type** is fixed once
+    saved. The **category** is Promotional, Transactional or OTP.
+  </Step>
+  <Step title="Write the content">
+    Fill in the parts the type asks for (below). Put a column of your recipient list in
+    with `{{column}}` — for example `{{name}}`.
+  </Step>
+  <Step title="Check the preview">
+    Give **sample values for the preview** to see the message as a phone shows it.
+  </Step>
+  <Step title="Save template">
+    Then submit it to your bots.
+  </Step>
+</Steps>
+
+```text
+Dear {{name}}, your EMI of {{amount}} is due on {{due_date}}.
+```
+
+### Types
+
+| Type | What it is |
+| :--- | :--- |
+| **Text** | A message of up to 2,500 characters, with buttons. |
+| **Rich card** | One card: an image or video (optional), a title, a description and up to 4 buttons. Choose the layout — **picture on top** or **picture beside** — and the media's height. |
+| **Carousel** | 2 to 10 cards side by side, each with an image or video, a title, a description and up to 4 buttons. Choose the card width and the media's height. |
+| **Text with image or video** | A message with one image or video, before or after the text. |
+| **Text with PDF** | A message with a PDF, before or after the text. |
+
+A card's title is up to 200 characters and its description up to 2,000. A message has
+at most 11 buttons.
+
+### Buttons
+
+Each button has text of up to 25 characters and does one thing:
+
+| Button | Does |
+| :--- | :--- |
+| **Open a link** | Opens a web address. Variables work here too: `https://acme.in/pay/{{ref}}`. |
+| **Call a number** | Dials the number you give. |
+| **Quick reply** | Sends its text back as the person's answer, into your Inbox. |
+| **Share location** | Asks the person to share where they are. |
+| **Save to calendar** | Adds an event, with a start and end, to their calendar. |
+| **Show on a map** | Opens a place, by latitude and longitude, with its name. |
+
+Every tap is counted in the broadcast's **Button taps** and on the
+[RCS dashboard](/channels/rcs#the-rcs-dashboard).
+
+## Get it approved
+
+Under **Approval by bot**, the template lists each of your bots with where it stands
+there.
+
+<Steps>
+  <Step title="Tick the bots">
+    Tick each bot you will send through. A bot that already has the template is ticked
+    and locked; one that rejected it can be ticked again, with its reason beside it.
+  </Step>
+  <Step title="Submit for approval">
+    Approval usually takes a few hours. If a bot's provider refuses the submission
+    outright, OMNI says which bot and why.
+  </Step>
+  <Step title="Check approval">
+    While any bot is still deciding, **Check approval** asks the providers how each
+    submission stands. Approvals and rejections also arrive on their own.
+  </Step>
+</Steps>
+
+In the list, a template reads **Approved** when every bot has approved it, **Approved on
+2 of 3** (for example) when some have, **Waiting for approval** while any is still
+deciding, and **Rejected** otherwise.
+
+**Already made it at the provider?** Link a template you made there: choose the **bot**,
+enter **its template id there**, and OMNI asks the provider how it stands.
+
+## Change or delete
+
+A template can be changed only while no bot has it — or every bot turned it down. Once a
+bot has it, the page says so and the content is locked; write a new template for new
+wording.
+
+**Delete** removes the template from OMNI. It stays at the provider.
+
+## Send it
+
+Approved templates are offered in **Send RCS** and in RCS
+[broadcasts](/using/broadcasts), where each `{{variable}}` is filled from a column or
+with your own text. See [Send RCS](/channels/rcs#send-rcs).
+
+## Who may
+
+Writing, submitting, linking and deleting RCS templates needs the permission to **manage
+RCS templates** — the **Owner** and **Admin** roles by default.

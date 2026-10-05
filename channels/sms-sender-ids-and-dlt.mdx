@@ -1,0 +1,174 @@
+---
+title: "Sender IDs and DLT"
+description: "How to request SMS sender IDs and templates, how a message is matched against a template, and how India's DLT identifiers are added."
+---
+
+Before an SMS goes out, your provider may check two things: that it comes from an
+**approved sender ID**, and that its wording matches an **approved template**. You
+request both in OMNI; your provider reviews them.
+
+Both screens say at the top how strictly your account is checked:
+
+| What the screen says | What it means |
+| :--- | :--- |
+| Only approved sender IDs can send on your account. / Messages must match an approved template on your account. | Anything unapproved is refused. |
+| Your provider is noting messages without approved sender IDs (or templates), but not refusing them yet. | Unapproved messages go out, and are noted. |
+| Any sender ID is accepted on your account — approval is optional. / Any wording is accepted on your account — templates are optional. | Nothing is checked. |
+
+## Sender IDs
+
+A **sender ID** is the name people see your SMS come from.
+
+<Steps>
+  <Step title="Start a request">
+    Open **SMS → Sender IDs** and choose **Request sender ID**.
+  </Step>
+  <Step title="Enter the sender ID">
+    Exactly as recipients will see it — casing counts. Use up to 11 letters or digits,
+    or a phone number.
+  </Step>
+  <Step title="Add a label and a reason (optional)">
+    The **label** is for you and is never matched against anything. **Why you need it**
+    is read by whoever reviews it; a good reason is answered faster.
+  </Step>
+  <Step title="Send request">
+    It shows as **Waiting for approval** and can send once it is approved.
+  </Step>
+</Steps>
+
+<Frame caption="Sender IDs, with each one's status.">
+  <img src="/images/channels/sms-senders.png" alt="The Sender IDs list with statuses In use and Waiting for approval" />
+</Frame>
+
+### What a sender ID can be
+
+- Letters, digits and ordinary punctuation, with no spaces at the start or end — it is
+  matched exactly.
+- At most 64 characters. Longer than 21 won't reach most carriers, and names longer than
+  11 characters are cut or refused by some carriers. The form warns you as you type.
+
+### Its status
+
+| Status | Meaning |
+| :--- | :--- |
+| **In use** | Approved. It can send. |
+| **Waiting for approval** | With your provider. You can **Withdraw** the request. |
+| **Not approved** | Turned down, with the reason underneath. |
+| **Withdrawn** | You withdrew the request. You can request it again later. |
+
+<Warning>
+  Changing an **In use** sender ID, or its reason, sends it back for approval — and
+  messages from it are refused until your provider approves it again. OMNI asks you to
+  confirm first.
+</Warning>
+
+## Templates
+
+A **template** is approved wording with **blanks** for the parts that change: a code, a
+name, an amount.
+
+<Steps>
+  <Step title="Start a template">
+    Open **SMS → Templates** and choose **New template**.
+  </Step>
+  <Step title="Name it">
+    What you and your provider call it.
+  </Step>
+  <Step title="Write the wording">
+    Use **Insert a blank** to add the parts that change. Under the box, OMNI shows an
+    example message the template would accept, with its number of segments.
+  </Step>
+  <Step title="Submit for approval">
+    Add a **note for the reviewer** if it helps — a registration reference, for example.
+  </Step>
+</Steps>
+
+<Frame caption="SMS templates, with their blanks drawn as chips.">
+  <img src="/images/channels/sms-templates.png" alt="The SMS Templates list" />
+</Frame>
+
+### Blanks
+
+| Blank | Accepts |
+| :--- | :--- |
+| `{#var#}` | anything |
+| `{#num#}` | digits only |
+| `{#alp#}` | letters, spaces, apostrophes and hyphens |
+
+```text
+Hi {#alp#}, order {#var#} is out for delivery.
+```
+
+### How a message is matched
+
+**Everything around a blank is matched exactly** — every word, space and punctuation
+mark. Only the blanks change. Wording with no blank approves exactly one message.
+
+When you send with **Use a template**, OMNI shows a box for each blank and won't send
+until every blank holds something its kind accepts.
+
+OMNI refuses wording that could never match safely:
+
+- more than 2,000 characters;
+- a blank in the wrong case or spelling, such as `{#VAR#}` or `{#code#}`;
+- `{{1}}` — that is WhatsApp's blank, not SMS's;
+- a template that is nothing but a blank, which would accept every message;
+- two blanks with nothing between them, which can't be told apart.
+
+<Warning>
+  Changing the name or wording of an **In use** template sends it back for approval, and
+  messages using it are refused until it is approved again. To keep sending meanwhile,
+  submit the new wording as a separate template.
+</Warning>
+
+## Many at once
+
+The **⋯** menu on both screens imports and exports the list as a CSV or Excel file. An
+export has exactly the columns an import reads, so a downloaded list is a working file.
+After an import, OMNI says how many rows were submitted and how many refused, and lets
+you download the refused rows with their reasons.
+
+## DLT (India)
+
+India's DLT registry gives every business an **entity ID**, and every registered
+template a **template ID**. Messages to India carry them.
+
+<Steps>
+  <Step title="Switch DLT on">
+    In **SMS → Settings → DLT (India)**, turn on **We send to India under DLT**.
+  </Step>
+  <Step title="Enter your DLT entity ID">
+    Issued once per business by the DLT registry. It goes with every send.
+  </Step>
+  <Step title="Add the DLT template ID to each template">
+    The template and sender ID forms now have an **Advanced · DLT (India)** section. Enter
+    the **DLT template ID** from your DLT portal — it is numeric. A sender ID or template
+    can carry its own entity ID; it defaults to the one in SMS settings.
+  </Step>
+</Steps>
+
+With DLT off, none of these fields appear anywhere.
+
+**Tags and a default stamp (advanced).** The identifiers travel as tagged values,
+**0x1400** for the entity ID and **0x1402** for the template ID unless your provider uses
+others. You can change the tags, and add one more stamp to every send. On a sender ID you
+can propose extra stamps; your provider decides what is attached. When you send, OMNI
+lists the stamps the message will carry and where each came from — your account, the
+sender ID, or the template.
+
+<Tip>
+  Write tags as hex, like `0x1401`. A bare number is read as decimal, and the carrier
+  would quietly ignore it — the form refuses it.
+</Tip>
+
+## From your own software
+
+The OMNI API lists, requests and withdraws [sender IDs](/api-reference/sms/list-senders)
+and [templates](/api-reference/sms/list-templates), with the same rules.
+
+## Who may
+
+Requesting, editing and withdrawing sender IDs and templates needs the permission to
+**manage sender IDs and template registrations** — the **Owner** and **Admin** roles by
+default. Switching DLT on and setting the entity ID is in SMS settings, which needs the
+permission to **configure channel modules** (Owner and Admin by default).

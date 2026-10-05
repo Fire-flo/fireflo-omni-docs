@@ -1,0 +1,6 @@
+node_modules/
+.mintlify/
+.DS_Store
+*.log
+# Playwright, when the capture script runs
+/test-results/

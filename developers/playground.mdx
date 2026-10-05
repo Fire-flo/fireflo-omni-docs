@@ -1,0 +1,47 @@
+---
+title: "API & playground"
+description: "Every endpoint, run in the panel as one of your own keys, on your own data, with the code to take away."
+---
+
+**API & playground** is at the bottom of the side menu, in the **OMNI API** group. It is
+for Owners and Admins, on accounts whose plan includes the API.
+
+<Frame caption="API & playground">
+  <img src="/images/developers/playground.png" alt="The API & playground: the endpoint list, the endpoint's docs and Try it, and the code and answer" />
+</Frame>
+
+## Using it
+
+<Steps>
+  <Step title="Choose the key to run as">
+    **Run as** lists your keys that are still in use. A request runs exactly as that key
+    would from your server: its scopes, and whether it is a test key. With no keys yet,
+    the playground offers to make one.
+  </Step>
+  <Step title="Pick an endpoint">
+    The list on the left groups every endpoint, then each of your channels' own. The
+    middle shows what it does, its parameters, and the scope it needs — and warns when
+    the chosen key doesn't have it.
+  </Step>
+  <Step title="Try it">
+    The path and body come filled in from your own account — a real contact, template,
+    route or message — so the first run works. **Sample from your account** switches to
+    another record; **Reset** puts the sample back. Add an `Idempotency-Key` and run
+    twice to see a replay.
+  </Step>
+  <Step title="Run it">
+    With a live key, anything that reaches people asks first: *Send a real message to
+    +91…?* Removing something always asks.
+  </Step>
+  <Step title="Take the code">
+    cURL, Python, Node.js or PHP, built from the same request. The key is read from the
+    `OMNI_API_KEY` environment variable — never written into the code.
+  </Step>
+</Steps>
+
+## Debug
+
+Under the answer, **Debug** opens the exact request that was sent (the key shown by its
+start only), the answer's headers, how long it took, and — for a refusal — its code and
+what to do about it. **Find in the request log** opens that one request in
+**Developers → Requests**, where runs from the playground carry a *Playground* badge.

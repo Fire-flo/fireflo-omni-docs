@@ -1,0 +1,174 @@
+---
+title: "Webhooks"
+description: "One signed stream of events to your server: messages, every channel's deliveries and replies, and calls — how to receive them, check them, and what each carries."
+---
+
+A webhook endpoint is an `https://` address on your server that OMNI tells about what
+happened. Add endpoints in **Developers → Webhooks**, or with `POST /v1/webhooks`; each
+asks for the events it wants, or `*` for all of them, including events added later.
+
+<Frame caption="Developers → Webhooks">
+  <img src="/images/developers/webhooks.png" alt="The webhooks screen, listing endpoints with their events and whether each is working" />
+</Frame>
+
+## What arrives
+
+Each delivery is one `POST` with a JSON body:
+
+```json
+{
+  "id": "evt_6f1c0a3b9d2e4f7a8b6c5d4e3f2a1b0c",
+  "event": "message.succeeded",
+  "created": "2026-10-05T11:42:11.902Z",
+  "data": { "message": { "id": "msg_4f1c…", "status": "succeeded", … } }
+}
+```
+
+and these headers:
+
+| Header | |
+| :--- | :--- |
+| `X-FireFlo-Signature` | `t=<unix seconds>,v1=<hex>` — see below |
+| `X-FireFlo-Event` | The event, e.g. `message.succeeded` |
+| `X-FireFlo-Delivery` | This delivery's id — the same on every retry of it |
+| `User-Agent` | `FireFlo-OMNI-Webhooks/1` |
+
+Answer with any `2xx` within 10 seconds. Do slow work after answering. Redirects are not
+followed.
+
+## Checking the signature
+
+Every delivery is signed with the endpoint's secret (`whsec_…`, shown once when the
+endpoint is made, or when you make a new one). The signature is the HMAC-SHA256, in hex,
+of `"<t>.<body>"` — the timestamp, a full stop, and the raw body exactly as received.
+
+Check it before trusting the body, and refuse deliveries whose `t` is more than a few
+minutes old:
+
+<CodeGroup>
+```python Python
+import hashlib, hmac, os, time
+
+def verify(raw_body: bytes, header: str, secret=os.environ["OMNI_WEBHOOK_SECRET"]) -> bool:
+    parts = dict(part.split("=", 1) for part in header.split(","))
+    t, given = parts.get("t", ""), parts.get("v1", "")
+    if not t.isdigit() or abs(time.time() - int(t)) > 300:
+        return False
+    expected = hmac.new(secret.encode(), f"{t}.".encode() + raw_body, hashlib.sha256).hexdigest()
+    return hmac.compare_digest(expected, given)
+```
+
+```javascript Node
+import { createHmac, timingSafeEqual } from "node:crypto";
+
+export function verify(rawBody, header, secret = process.env.OMNI_WEBHOOK_SECRET) {
+  const parts = Object.fromEntries(header.split(",").map((part) => part.split("=")));
+  if (!/^\d+$/.test(parts.t ?? "") || Math.abs(Date.now() / 1000 - Number(parts.t)) > 300) return false;
+  const expected = createHmac("sha256", secret).update(`${parts.t}.`).update(rawBody).digest("hex");
+  return expected.length === (parts.v1 ?? "").length && timingSafeEqual(Buffer.from(expected), Buffer.from(parts.v1));
+}
+```
+
+```php PHP
+function verify(string $rawBody, string $header, string $secret): bool {
+    parse_str(str_replace(',', '&', $header), $parts);
+    $t = $parts['t'] ?? '';
+    if (!ctype_digit($t) || abs(time() - (int) $t) > 300) return false;
+    $expected = hash_hmac('sha256', $t . '.' . $rawBody, $secret);
+    return hash_equals($expected, $parts['v1'] ?? '');
+}
+```
+
+```ruby Ruby
+require "openssl"
+
+def verify(raw_body, header, secret = ENV["OMNI_WEBHOOK_SECRET"])
+  parts = header.split(",").map { |part| part.split("=", 2) }.to_h
+  t = parts["t"].to_s
+  return false unless t.match?(/\A\d+\z/) && (Time.now.to_i - t.to_i).abs <= 300
+  expected = OpenSSL::HMAC.hexdigest("SHA256", secret, "#{t}.#{raw_body}")
+  OpenSSL.secure_compare(expected, parts["v1"].to_s)
+end
+```
+</CodeGroup>
+
+<Warning>
+Use the raw body bytes. A body parsed and re-encoded by your framework will not match.
+</Warning>
+
+## Retries, and an endpoint switched off
+
+A delivery not answered `2xx` is tried again after **30 seconds, 5 minutes, 30 minutes,
+2 hours and 12 hours**, then given up. An endpoint that has failed for **three days**
+without a single success is switched off, and says so in the panel; switch it back on
+once it's fixed.
+
+Deliveries can arrive more than once and out of order. Use `X-FireFlo-Delivery` (or the
+event's `id`) to ignore a repeat, and the times in `data` rather than arrival order.
+
+Every endpoint's deliveries — each event, its answer and its tries — are in
+**Developers → Webhooks → the endpoint**, where any of them can be sent again, and in
+`GET /v1/webhooks/{endpoint_id}/deliveries`. **Send a test** sends a `webhook.test` event
+at once.
+
+## Events
+
+### A message, with failover
+
+`data.message` is the message as [`GET /v1/messages/{message_id}`](/api-reference/messages/get)
+shows it, with every attempt.
+
+| Event | When |
+| :--- | :--- |
+| `message.attempted` | A step handed the message to a channel |
+| `message.failed_over` | A step didn't get there; the next one is trying |
+| `message.succeeded` | A step reached its goal (`outcome` says which channel, and how far) |
+| `message.failed` | Every step was tried, or the person may not be reached |
+| `message.expired` | It ran out of time before it got there |
+| `message.canceled` | It was canceled |
+
+### A message on a channel
+
+Every message any channel carries — sent through the API, a broadcast, the Inbox or an
+AI agent. `data.channel_message`:
+
+```json
+{
+  "id": "cm_88123",
+  "channel": "sms",
+  "direction": "outbound",
+  "to": "+919876543210",
+  "from": "FIRFLO",
+  "status": "delivered",
+  "text": "Hi Ravi, your order A-1043 has shipped.",
+  "error": "",
+  "campaign": null,
+  "created": "2026-10-05T11:42:07.164Z",
+  "status_at": "2026-10-05T11:42:11.902Z"
+}
+```
+
+| Event | When |
+| :--- | :--- |
+| `channel_message.received` | Someone sent you a message, on any channel |
+| `channel_message.sent` | A message was handed to its channel |
+| `channel_message.delivered` | It reached the phone |
+| `channel_message.read` | It was read |
+| `channel_message.failed` | It couldn't be delivered |
+
+### A call
+
+`data.call` is the call as [`GET /v1/calls/{call_id}`](/api-reference/calls/get) shows
+it, with its `channel`.
+
+| Event | When |
+| :--- | :--- |
+| `call.started` | A call started, either way |
+| `call.answered` | It was answered |
+| `call.ended` | It ended after being answered |
+| `call.failed` | A call you placed wasn't answered |
+| `call.missed` | A call rang in and nobody took it |
+
+### Testing
+
+`webhook.test` — sent only when you ask, with `data.endpoint` naming the endpoint.

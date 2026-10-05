@@ -1,0 +1,47 @@
+---
+title: "Branding"
+description: "How a reseller puts its own name, logo, colour and web address on the panel its customers use."
+---
+
+Branding answers **"what do my customers see?"** A reseller's customers use OMNI under
+the reseller's brand: on the sign-in page, in the panel, and in the emails they get.
+
+<Frame caption="Branding: your brand, and your own web address in three steps.">
+  <img src="/images/using/branding.png" alt="The Branding screen with brand name, colour and logo, and the custom address steps" />
+</Frame>
+
+**Who can use it:** the **Owner** or **Reseller** role, on a reseller account. Other
+accounts don't have this screen: a customer's panel carries its provider's brand.
+
+## Your brand
+
+| Setting | What it does |
+| --- | --- |
+| **Brand name** | The name your customers see. Leave it empty to use your company name. |
+| **Brand colour** | Buttons, links and highlights. |
+| **Logo** | PNG, JPEG or WebP, up to 256 KB. |
+
+Choose **Save brand**. **What your customers see** previews the result.
+
+## Your own address
+
+Give your customers a panel at an address of your own, such as
+`panel.yourcompany.com`. Once it is live, **anyone who signs up there becomes your
+customer**.
+
+<Steps>
+  <Step title="Save your panel's address">
+    Enter the address and save it. Changing it later starts the setup again.
+  </Step>
+  <Step title="Add the records at your DNS provider">
+    The screen shows a **CNAME** record and a **TXT** record. Copy each one to your DNS
+    provider, then choose **Check DNS**. The status moves from *Waiting for your DNS* to
+    *Waiting for FireFlo* once both are found.
+  </Step>
+  <Step title="FireFlo switches it on">
+    FireFlo adds your address and gets its certificate, usually within a working day of
+    the records being found. The status then reads *Live*.
+  </Step>
+</Steps>
+
+See also [Resellers](/using/resellers).

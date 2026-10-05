@@ -1,0 +1,129 @@
+---
+title: "GET /v1/events"
+description: "Every event a webhook endpoint can subscribe to, with what each means."
+---
+
+Every event a webhook endpoint can ask for, in alphabetical order, with a sentence on what each means. Use these names in a webhook endpoint's `events`.
+
+<Note>Needs the `webhooks:read` scope.</Note>
+
+## Request
+
+<CodeGroup>
+
+```bash cURL
+curl https://api.fireflo.au/v1/events \
+  -H "Authorization: Bearer $OMNI_API_KEY"
+```
+
+```python Python
+import os
+
+import requests
+
+response = requests.get(
+    "https://api.fireflo.au/v1/events",
+    headers={"Authorization": f"Bearer {os.environ['OMNI_API_KEY']}"},
+)
+print(response.status_code, response.json())
+```
+
+```javascript Node
+const response = await fetch("https://api.fireflo.au/v1/events", {
+  headers: {
+    Authorization: `Bearer ${process.env.OMNI_API_KEY}`,
+  },
+});
+console.log(response.status, await response.json());
+```
+
+</CodeGroup>
+
+## Response
+
+`200 OK`
+
+```json
+{
+  "events": [
+    {
+      "event": "call.answered",
+      "description": "A call was answered"
+    },
+    {
+      "event": "call.ended",
+      "description": "A call ended after being answered"
+    },
+    {
+      "event": "call.failed",
+      "description": "A call you placed wasn't answered"
+    },
+    {
+      "event": "call.missed",
+      "description": "A call rang in and nobody took it"
+    },
+    {
+      "event": "call.started",
+      "description": "A call started, either way"
+    },
+    {
+      "event": "channel_message.delivered",
+      "description": "A channel message reached the phone"
+    },
+    {
+      "event": "channel_message.failed",
+      "description": "A channel message could not be delivered"
+    },
+    {
+      "event": "channel_message.read",
+      "description": "A channel message was read"
+    },
+    {
+      "event": "channel_message.received",
+      "description": "Someone sent a message, on any channel"
+    },
+    {
+      "event": "channel_message.sent",
+      "description": "A channel message was handed to the channel"
+    },
+    {
+      "event": "message.attempted",
+      "description": "A message was handed to a channel"
+    },
+    {
+      "event": "message.canceled",
+      "description": "A message was canceled before it got there"
+    },
+    {
+      "event": "message.expired",
+      "description": "A message ran out of time before it got there"
+    },
+    {
+      "event": "message.failed",
+      "description": "Every channel was tried, or the person may not be reached"
+    },
+    {
+      "event": "message.failed_over",
+      "description": "A channel didn't get it there; the next one is trying"
+    },
+    {
+      "event": "message.succeeded",
+      "description": "A message reached the person as its route asked"
+    },
+    {
+      "event": "webhook.test",
+      "description": "A test, sent from the endpoint's screen or the API"
+    }
+  ]
+}
+```
+
+## Errors
+
+Every refusal is `{"error": {"code", "message", "field"}}`; `field` is there when one input is at fault.
+
+| Status | Error code | When |
+| :--- | :--- | :--- |
+| 403 | `scope_missing` | The key doesn't have the `webhooks:read` scope. |
+
+Any request can also be refused for its key, its account or its rate (`key_required`, `invalid_key`, `account_suspended`, `plan_excludes_api`, `address_not_allowed`, `rate_limited`); see [the overview](/api-reference/overview).

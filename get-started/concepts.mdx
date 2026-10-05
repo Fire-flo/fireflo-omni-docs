@@ -1,0 +1,143 @@
+---
+title: "Concepts"
+description: "The ideas OMNI is built on: accounts, resellers, plans and features, roles, modules, connections and consent."
+---
+
+A few ideas explain almost everything in OMNI. Read this page once and the rest of
+the panel will make sense.
+
+## Accounts
+
+An **account** is one business. Everything belongs to an account: its contacts,
+conversations, broadcasts, balance, team and settings. Nothing is shared between
+accounts.
+
+People sign in as **members** of an account. Each member holds one or more
+**roles**, and the roles decide what they may see and do. See
+[Plans and roles](/get-started/plans-and-roles).
+
+Each account has its own business name, timezone and date format. The timezone is
+used for scheduled broadcasts and for dates written into messages.
+
+## Resellers and their customers
+
+Some accounts are **resellers**. A reseller sets up accounts for businesses of its
+own, its **customers**. It puts each one on a plan, funds them with credit from its
+own balance, and can add a markup on top of its prices.
+
+- A reseller's customer is an ordinary account. It runs its own team and sees the
+  panel under the reseller's brand: name, logo, colour and, once set up, its own
+  web address.
+- A customer can never do more than its reseller can. Its roles are limited to what
+  the reseller's account may do.
+- A reseller's customer can't have customers of its own.
+- FireFlo turns an account into a reseller. It isn't something an account can
+  switch on for itself.
+
+See [Resellers](/using/resellers) and [Branding](/using/branding).
+
+## Plans and features
+
+A **plan** is what an account has bought. It is made of **features**. Some features
+are switched on or off (custom roles, API access, reseller accounts, each channel).
+Others are limits (how many team members may sign in).
+
+FireFlo decides what each plan includes and what it costs. FireFlo can also change
+one feature for one account without changing its plan. The panel always shows the
+result: what *your* account has today.
+
+A plan has a monthly price and, often, a trial. Payment is offline (bank transfer or
+cheque). Your paid time starts once FireFlo records the payment. If a payment falls
+due, sending, campaigns and agents pause until it is recorded.
+
+See [Plan and modules](/using/plan-and-modules).
+
+## Roles and permissions
+
+A **role** is a set of permissions, such as "send messages", "manage contacts" or
+"see the balance". OMNI starts every account with six shared roles: **Owner**,
+**Admin**, **Billing**, **Support**, **Viewer** and **Reseller**. On a plan that
+includes them, an account can also make **custom roles** of its own.
+
+Permissions decide what you can do. The plan decides what the account has. A screen
+appears only when both allow it. That is why two people in the same account can see
+different menus.
+
+## Modules
+
+OMNI is built from modules, in three kinds.
+
+<CardGroup cols={3}>
+  <Card title="Channels" icon="tower-broadcast" href="/channels/overview">
+    SMS, WhatsApp, RCS and Voice. How messages and calls leave and arrive.
+  </Card>
+  <Card title="Batteries" icon="battery-full" href="/batteries/overview">
+    AI Agents, Calendar, Catalogue, Customer data, Pipelines and Tickets. More the
+    panel can do.
+  </Card>
+  <Card title="OMNI API" icon="code" href="/developers/overview">
+    A plugin that opens the account to your own systems.
+  </Card>
+</CardGroup>
+
+A module is part of your account when your plan includes it. A **channel** also has
+to be **connected** before it sends. The Inbox, Contacts, Broadcasts and the Delivery
+report work the same however many channels are on, and they grow as you add more.
+
+## Connections: FireFlo's or your own
+
+Each channel needs a connection to the networks that carry its messages. For most
+channels there are two choices:
+
+<Tabs>
+  <Tab title="FireFlo's connection">
+    FireFlo provides the connection. Nothing to set up: for SMS it is included, and
+    for WhatsApp FireFlo hosts a number for you, with no Meta setup. Messages are
+    priced from your account's price list and shown under
+    [Billing](/using/billing).
+  </Tab>
+  <Tab title="Your own connection">
+    You bring your own: your own SMS gateway's address and login, or your own
+    WhatsApp Business Account in your own Meta Business account. Credentials are
+    encrypted when saved and never shown again. You can switch back to FireFlo's
+    connection later without losing your saved details.
+  </Tab>
+</Tabs>
+
+Which choices you have depends on what FireFlo offers on your platform and, for a
+reseller's customer, on whether the reseller allows its own connection. Each
+channel's page explains its options: see [Channels](/channels/overview).
+
+## People and consent
+
+A **contact** is one person, identified by their phone number. They are the same
+contact on every channel, with one thread in the Inbox.
+
+OMNI checks every message against what the person has said before it sends:
+
+| Rule | What it stops |
+| --- | --- |
+| **Opt-out** | A person who replies **STOP** (or UNSUBSCRIBE, OPTOUT, CANCEL, END, QUIT) on any channel stops messages they didn't ask for. **START** (or UNSTOP, SUBSCRIBE, OPTIN) undoes it. One-time codes still go. |
+| **Do not contact** | A hard no, set by your team on the contact's page. Nothing reaches the person: not a campaign, not a reply, not a one-time code. It can last forever or lift on a date. |
+| **Quiet hours** | A person's own quiet hours, in their own timezone, hold marketing messages. Messages they asked for still go. |
+
+An opt-out is kept even if the contact is deleted and later added again, and an
+import never removes one.
+
+Each broadcast says whether it is **marketing** or **an update the person
+expects**. Marketing skips people who stopped offers; an update skips only people
+who stopped everything.
+
+The [Customer data](/batteries/customer-data) battery adds finer control on top:
+stops per channel and per purpose, opt-in for marketing, and a preference page.
+
+## What to read next
+
+<CardGroup cols={2}>
+  <Card title="Plans and roles" icon="users" href="/get-started/plans-and-roles">
+    What each role may do, and how plans are put together.
+  </Card>
+  <Card title="Quickstart" icon="rocket" href="/get-started/quickstart">
+    Your first hour: connect a channel, add contacts, send, reply.
+  </Card>
+</CardGroup>

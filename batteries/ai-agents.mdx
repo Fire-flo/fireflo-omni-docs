@@ -1,0 +1,293 @@
+---
+title: "AI Agents"
+description: "How AI agents work in OMNI: roles, plans and approvals, workflows, stories, activity, usage and AI providers, and how agents share conversations with your team."
+---
+
+The **AI Agents** battery adds agents that work your customers for you. Each agent does
+one job — sales or support — on your own AI key. Every action an agent takes is planned,
+logged, and waits for a person's approval wherever you say so.
+
+AI Agents also includes [Knowledge](/batteries/knowledge): the FAQs, files and web pages
+your agents answer from.
+
+<Note>
+Your plan must include **AI agents**. The plan also sets how many agents can be live at
+once. If agents are in your plan but switched off for your account, the screens say so,
+and your agents and their history are kept.
+</Note>
+
+## Overview
+
+**AI agents → Overview** answers "what are my agents doing right now?"
+
+- Your channels, and which ones agents can use.
+- **Live agents**, **Contacts worked**, **Actions today** and **Tokens today**.
+- **Waiting on you** — plans to approve and conversations handed over to a person.
+- **Recent activity**, and **Your agents** with the channels and pipelines each one works.
+
+A line at the top shows whether the agent worker is running. If it has not reported in
+for a while, agents do not plan or act until it is running again.
+
+<Frame caption="The AI agents overview">
+  <img src="/images/batteries/agents-overview.png" alt="AI agents overview with live agents, tokens today and plans waiting for approval" />
+</Frame>
+
+## Roles
+
+Every agent has one role. The role decides which actions it may take and what it does by
+default.
+
+| Role | What it does |
+|---|---|
+| **Sales** (SalesBot) | Works deals on a pipeline: qualifies, quotes, follows up, moves stages, and marks deals won or lost with your approval. |
+| **Support** (SupportBot) | Answers customers, resolves what it can, sends reminders and updates, and hands anything sensitive to your team. A support agent can pick up new conversations on its own. |
+| **Appointments** (AppointmentBot) | Offers real free times, books, reschedules and cancels appointments, and chases confirmations and no-shows. Available when your plan also includes [Calendar](/batteries/calendar). |
+
+A contact can have one sales agent and one support agent at the same time, but never two
+agents in the same role. The role of a live agent cannot change — design a new agent
+instead.
+
+## Design an agent
+
+**AI agents → Agents** lists your agents. Choose **New agent** to design one in five steps.
+
+<Steps>
+  <Step title="Goal">
+    Say in your own words what the agent should achieve — for example, "Answer order and
+    refund questions within minutes and hand complaints to the team." The agent reads this
+    every time it plans. Pick the role (OMNI suggests one from your goal) and give the agent
+    a name. Customers may see the name, so pick a name rather than a job title.
+  </Step>
+  <Step title="Model & key">
+    Choose one of your AI keys and a model. You can add a key here too. Tick the box to
+    confirm that, to plan, agents send contact names, numbers, recent messages and memory
+    to your chosen AI provider under your own key and its terms. This is asked once per
+    account.
+  </Step>
+  <Step title="Verify">
+    OMNI sends one small test request to your provider and model, checking it can plan in
+    the format agents use. Nothing about your customers is sent. Changing the key or the
+    model later sends the agent back through this step.
+  </Step>
+  <Step title="Configure">
+    Set the instructions, channels, how the agent shares conversations with your team,
+    knowledge, hand-overs, actions and approvals, when to plan again, working hours and
+    limits. **Draft my configuration** lets your model suggest settings from your goal; you
+    pick what to keep. For a support
+    agent, **Use this workflow** starts a ready-made knowledge-first workflow.
+  </Step>
+  <Step title="Engage">
+    Choose the pipelines the agent works. Each pipeline brings its own strategy — goal,
+    stage playbooks, approval rules and token budget. Then choose **Go live**. You can
+    disengage a pipeline at any time; pending work on it stops.
+  </Step>
+</Steps>
+
+<Frame caption="Your agents">
+  <img src="/images/batteries/agents.png" alt="The list of AI agents with their role, status and channels" />
+</Frame>
+
+### What you configure
+
+| Setting | What it does |
+|---|---|
+| **Instructions** | Who the agent is, what it may promise and what it must never say. Pipelines add their own playbook on top. |
+| **Channels** | Where the agent may message customers: WhatsApp and SMS, when your account has them. |
+| **Pick up new conversations** | Support agents only. When a contact nobody is working messages you, this agent takes it. |
+| **Step back when a person replies** | If someone on your team replies or takes the thread, the agent pauses for that contact. On by default. |
+| **Knowledge** | Which knowledge collections the agent answers from (all of them if you pick none), and how sure an answer must be before it is sent. |
+| **Hand-overs go to** | The people a hand-over is assigned to — whoever of them has the fewest open tickets. Pick nobody and hand-overs stay unassigned for anyone to take. |
+| **Actions and approvals** | For each action: on its own, needs approval, or off. |
+| **Approval mode** | **Approve the whole plan** — if any step needs approval, nothing runs until the plan is approved. **Approve step by step** — automatic steps run on schedule, and a step that needs approval waits when it is due. |
+| **When to plan again** | When the customer replies, when the deal changes stage, when a plan finishes, on a schedule, or only when someone clicks **Run**. |
+| **Working hours** | Messages are sent only inside these hours; a step due outside them waits for the next window. |
+| **Limits** | Daily token limit, most steps in one plan, most messages to one contact per day, and largest broadcast audience. When a limit is reached the agent pauses and says so in Activity. |
+
+### Actions
+
+These are the actions an agent can be allowed. Hand-over can never be switched off: an
+agent must always be able to give up.
+
+| Action | Sales default | Support default |
+|---|---|---|
+| Send a message | Needs approval | On its own |
+| Send a WhatsApp template | Needs approval | Needs approval |
+| Send a broadcast | Needs approval | Needs approval |
+| Ask for a new template | Needs approval | Needs approval |
+| Create a deal | On its own | — |
+| Move a deal between stages | On its own | On its own |
+| Mark a deal won / lost | Needs approval | — |
+| Change a deal's value | Needs approval | — |
+| Add a note | On its own | On its own |
+| Update tags and fields | On its own | On its own |
+| Schedule a follow-up | On its own | On its own |
+| Close the conversation | — | On its own |
+| Hand over to a person | Always on | Always on |
+
+Other batteries add actions of their own when your plan includes them: booking,
+rescheduling and cancelling appointments ([Calendar](/batteries/calendar)); finding,
+sending, adding and changing products and drafting orders ([Catalogue](/batteries/catalogue));
+updating and solving tickets ([Tickets](/batteries/tickets)).
+
+A pipeline's strategy can override an agent's settings for deals in that pipeline, and a
+stage can narrow them further: an action a stage does not list is off there.
+
+## How agents reply on each channel
+
+| Channel | How an agent writes |
+|---|---|
+| **WhatsApp** | Free text inside WhatsApp's 24-hour window. Outside it, an approved template. When no approved template fits, the agent drafts one and asks for it to be submitted — after approval, if your policy says so. |
+| **SMS** | Only text that fills in one of your registered DLT templates word for word; only the variable parts change. Anything else is blocked, not sent. When no template fits, the agent drafts one and asks for it to be registered. |
+| **RCS** | Agents do not reply on RCS, because RCS carries approved templates, not typed text. |
+
+Template requests an agent drafts appear under **Template requests** on the Approvals
+screen. Check the wording, then approve to submit it. OMNI checks every 10 minutes
+whether it has been decided; waiting conversations carry on once it is
+approved.
+
+## Sharing conversations with your team
+
+An agent steps back as soon as a person steps in.
+
+- **A teammate replies** in the Inbox, or **the conversation is assigned** to a person:
+  every agent working that contact pauses for them (when **Step back when a person
+  replies** is on). Anything the agent had planned is cancelled.
+- **How long it steps back** is set in the agent's settings: a number of minutes, after
+  which it takes over again, or 0 to wait until someone hands the conversation back. You
+  can also choose that it leaves the conversation with the team.
+- In the Inbox, a banner shows which agent is working the thread. **Take over** assigns
+  the conversation to you and pauses the agent. While it is paused, **Hand back now**
+  returns it to the agent, and **Keep with team** means the agent won't take it back.
+- When an agent **hands over** to a person, it pauses for that contact and leaves your
+  team a short summary — what the customer wants, what it tried and what is needed. With
+  [Tickets](/batteries/tickets), the summary is a note on the ticket.
+
+Under each AI reply in the Inbox you can mark it **Good answer** or **Wrong answer**; wrong
+answers show in [Missing answers](/batteries/knowledge#missing-answers).
+
+On a contact's page and in the Inbox, the **AI agents** card shows who is working the
+contact and their current plan, and **Memory** shows what agents know about the person.
+Anything your team writes, edits or pins in Memory is never changed by an agent.
+
+## Plans and approvals
+
+Each time an agent works a contact, it makes a **plan**: a goal, the reason for it, and a
+list of steps. A plan starts when a contact is assigned to the agent, the customer
+replies, a deal changes stage, a follow-up falls due, a person chooses **Run now** on the
+contact, or a workflow block asks for it.
+
+**AI agents → Approvals** lists the plans waiting for a person. You can edit a note or an
+amount, or drop a step, before approving — what you approve is exactly what runs. To
+reject, tell the agent why; it reads your note the next time it plans for that contact.
+
+An unanswered plan is dropped after a time you set (24 hours by default), not run late.
+
+<Frame caption="Plans waiting for approval">
+  <img src="/images/batteries/agent-approvals.png" alt="The approvals queue with a plan's steps and Approve and Reject buttons" />
+</Frame>
+
+## Workflows
+
+Each agent has a **workflow**: a diagram of blocks that decides what happens in a
+conversation, and when the AI is called at all. Open it from the agent's page.
+
+| Kind | Blocks |
+|---|---|
+| Start | Customer writes · Deal changes stage · Assigned to the agent · Every N hours |
+| Rules | Business hours · Keyword · Condition · Wait for reply · A/B split |
+| Talk | Send message · Send approved template · Send buttons (WhatsApp buttons, RCS suggestions, or numbered options on SMS) |
+| Inbox | Assign to person · Assign to one of · Label conversation · Set priority · Snooze · Close conversation |
+| Deals | Create deal · Move deal stage · Update contact · Add note |
+| AI | AI decides · AI replies (answers from knowledge, only when sure, citing a source) · AI takes it from here |
+| Hand-over | Hand to a person |
+
+Other batteries add blocks when your plan includes them: appointment blocks (Calendar),
+**Send products** (Catalogue), **Ticket is**, **Set ticket** and **Add ticket note**
+(Tickets), and a start block for someone joining or leaving an audience (Customer data).
+
+Workflows are versioned:
+
+- You edit a **draft**. Checks show anything broken, and how many AI calls each path makes.
+- **Test run** a sample message on a channel to see the path it takes. Nothing is sent.
+- **Publish** with a short note. Published versions never change; you can compare one with
+  the draft, restore it as the draft, or roll back to it.
+- **Design with AI** proposes a workflow from a brief. **Export JSON** and **Import JSON**
+  move a workflow between agents or accounts; an import replaces only the draft.
+
+## Stories
+
+**AI agents → Stories** lets you tell an agent what you want in plain words — "remind my
+customers about their bill due dates, 3 days before and on the day". Today, stories send
+date-based reminders from a list.
+
+<Steps>
+  <Step title="Say what you want">
+    Write it the way you would to a colleague. The agent asks for anything it needs.
+  </Step>
+  <Step title="Give it the list">
+    Upload a CSV or Excel file and point to the phone number column and the date column.
+  </Step>
+  <Step title="Choose when and what">
+    The agent proposes when to send and which approved message to use.
+  </Step>
+  <Step title="Approve and run">
+    Someone who can approve plans approves it. Rejecting ends the story; nothing is
+    imported or sent.
+  </Step>
+</Steps>
+
+Reminder stories go out on WhatsApp first, since templates reach people outside the
+24-hour window, and as SMS broadcasts where WhatsApp isn't available. Starting a story
+needs permission to change contacts and to send messages, because a story imports contacts
+and sends messages in your name.
+
+## Questions about a broadcast
+
+On a broadcast's page, **Ask about this campaign** answers questions about its results in
+plain words, on SMS, WhatsApp and RCS broadcasts alike.
+
+## Activity
+
+**AI agents → Activity** is everything every agent did — plans, approvals, actions, AI
+calls with their token cost, and anything a guardrail stopped. It is append-only. Filter
+it by **Plans & approvals**, **Actions**, **AI calls**, **Stopped** or **Setup**.
+
+Each agent's page has its own plans, log, pipelines, tokens used today and limits.
+
+## Usage
+
+**AI agents → Usage** shows the tokens your agents used on your own AI keys over 7, 14 or
+30 days. Your AI provider bills those tokens directly; OMNI never charges for AI.
+
+**Account limits** apply to every agent in the account, on top of each agent's and each
+pipeline's own limits:
+
+- **Pause every agent** — no agent plans or acts while this is on.
+- **Daily token budget, all agents** — empty means no account-wide limit.
+- **Approvals lapse after (hours)** — an unanswered plan is dropped, not run late.
+
+## AI providers
+
+**AI agents → AI providers** holds your own AI keys. Agents work with any of these:
+
+| Provider | What you need |
+|---|---|
+| **OpenAI** | Your OpenAI API key. |
+| **Google Gemini** | Your Google AI key. |
+| **Your own model** | Any OpenAI-compatible endpoint — self-hosted or rented — with its base URL (HTTPS, ending in `/v1`). |
+
+A key is encrypted when you save it and is never shown again. **Test** a key to list the
+models it offers (**Save and test** does both when you add one); you can limit which models agents may use with it. Replacing a key that
+agents use means those agents must be verified again before they go live. A key that
+agents still use cannot be deleted — move its agents to another key first.
+
+## Who may use AI agents
+
+| Permission | Lets someone | Roles that have it by default |
+|---|---|---|
+| See agents, their plans and their log | Open every AI agents screen | Owner, Admin, Support, Viewer |
+| Approve or reject agent plans | Approve plans and template requests | Owner, Admin, Support |
+| Design agents and manage AI keys | Create and change agents, workflows, AI keys and account limits | Owner, Admin |
+
+An Owner or Admin can change these on the **Roles** screen. See
+[Team and roles](/using/team-and-roles).

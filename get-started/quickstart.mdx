@@ -1,0 +1,91 @@
+---
+title: "Quickstart"
+description: "A business's first hour with OMNI: connect a channel, add contacts, send a broadcast, answer replies and read the delivery report."
+---
+
+This walk-through takes a new account from nothing to a sent broadcast and an answered
+reply. You need the **Owner** or **Admin** role for the first step; a **Support** member
+can do the rest.
+
+<Steps>
+  <Step title="Connect a channel">
+    Open **Channels** from the icons at the top of the panel. Each channel shows where
+    it stands: *Not in plan*, *Not configured*, *Configured · untested* or
+    *Connected*.
+
+    Pick a channel your plan includes, open its settings and choose how it connects:
+    FireFlo's connection (nothing to set up) or your own, with its credentials. A
+    connection of your own reads *Configured · untested* until it has been tested.
+
+    <Frame caption="Channels: each channel your plan includes, and whether it is connected.">
+      <img src="/images/using/channels.png" alt="The Channels screen with a card for each channel and its connection state" />
+    </Frame>
+
+    Some channels need more before they can send to customers: approved WhatsApp
+    templates, or registered SMS sender IDs and templates in India. Each channel's
+    page explains what it needs: see [Channels](/channels/overview).
+  </Step>
+
+  <Step title="Add your contacts">
+    Open **Contacts**. To add one person, choose **Add contact** and enter their name
+    and phone number. To bring in a list, choose **Import**:
+
+    1. Drop a CSV or Excel file (up to 25 MB).
+    2. **Map columns**: say which column is the phone number, which is the name, and
+       where each other column goes. You can make a new field from a column, or skip it.
+    3. **Options**: choose what happens when a number is already in your contacts
+       (*Add and update* is recommended), and optionally put everyone in a segment and
+       add tags.
+    4. Start the import. It runs in the background; you can leave the page.
+
+    See [Contacts](/using/contacts).
+  </Step>
+
+  <Step title="Send a broadcast">
+    Open **Broadcasts** and choose **New campaign**. The wizard has five steps:
+
+    1. **Channel**: the channel to send on.
+    2. **Audience**: upload a file, or pick contact segments.
+    3. **Message**: what to send, in the form that channel needs (a template, a sender
+       ID).
+    4. **Schedule**: now, at a time, or by a date column in an uploaded sheet.
+    5. **Preview**: how many will be sent, how many are skipped and why. Say whether
+       this is marketing or an update the person expects.
+
+    Start it, and follow its progress on the campaign's report. See
+    [Broadcasts](/using/broadcasts).
+  </Step>
+
+  <Step title="Answer in the Inbox">
+    Replies arrive in the **Inbox**, one thread per person whatever the channel. Pick a
+    conversation, assign it to yourself, and write your reply. It goes out on the
+    channel the person last wrote on, unless you pick another under **Reply via**.
+
+    See [Inbox](/using/inbox).
+  </Step>
+
+  <Step title="Read the delivery report">
+    Open **Delivery report** to see every message on every channel: who it went to,
+    its status (pending, sent, delivered, read or failed) and, when a message failed,
+    what the carrier said. Filter by status, channel or date, and export a CSV.
+
+    See [Delivery report](/using/delivery-report).
+  </Step>
+</Steps>
+
+## What next
+
+<CardGroup cols={2}>
+  <Card title="Bring your team" icon="users" href="/using/team-and-roles">
+    Add members and give each the role their work needs.
+  </Card>
+  <Card title="Add batteries" icon="battery-full" href="/batteries/overview">
+    AI Agents, Calendar, Catalogue, Customer data, Pipelines and Tickets.
+  </Card>
+  <Card title="Connect your systems" icon="code" href="/get-started/developer-quickstart">
+    Send messages and receive events from your own servers.
+  </Card>
+  <Card title="Check your balance" icon="wallet" href="/using/billing">
+    Your prepaid balance and what each message costs.
+  </Card>
+</CardGroup>

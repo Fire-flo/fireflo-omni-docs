@@ -1,0 +1,90 @@
+---
+title: "GET /v1/webhooks/{endpoint_id}/deliveries"
+description: "The latest deliveries to an endpoint: each event, its answer and its tries."
+---
+
+The latest 100 deliveries to an endpoint, newest first: each event, how many times it was tried, and what your server answered. A delivery that isn't answered 2xx is tried again after 30 seconds, 5 minutes, 30 minutes, 2 hours and 12 hours, then given up.
+
+<Note>Needs the `webhooks:read` scope.</Note>
+
+## Path parameters
+
+| Field | Type | Required | Notes |
+| :--- | :--- | :--- | :--- |
+| `endpoint_id` | string | Yes | The endpoint's id. |
+
+## Request
+
+<CodeGroup>
+
+```bash cURL
+curl https://api.fireflo.au/v1/webhooks/c4e8f2a6-1b3d-4c5e-9f7a-8b6d4e2c0a19/deliveries \
+  -H "Authorization: Bearer $OMNI_API_KEY"
+```
+
+```python Python
+import os
+
+import requests
+
+response = requests.get(
+    "https://api.fireflo.au/v1/webhooks/c4e8f2a6-1b3d-4c5e-9f7a-8b6d4e2c0a19/deliveries",
+    headers={"Authorization": f"Bearer {os.environ['OMNI_API_KEY']}"},
+)
+print(response.status_code, response.json())
+```
+
+```javascript Node
+const response = await fetch("https://api.fireflo.au/v1/webhooks/c4e8f2a6-1b3d-4c5e-9f7a-8b6d4e2c0a19/deliveries", {
+  headers: {
+    Authorization: `Bearer ${process.env.OMNI_API_KEY}`,
+  },
+});
+console.log(response.status, await response.json());
+```
+
+</CodeGroup>
+
+## Response
+
+`200 OK` — each delivery: `status` is `pending`, `delivered` or `failed`.
+
+```json
+{
+  "data": [
+    {
+      "id": "a7c9e1b3-5d4f-4a2c-9e8b-3f1d7c5a9e60",
+      "event": "message.succeeded",
+      "status": "pending",
+      "attempts": 2,
+      "response_status": 503,
+      "error": "Answered 503",
+      "next_at": "2026-10-05T09:30:12.004Z",
+      "delivered_at": null,
+      "created": "2026-10-05T09:24:36.802Z"
+    },
+    {
+      "id": "e9a1c3b5-7d2f-4e6a-8b0c-1f3d5e7a9c24",
+      "event": "webhook.test",
+      "status": "delivered",
+      "attempts": 1,
+      "response_status": 200,
+      "error": "",
+      "next_at": null,
+      "delivered_at": "2026-10-05T09:14:23.108Z",
+      "created": "2026-10-05T09:14:22.413Z"
+    }
+  ]
+}
+```
+
+## Errors
+
+Every refusal is `{"error": {"code", "message", "field"}}`; `field` is there when one input is at fault.
+
+| Status | Error code | When |
+| :--- | :--- | :--- |
+| 404 | `not_found` | No webhook endpoint has that id on this account. |
+| 403 | `scope_missing` | The key doesn't have the `webhooks:read` scope. |
+
+Any request can also be refused for its key, its account or its rate (`key_required`, `invalid_key`, `account_suspended`, `plan_excludes_api`, `address_not_allowed`, `rate_limited`); see [the overview](/api-reference/overview).

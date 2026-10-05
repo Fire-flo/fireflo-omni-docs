@@ -1,0 +1,62 @@
+---
+title: "DELETE /v1/templates/{template_id}"
+description: "Remove a message template."
+---
+
+Removes a template. Messages already sent with it are not affected.
+
+<Note>Needs the `templates:write` scope.</Note>
+
+## Path parameters
+
+| Field | Type | Required | Notes |
+| :--- | :--- | :--- | :--- |
+| `template_id` | string | Yes | The template's id. |
+
+## Request
+
+<CodeGroup>
+
+```bash cURL
+curl -X DELETE https://api.fireflo.au/v1/templates/7a2c9e14-5b3d-4f6a-8c1e-2d9b0f7e6a53 \
+  -H "Authorization: Bearer $OMNI_API_KEY"
+```
+
+```python Python
+import os
+
+import requests
+
+response = requests.delete(
+    "https://api.fireflo.au/v1/templates/7a2c9e14-5b3d-4f6a-8c1e-2d9b0f7e6a53",
+    headers={"Authorization": f"Bearer {os.environ['OMNI_API_KEY']}"},
+)
+print(response.status_code)
+```
+
+```javascript Node
+const response = await fetch("https://api.fireflo.au/v1/templates/7a2c9e14-5b3d-4f6a-8c1e-2d9b0f7e6a53", {
+  method: "DELETE",
+  headers: {
+    Authorization: `Bearer ${process.env.OMNI_API_KEY}`,
+  },
+});
+console.log(response.status);
+```
+
+</CodeGroup>
+
+## Response
+
+`204 No Content` — no body.
+
+## Errors
+
+Every refusal is `{"error": {"code", "message", "field"}}`; `field` is there when one input is at fault.
+
+| Status | Error code | When |
+| :--- | :--- | :--- |
+| 404 | `not_found` | No template has that id on this account. |
+| 403 | `scope_missing` | The key doesn't have the `templates:write` scope. |
+
+Any request can also be refused for its key, its account or its rate (`key_required`, `invalid_key`, `account_suspended`, `plan_excludes_api`, `address_not_allowed`, `rate_limited`); see [the overview](/api-reference/overview).

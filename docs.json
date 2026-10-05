@@ -1,0 +1,315 @@
+{
+  "$schema": "https://mintlify.com/docs.json",
+  "theme": "mint",
+  "name": "FireFlo OMNI",
+  "description": "One inbox, one set of contacts and one API for SMS, WhatsApp, RCS and voice — with batteries for AI agents, calendars, catalogues, customer data, pipelines and tickets.",
+  "colors": {
+    "primary": "#E2571E",
+    "light": "#FF8A4C",
+    "dark": "#B23A0F"
+  },
+  "favicon": "/favicon.svg",
+  "logo": {
+    "light": "/logo/mark.svg",
+    "dark": "/logo/mark.svg"
+  },
+  "seo": {
+    "metatags": {
+      "og:site_name": "FireFlo OMNI",
+      "og:title": "FireFlo OMNI",
+      "og:description": "One inbox, one set of contacts and one API for SMS, WhatsApp, RCS and voice.",
+      "og:type": "website",
+      "twitter:card": "summary",
+      "twitter:title": "FireFlo OMNI",
+      "twitter:description": "One inbox, one set of contacts and one API for SMS, WhatsApp, RCS and voice."
+    }
+  },
+  "navbar": {
+    "links": [
+      { "label": "fireflo.au", "href": "https://fireflo.au" }
+    ],
+    "primary": {
+      "type": "button",
+      "label": "Support",
+      "href": "mailto:support@fireflo.au"
+    }
+  },
+  "footer": {
+    "links": [
+      {
+        "header": "FireFlo",
+        "items": [
+          { "label": "fireflo.au", "href": "https://fireflo.au" },
+          { "label": "Support", "href": "mailto:support@fireflo.au" }
+        ]
+      },
+      {
+        "header": "Documentation",
+        "items": [
+          { "label": "Get started", "href": "/index" },
+          { "label": "Developers", "href": "/developers/overview" },
+          { "label": "API reference", "href": "/api-reference/overview" }
+        ]
+      }
+    ]
+  },
+  "navigation": {
+    "languages": [
+      {
+        "language": "en",
+        "default": true,
+        "tabs": [
+          {
+            "tab": "Get started",
+            "groups": [
+              {
+                "group": "Get started",
+                "pages": [
+                  "index",
+                  "get-started/concepts",
+                  "get-started/plans-and-roles",
+                  "get-started/quickstart",
+                  "get-started/developer-quickstart"
+                ]
+              }
+            ]
+          },
+          {
+            "tab": "Using OMNI",
+            "groups": [
+              {
+                "group": "Every day",
+                "pages": [
+                  "using/finding-your-way",
+                  "using/dashboard",
+                  "using/inbox",
+                  "using/contacts",
+                  "using/contact-page",
+                  "using/broadcasts",
+                  "using/delivery-report",
+                  "using/downloads"
+                ]
+              },
+              {
+                "group": "Your account",
+                "pages": [
+                  "using/billing",
+                  "using/team-and-roles",
+                  "using/plan-and-modules",
+                  "using/branding",
+                  "using/resellers"
+                ]
+              }
+            ]
+          },
+          {
+            "tab": "Channels",
+            "groups": [
+              {
+                "group": "Channels",
+                "pages": ["channels/overview"]
+              },
+              {
+                "group": "SMS",
+                "pages": ["channels/sms", "channels/sms-sender-ids-and-dlt"]
+              },
+              {
+                "group": "WhatsApp",
+                "pages": ["channels/whatsapp", "channels/whatsapp-templates"]
+              },
+              {
+                "group": "RCS",
+                "pages": ["channels/rcs", "channels/rcs-templates"]
+              },
+              {
+                "group": "Voice",
+                "pages": ["channels/voice", "channels/voice-numbers-and-ivrs", "channels/voice-calls"]
+              }
+            ]
+          },
+          {
+            "tab": "Batteries",
+            "groups": [
+              {
+                "group": "Batteries",
+                "pages": [
+                  "batteries/overview",
+                  "batteries/ai-agents",
+                  "batteries/knowledge",
+                  "batteries/calendar",
+                  "batteries/catalogue",
+                  "batteries/customer-data",
+                  "batteries/pipelines",
+                  "batteries/tickets"
+                ]
+              }
+            ]
+          },
+          {
+            "tab": "Developers",
+            "groups": [
+              {
+                "group": "Start here",
+                "pages": [
+                  "developers/overview",
+                  "developers/keys-and-scopes",
+                  "developers/errors",
+                  "developers/conventions",
+                  "developers/playground"
+                ]
+              },
+              {
+                "group": "Guides",
+                "pages": [
+                  "developers/messages-with-failover",
+                  "developers/webhooks",
+                  "developers/contacts-and-consent",
+                  "developers/conversations",
+                  "developers/calls",
+                  "developers/channel-extensions"
+                ]
+              }
+            ]
+          },
+          {
+            "tab": "API reference",
+            "groups": [
+              {
+                "group": "Overview",
+                "pages": ["api-reference/overview", "api-reference/scopes-and-events"]
+              },
+              {
+                "group": "Account",
+                "pages": ["api-reference/account/get-me", "api-reference/account/list-event-types"]
+              },
+              {
+                "group": "Messages",
+                "pages": [
+                  "api-reference/messages/send",
+                  "api-reference/messages/list",
+                  "api-reference/messages/get",
+                  "api-reference/messages/cancel"
+                ]
+              },
+              {
+                "group": "Routes",
+                "pages": [
+                  "api-reference/routes/list",
+                  "api-reference/routes/create",
+                  "api-reference/routes/get",
+                  "api-reference/routes/update",
+                  "api-reference/routes/delete"
+                ]
+              },
+              {
+                "group": "Templates",
+                "pages": [
+                  "api-reference/templates/list",
+                  "api-reference/templates/create",
+                  "api-reference/templates/get",
+                  "api-reference/templates/update",
+                  "api-reference/templates/delete"
+                ]
+              },
+              {
+                "group": "Contacts",
+                "pages": [
+                  "api-reference/contacts/list",
+                  "api-reference/contacts/create",
+                  "api-reference/contacts/get",
+                  "api-reference/contacts/update",
+                  "api-reference/contacts/consent"
+                ]
+              },
+              {
+                "group": "Conversations",
+                "pages": [
+                  "api-reference/conversations/list",
+                  "api-reference/conversations/get",
+                  "api-reference/conversations/update",
+                  "api-reference/conversations/messages",
+                  "api-reference/conversations/reply",
+                  "api-reference/conversations/read"
+                ]
+              },
+              {
+                "group": "Senders",
+                "pages": ["api-reference/senders/list"]
+              },
+              {
+                "group": "Calls",
+                "pages": [
+                  "api-reference/calls/list",
+                  "api-reference/calls/targets",
+                  "api-reference/calls/place",
+                  "api-reference/calls/get"
+                ]
+              },
+              {
+                "group": "Usage",
+                "pages": ["api-reference/usage/get"]
+              },
+              {
+                "group": "Webhooks",
+                "pages": [
+                  "api-reference/webhooks/list",
+                  "api-reference/webhooks/create",
+                  "api-reference/webhooks/get",
+                  "api-reference/webhooks/update",
+                  "api-reference/webhooks/delete",
+                  "api-reference/webhooks/rotate-secret",
+                  "api-reference/webhooks/test",
+                  "api-reference/webhooks/deliveries"
+                ]
+              },
+              {
+                "group": "WhatsApp",
+                "pages": [
+                  "api-reference/whatsapp/list-templates",
+                  "api-reference/whatsapp/submit-template",
+                  "api-reference/whatsapp/get-template",
+                  "api-reference/whatsapp/edit-template",
+                  "api-reference/whatsapp/delete-template"
+                ]
+              },
+              {
+                "group": "SMS",
+                "pages": [
+                  "api-reference/sms/list-senders",
+                  "api-reference/sms/request-sender",
+                  "api-reference/sms/withdraw-sender",
+                  "api-reference/sms/list-templates",
+                  "api-reference/sms/request-template",
+                  "api-reference/sms/withdraw-template",
+                  "api-reference/sms/balance"
+                ]
+              },
+              {
+                "group": "Try it",
+                "openapi": "api-reference/openapi.json"
+              }
+            ]
+          },
+          {
+            "tab": "For operators",
+            "groups": [
+              {
+                "group": "Running OMNI for your customers",
+                "pages": [
+                  "operators/overview",
+                  "operators/customers",
+                  "operators/products-and-plans",
+                  "operators/pricing",
+                  "operators/channel-connections",
+                  "operators/modules",
+                  "operators/domains-and-email",
+                  "operators/resellers"
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

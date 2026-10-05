@@ -1,0 +1,124 @@
+---
+title: "Plans and roles"
+description: "What each of OMNI's roles may do, how custom roles work, and how plans are built from features."
+---
+
+Two things decide what someone sees in OMNI: the **roles** they hold, and the
+**plan** their account is on. A role says what a person may do. A plan says what the
+account has. A screen appears only when both allow it.
+
+## The six shared roles
+
+Every account starts with six roles. They work the same in every account. A member
+can hold more than one, and gets everything each of them allows.
+
+| Role | Who it is for | What it may do |
+| --- | --- | --- |
+| **Owner** | The person responsible for the account | Everything the account can do. On a reseller account, this includes managing customers and allocating credit to them. |
+| **Admin** | People who run the account day to day | Everything an Owner can do, except managing a reseller's customers and allocating credit. |
+| **Billing** | Finance | See the balance, the transactions and the plan, and who is on the team. No messages or contacts. |
+| **Support** | Agents who talk to customers | Read and reply in the Inbox, send messages and broadcasts, manage contacts, and label conversations. Day-to-day work in the batteries. No settings, no billing. |
+| **Viewer** | People who only need to look | Read the Inbox, contacts, the Delivery report and Downloads, and view what the batteries hold. Can't send or change anything. |
+| **Reseller** | People who look after a reseller's customers | See the balance and transactions, manage customers and allocate credit to them, and see the team. |
+
+### Role by role, in detail
+
+<AccordionGroup>
+  <Accordion title="Messages, Inbox and contacts">
+    | | Owner | Admin | Support | Viewer | Billing | Reseller |
+    | --- | :-: | :-: | :-: | :-: | :-: | :-: |
+    | Read the Inbox, Broadcasts, Delivery report, Downloads | ✓ | ✓ | ✓ | ✓ | | |
+    | Send messages, reply, start broadcasts | ✓ | ✓ | ✓ | | | |
+    | See contacts | ✓ | ✓ | ✓ | ✓ | | |
+    | Add, edit, import and delete contacts | ✓ | ✓ | ✓ | | | |
+    | Make and apply conversation labels | ✓ | ✓ | ✓ | | | |
+    | Save Inbox views for the whole team | ✓ | ✓ | | | | |
+  </Accordion>
+  <Accordion title="Channels and the API">
+    | | Owner | Admin | Support | Viewer | Billing | Reseller |
+    | --- | :-: | :-: | :-: | :-: | :-: | :-: |
+    | Set up and connect channels | ✓ | ✓ | | | | |
+    | Register SMS sender IDs and templates; manage WhatsApp and RCS templates | ✓ | ✓ | | | | |
+    | Route Voice numbers and design IVRs | ✓ | ✓ | | | | |
+    | See calls | ✓ | ✓ | ✓ | ✓ | | |
+    | Place calls | ✓ | ✓ | ✓ | | | |
+    | Manage API keys and webhooks, and see the request log | ✓ | ✓ | | | | |
+  </Accordion>
+  <Accordion title="Account, team and billing">
+    | | Owner | Admin | Support | Viewer | Billing | Reseller |
+    | --- | :-: | :-: | :-: | :-: | :-: | :-: |
+    | Change workspace settings | ✓ | ✓ | | | | |
+    | See the team | ✓ | ✓ | ✓ | | ✓ | ✓ |
+    | Add and remove members, give roles, make custom roles | ✓ | ✓ | | | | |
+    | See the balance and transactions | ✓ | ✓ | | | ✓ | ✓ |
+    | See the plan and modules | ✓ | ✓ | | | ✓ | |
+    | Switch to another plan | ✓ | ✓ | | | | |
+    | Manage a reseller's customers and allocate credit; branding | ✓ | | | | | ✓ |
+  </Accordion>
+  <Accordion title="Batteries">
+    | | Owner | Admin | Support | Viewer |
+    | --- | :-: | :-: | :-: | :-: |
+    | AI Agents: set up agents | ✓ | ✓ | | |
+    | AI Agents: approve plans, see agent activity | ✓ | ✓ | ✓ | see activity |
+    | Knowledge: view | ✓ | ✓ | ✓ | ✓ |
+    | Knowledge: manage | ✓ | ✓ | ✓ | |
+    | Calendar: view / book / manage | all | all | view, book | view |
+    | Catalogue: view | ✓ | ✓ | ✓ | ✓ |
+    | Catalogue: manage products | ✓ | ✓ | | |
+    | Orders: manage | ✓ | ✓ | ✓ | |
+    | Customer data: manage sources and audiences | ✓ | ✓ | | |
+    | Pipelines: view | ✓ | ✓ | ✓ | ✓ |
+    | Pipelines: manage deals | ✓ | ✓ | ✓ | |
+    | Tickets: view | ✓ | ✓ | ✓ | ✓ |
+    | Tickets: manage | ✓ | ✓ | ✓ | |
+
+    Billing and Reseller have no battery permissions. Each battery's own page says
+    more: see [Batteries](/batteries/overview).
+  </Accordion>
+</AccordionGroup>
+
+<Note>
+  These are the roles as OMNI ships them. The operator who runs your OMNI can adjust
+  what a shared role carries, and that change applies to every account.
+</Note>
+
+### Rules for giving roles
+
+- **You can only give a role whose permissions you already hold.** An Admin can't
+  make someone an Owner and pick up an Owner's powers that way.
+- **Only an Owner can give the Owner role.**
+- **Nobody changes their own roles, or removes themselves.** Another admin does.
+- **Team size follows the plan.** When the plan limits team members, the panel shows
+  how many seats are used, and refuses a new member once they are all taken.
+
+## Custom roles
+
+On a plan that includes custom roles, an account can make roles of its own, such as
+"Sales rep", from the same permissions the shared roles use. They appear beside the
+shared roles, marked as yours, and only your account can see or give them.
+
+A custom role can only carry what your account may do. On a reseller's customer
+account, that also means nothing the reseller itself can't do.
+
+See [Team and roles](/using/team-and-roles).
+
+## Plans
+
+A plan is a set of **features**. A feature is either switched on or off (custom
+roles, single sign-on, the audit log, reseller accounts, API access, each channel,
+each battery) or a **limit** (how many team members may sign in).
+
+**The operator decides what each plan includes, what it costs and what it is called.**
+As an example of how plans are often built:
+
+| Example plan | Who it suits | Features |
+| --- | --- | --- |
+| **Starter** | Small teams getting set up | Up to 5 team members, API access |
+| **Growth** | Growing teams | Up to 25 team members, custom roles, API access, audit log |
+| **Enterprise** | Large organisations and resellers | Unlimited team members, custom roles, API access, audit log, single sign-on, reseller accounts |
+
+Your own plan may look nothing like this. The panel always shows what yours includes,
+under **Plan**. FireFlo can also change a single feature for your account without
+changing your plan.
+
+See [Plan and modules](/using/plan-and-modules).

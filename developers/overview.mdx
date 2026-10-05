@@ -1,0 +1,76 @@
+---
+title: "The OMNI API"
+description: "One API for every channel and service in OMNI: one kind of key, one error shape, one stream of signed webhooks."
+---
+
+The OMNI API is how your own systems use OMNI. Everything a person does in the panel —
+reach someone on whichever channel gets there, look up and change contacts, answer in the
+Inbox, ring someone into an IVR, read what was sent and what it cost — your servers can
+do with one key.
+
+Behind it are every channel your account has. You never hold a provider's credentials
+and never learn a provider's API: OMNI connects to SMS, WhatsApp, RCS and Voice for you,
+whether through FireFlo's shared connections or your own.
+
+## What it covers
+
+<CardGroup cols={2}>
+  <Card title="Messages with failover" icon="arrows-split-up-and-left" href="/developers/messages-with-failover">
+    One message to one person, tried on each channel of a route until one gets there.
+  </Card>
+  <Card title="Webhooks" icon="bell" href="/developers/webhooks">
+    Signed events for messages, every channel's deliveries and replies, and calls.
+  </Card>
+  <Card title="Contacts and consent" icon="address-book" href="/developers/contacts-and-consent">
+    Find people by any number they've had, keep their fields and tags, record consent.
+  </Card>
+  <Card title="Conversations" icon="inbox" href="/developers/conversations">
+    The Inbox: read threads, reply, close, assign and label them.
+  </Card>
+  <Card title="Calls" icon="phone" href="/developers/calls">
+    The call log, and ringing someone into an IVR or to a voice agent.
+  </Card>
+  <Card title="Channel extensions" icon="puzzle-piece" href="/developers/channel-extensions">
+    Each channel's own features: WhatsApp templates, SMS sender IDs and DLT templates.
+  </Card>
+</CardGroup>
+
+Also: [senders](/api-reference/senders/list) (every sender ID, number and bot your
+messages can come from) and [usage](/api-reference/usage/get) (what was sent and
+received, calls, and what was charged).
+
+## The basics
+
+| | |
+| :--- | :--- |
+| Base URL | The address shown in **API & playground** for your OMNI service. Examples on this site use `https://api.fireflo.au/v1` |
+| Authentication | `Authorization: Bearer <key>` — a live key `ff_live_…`, or a test key `ff_test_…` |
+| Format | JSON in, JSON out; times are ISO 8601 with their offset |
+| Errors | Always `{"error": {"code", "message", "field"}}` — see [Errors](/developers/errors) |
+| Retries | Safe with an `Idempotency-Key` on any POST — see [Conventions](/developers/conventions) |
+| Reference | [API reference](/api-reference/overview), and a machine-readable description at `https://api.fireflo.au/v1/openapi.json` |
+
+<Note>
+The API needs your plan to include it. If it doesn't, every request is refused with
+`plan_excludes_api` — ask whoever runs your OMNI service.
+</Note>
+
+## Where to begin
+
+<Steps>
+  <Step title="Make a key">
+    In the panel, open **Developers → API keys**, choose what the key may do, and copy
+    it — it is shown once. Start with a test key. See [Keys and scopes](/developers/keys-and-scopes).
+  </Step>
+  <Step title="Ask who you are">
+    `GET /v1/me` answers with your account, your plan and the key's scopes.
+  </Step>
+  <Step title="Send a message">
+    `POST /v1/messages` with a number and a little content. With a test key nothing
+    reaches a phone. See the [developer quickstart](/get-started/developer-quickstart).
+  </Step>
+  <Step title="Try anything in the panel">
+    **API & playground**, at the bottom of the side menu, runs every endpoint as one of
+    your keys on your own data, and gives you the code. See [Playground](/developers/playground).
+  </Step>
+</Steps>

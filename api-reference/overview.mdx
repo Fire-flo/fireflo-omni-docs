@@ -1,0 +1,31 @@
+---
+title: "API reference"
+description: "Every endpoint of the OMNI API, with its scope, parameters, an example in three languages, the answer and the errors."
+---
+
+Base URL: the address shown in **API & playground** for your OMNI service — examples use
+`https://api.fireflo.au/v1`. Every request needs a key:
+`Authorization: Bearer $OMNI_API_KEY`. See [The OMNI API](/developers/overview) for how it
+fits together, and [Conventions](/developers/conventions) for idempotency, paging and
+limits.
+
+| Group | What it does |
+| :--- | :--- |
+| [Account](/api-reference/account/get-me) | Who a key is; the events webhooks can carry |
+| [Messages](/api-reference/messages/send) | One message to one person, with failover between channels |
+| [Routes](/api-reference/routes/list) | The channels a message is tried on, in order |
+| [Templates](/api-reference/templates/list) | One message, written once per channel |
+| [Contacts](/api-reference/contacts/list) | People, their fields, tags and consent |
+| [Conversations](/api-reference/conversations/list) | The Inbox: threads, replies, assignment |
+| [Senders](/api-reference/senders/list) | Every sender ID, number and bot messages can come from |
+| [Calls](/api-reference/calls/list) | The call log; ringing someone into an IVR or to a voice agent |
+| [Usage](/api-reference/usage/get) | What was sent, received and called, and what it cost |
+| [Webhooks](/api-reference/webhooks/list) | Endpoints and what was sent to them |
+| [WhatsApp](/api-reference/whatsapp/list-templates) | WhatsApp message templates and Meta's approval |
+| [SMS](/api-reference/sms/list-senders) | Sender IDs, DLT templates and the gateway balance |
+
+**Try it** lists the same endpoints from the API's machine-readable description
+(`https://api.fireflo.au/v1/openapi.json`), each with a panel that sends a real request
+with your key. Use a test key there.
+
+Every scope and every webhook event is on [Scopes and events](/api-reference/scopes-and-events).

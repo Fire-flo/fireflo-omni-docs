@@ -1,0 +1,113 @@
+---
+title: "POST /v1/conversations/{contact_id}/reply"
+description: "Reply in a conversation, on the channel named or where a reply goes by default."
+---
+
+Replies in a conversation, on the channel you name or where a reply goes by default (see [GET /v1/conversations/`{contact_id}`](/api-reference/conversations/get)). It is screened like a reply typed in the Inbox: refused with `not_permitted` when the person's consent doesn't allow it, and with `channel_closed` when the channel can't take typed text now. An AI agent on the conversation steps back, as when a person replies.
+
+<Note>Needs the `conversations:write` scope.</Note>
+
+## Path parameters
+
+| Field | Type | Required | Notes |
+| :--- | :--- | :--- | :--- |
+| `contact_id` | string | Yes | The person's contact id: it names their conversation. |
+
+## Body
+
+| Field | Type | Required | Notes |
+| :--- | :--- | :--- | :--- |
+| `text` | string | Yes | The reply, up to 4096 characters. |
+| `channel` | string | No | A channel this account has, e.g. `sms`. Left out, the default reply channel. |
+
+Send an `Idempotency-Key` header to make a retry safe: the same key with the same body is answered once, and the first answer repeated (with `Idempotent-Replayed: true`).
+
+## Request
+
+<CodeGroup>
+
+```bash cURL
+curl -X POST https://api.fireflo.au/v1/conversations/3f6b2a1e-8c4d-4e2a-9b7f-5d1c0e8a9f42/reply \
+  -H "Authorization: Bearer $OMNI_API_KEY" \
+  -H "Content-Type: application/json" \
+  -H "Idempotency-Key: reply-a1042-1" \
+  -d '{
+    "text": "It's with the courier and arrives tomorrow."
+  }'
+```
+
+```python Python
+import os
+
+import requests
+
+response = requests.post(
+    "https://api.fireflo.au/v1/conversations/3f6b2a1e-8c4d-4e2a-9b7f-5d1c0e8a9f42/reply",
+    headers={
+        "Authorization": f"Bearer {os.environ['OMNI_API_KEY']}",
+        "Idempotency-Key": "reply-a1042-1",
+    },
+    json={
+        "text": "It's with the courier and arrives tomorrow.",
+    },
+)
+print(response.status_code, response.json())
+```
+
+```javascript Node
+const response = await fetch("https://api.fireflo.au/v1/conversations/3f6b2a1e-8c4d-4e2a-9b7f-5d1c0e8a9f42/reply", {
+  method: "POST",
+  headers: {
+    Authorization: `Bearer ${process.env.OMNI_API_KEY}`,
+    "Content-Type": "application/json",
+    "Idempotency-Key": "reply-a1042-1",
+  },
+  body: JSON.stringify({
+    "text": "It's with the courier and arrives tomorrow."
+  }),
+});
+console.log(response.status, await response.json());
+```
+
+</CodeGroup>
+
+## Response
+
+`201 Created` — the message sent. Its author is the key that sent it.
+
+```json
+{
+  "id": "cm_918455",
+  "channel": "whatsapp",
+  "direction": "outbound",
+  "to": "+919876543210",
+  "from": "+911140001234",
+  "status": "queued",
+  "text": "It's with the courier and arrives tomorrow.",
+  "error": "",
+  "campaign": null,
+  "created": "2026-10-05T09:15:40.208113+00:00",
+  "status_at": null,
+  "author": {
+    "type": "system",
+    "name": "API · Order service"
+  },
+  "media_url": null
+}
+```
+
+## Errors
+
+Every refusal is `{"error": {"code", "message", "field"}}`; `field` is there when one input is at fault.
+
+| Status | Error code | When |
+| :--- | :--- | :--- |
+| 404 | `not_found` | No conversation has that id on this account. |
+| 400 | `invalid_request` | `text` is missing or too long, or `channel` isn't one this account has (`field` names it). |
+| 409 | `channel_closed` | The channel can't take typed text now — WhatsApp's 24-hour window has closed, say. |
+| 409 | `not_permitted` | The person's consent doesn't allow a message now. |
+| 409 | `channel_refused` | The channel didn't take it; the message says why. |
+| 400 | `invalid_json` | The body isn't valid JSON. |
+| 403 | `scope_missing` | The key doesn't have the `conversations:write` scope. |
+
+Any request can also be refused for its key, its account or its rate (`key_required`, `invalid_key`, `account_suspended`, `plan_excludes_api`, `address_not_allowed`, `rate_limited`); see [the overview](/api-reference/overview).

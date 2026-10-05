@@ -1,0 +1,62 @@
+---
+title: "DELETE /v1/webhooks/{endpoint_id}"
+description: "Remove a webhook endpoint; nothing more is sent to it."
+---
+
+Removes an endpoint, with its delivery history. Nothing more is sent to it.
+
+<Note>Needs the `webhooks:write` scope.</Note>
+
+## Path parameters
+
+| Field | Type | Required | Notes |
+| :--- | :--- | :--- | :--- |
+| `endpoint_id` | string | Yes | The endpoint's id. |
+
+## Request
+
+<CodeGroup>
+
+```bash cURL
+curl -X DELETE https://api.fireflo.au/v1/webhooks/c4e8f2a6-1b3d-4c5e-9f7a-8b6d4e2c0a19 \
+  -H "Authorization: Bearer $OMNI_API_KEY"
+```
+
+```python Python
+import os
+
+import requests
+
+response = requests.delete(
+    "https://api.fireflo.au/v1/webhooks/c4e8f2a6-1b3d-4c5e-9f7a-8b6d4e2c0a19",
+    headers={"Authorization": f"Bearer {os.environ['OMNI_API_KEY']}"},
+)
+print(response.status_code)
+```
+
+```javascript Node
+const response = await fetch("https://api.fireflo.au/v1/webhooks/c4e8f2a6-1b3d-4c5e-9f7a-8b6d4e2c0a19", {
+  method: "DELETE",
+  headers: {
+    Authorization: `Bearer ${process.env.OMNI_API_KEY}`,
+  },
+});
+console.log(response.status);
+```
+
+</CodeGroup>
+
+## Response
+
+`204 No Content` — no body.
+
+## Errors
+
+Every refusal is `{"error": {"code", "message", "field"}}`; `field` is there when one input is at fault.
+
+| Status | Error code | When |
+| :--- | :--- | :--- |
+| 404 | `not_found` | No webhook endpoint has that id on this account. |
+| 403 | `scope_missing` | The key doesn't have the `webhooks:write` scope. |
+
+Any request can also be refused for its key, its account or its rate (`key_required`, `invalid_key`, `account_suspended`, `plan_excludes_api`, `address_not_allowed`, `rate_limited`); see [the overview](/api-reference/overview).

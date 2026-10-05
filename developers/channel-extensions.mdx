@@ -1,0 +1,50 @@
+---
+title: "Channel extensions"
+description: "Each channel's own features on the API, under /v1/channels/<channel>/: WhatsApp templates, SMS sender IDs and DLT templates."
+---
+
+Most of the API is the same whatever the channel. Some things belong to one channel —
+WhatsApp's message templates and Meta's approval, the SMS sender IDs and DLT templates
+operators register. Those are under `/v1/channels/<channel>/…`, with the same keys,
+errors and conventions as the rest.
+
+- A channel's endpoints exist when your account has that channel; otherwise they answer
+  `404 channel_off`.
+- Their scopes start with the channel: `whatsapp.templates:write`, `sms.senders:read`.
+
+## WhatsApp templates
+
+Outside the 24 hours after someone last wrote, WhatsApp only delivers **templates** Meta
+has approved. Manage them here, then use them in [messages](/developers/messages-with-failover).
+
+| | |
+| :--- | :--- |
+| [`GET /v1/channels/whatsapp/templates`](/api-reference/whatsapp/list-templates) | Your templates and their approval: `approved`, `pending`, `rejected`, `paused`, `disabled` |
+| [`POST …/templates`](/api-reference/whatsapp/submit-template) | Submit one for approval |
+| [`GET`, `PATCH`, `DELETE …/templates/{template_id}`](/api-reference/whatsapp/get-template) | Read, edit, or delete one language of it |
+
+Meta reviews every new template and every edit: it is `pending`, and can't be sent,
+until approved. On a number FireFlo hosts for you, you see and change only the templates
+you submitted.
+
+## SMS sender IDs and DLT templates
+
+Where operators require it, an SMS goes out only from a **registered sender ID**, and its
+text must fill in a **registered DLT template**.
+
+| | |
+| :--- | :--- |
+| [`GET`, `POST /v1/channels/sms/senders`](/api-reference/sms/list-senders) | Your sender IDs and their status; ask for one |
+| [`DELETE …/senders/{registration_id}`](/api-reference/sms/withdraw-sender) | Withdraw a request nobody has decided yet |
+| [`GET`, `POST /v1/channels/sms/templates`](/api-reference/sms/list-templates) | Your DLT templates; ask for one, with `{#var#}` where the text changes |
+| [`DELETE …/templates/{registration_id}`](/api-reference/sms/withdraw-template) | Withdraw a template request |
+| [`GET /v1/channels/sms/balance`](/api-reference/sms/balance) | Your own SMS gateway's balance |
+
+Requests are `pending` until decided. On FireFlo's shared SMS service you see and
+withdraw only what you asked for, and the balance to watch is your account's — in
+[`/v1/usage`](/api-reference/usage/get).
+
+## What every channel shares
+
+Every channel's senders — sender IDs, the WhatsApp number, RCS bots, voice numbers — are
+in one list at [`GET /v1/senders`](/api-reference/senders/list), whatever the channel.

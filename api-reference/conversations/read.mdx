@@ -1,0 +1,62 @@
+---
+title: "POST /v1/conversations/{contact_id}/read"
+description: "Mark a conversation read, sending read receipts where the channel has them."
+---
+
+Marks a conversation read: its unread count goes to 0, and read receipts are sent on the channels that have them (WhatsApp's blue ticks).
+
+<Note>Needs the `conversations:write` scope.</Note>
+
+## Path parameters
+
+| Field | Type | Required | Notes |
+| :--- | :--- | :--- | :--- |
+| `contact_id` | string | Yes | The person's contact id: it names their conversation. |
+
+## Request
+
+<CodeGroup>
+
+```bash cURL
+curl -X POST https://api.fireflo.au/v1/conversations/3f6b2a1e-8c4d-4e2a-9b7f-5d1c0e8a9f42/read \
+  -H "Authorization: Bearer $OMNI_API_KEY"
+```
+
+```python Python
+import os
+
+import requests
+
+response = requests.post(
+    "https://api.fireflo.au/v1/conversations/3f6b2a1e-8c4d-4e2a-9b7f-5d1c0e8a9f42/read",
+    headers={"Authorization": f"Bearer {os.environ['OMNI_API_KEY']}"},
+)
+print(response.status_code)
+```
+
+```javascript Node
+const response = await fetch("https://api.fireflo.au/v1/conversations/3f6b2a1e-8c4d-4e2a-9b7f-5d1c0e8a9f42/read", {
+  method: "POST",
+  headers: {
+    Authorization: `Bearer ${process.env.OMNI_API_KEY}`,
+  },
+});
+console.log(response.status);
+```
+
+</CodeGroup>
+
+## Response
+
+`204 No Content` — no body.
+
+## Errors
+
+Every refusal is `{"error": {"code", "message", "field"}}`; `field` is there when one input is at fault.
+
+| Status | Error code | When |
+| :--- | :--- | :--- |
+| 404 | `not_found` | No conversation has that id on this account. |
+| 403 | `scope_missing` | The key doesn't have the `conversations:write` scope. |
+
+Any request can also be refused for its key, its account or its rate (`key_required`, `invalid_key`, `account_suspended`, `plan_excludes_api`, `address_not_allowed`, `rate_limited`); see [the overview](/api-reference/overview).

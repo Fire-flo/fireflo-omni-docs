@@ -1,0 +1,110 @@
+---
+title: "POST /v1/channels/whatsapp/templates"
+description: "Submit a WhatsApp template for approval."
+---
+
+Submits a WhatsApp template for approval. It is `pending` until WhatsApp decides; follow it with [GET](/api-reference/whatsapp/get-template) or the list. Values go in the body as `{{1}}`, `{{2}}`… and are given, in order, as `params` when it is sent.
+
+<Note>Needs the `whatsapp.templates:write` scope.</Note>
+
+## Body
+
+| Field | Type | Required | Notes |
+| :--- | :--- | :--- | :--- |
+| `name` | string | Yes | Lower case letters, digits and underscores, up to 200 characters. |
+| `body` | string | Yes | The text, up to 1024 characters, with `{{1}}`-style values. |
+| `category` | string | No | `utility` (the default), `marketing` or `authentication`. |
+| `language` | string | No | A language code, e.g. `en` (the default) or `hi`. |
+| `header_text` | string | No | A text header, up to 60 characters. |
+| `footer` | string | No | Up to 60 characters. |
+
+Send an `Idempotency-Key` header to make a retry safe: the same key with the same body is answered once, and the first answer repeated (with `Idempotent-Replayed: true`).
+
+## Request
+
+<CodeGroup>
+
+```bash cURL
+curl -X POST https://api.fireflo.au/v1/channels/whatsapp/templates \
+  -H "Authorization: Bearer $OMNI_API_KEY" \
+  -H "Content-Type: application/json" \
+  -H "Idempotency-Key: wa-template-order-shipped-en" \
+  -d '{
+    "name": "order_shipped",
+    "category": "utility",
+    "language": "en",
+    "body": "Hi {{1}}, your order {{2}} has shipped.",
+    "footer": "Acme Retail"
+  }'
+```
+
+```python Python
+import os
+
+import requests
+
+response = requests.post(
+    "https://api.fireflo.au/v1/channels/whatsapp/templates",
+    headers={
+        "Authorization": f"Bearer {os.environ['OMNI_API_KEY']}",
+        "Idempotency-Key": "wa-template-order-shipped-en",
+    },
+    json={
+        "name": "order_shipped",
+        "category": "utility",
+        "language": "en",
+        "body": "Hi {{1}}, your order {{2}} has shipped.",
+        "footer": "Acme Retail",
+    },
+)
+print(response.status_code, response.json())
+```
+
+```javascript Node
+const response = await fetch("https://api.fireflo.au/v1/channels/whatsapp/templates", {
+  method: "POST",
+  headers: {
+    Authorization: `Bearer ${process.env.OMNI_API_KEY}`,
+    "Content-Type": "application/json",
+    "Idempotency-Key": "wa-template-order-shipped-en",
+  },
+  body: JSON.stringify({
+    "name": "order_shipped",
+    "category": "utility",
+    "language": "en",
+    "body": "Hi {{1}}, your order {{2}} has shipped.",
+    "footer": "Acme Retail"
+  }),
+});
+console.log(response.status, await response.json());
+```
+
+</CodeGroup>
+
+## Response
+
+`201 Created`
+
+```json
+{
+  "id": "1029384756473829",
+  "name": "order_shipped",
+  "language": "en",
+  "status": "pending",
+  "category": "utility"
+}
+```
+
+## Errors
+
+Every refusal is `{"error": {"code", "message", "field"}}`; `field` is there when one input is at fault.
+
+| Status | Error code | When |
+| :--- | :--- | :--- |
+| 400 | `invalid_request` | An input is wrong: a name with other characters, a missing or too long body, an unknown category (`field` names it). |
+| 404 | `channel_off` | The account doesn't have WhatsApp on. |
+| 409 | `provider_refused` | WhatsApp refused it; the message gives WhatsApp's reason. |
+| 400 | `invalid_json` | The body isn't valid JSON. |
+| 403 | `scope_missing` | The key doesn't have the `whatsapp.templates:write` scope. |
+
+Any request can also be refused for its key, its account or its rate (`key_required`, `invalid_key`, `account_suspended`, `plan_excludes_api`, `address_not_allowed`, `rate_limited`); see [the overview](/api-reference/overview).

@@ -1,0 +1,14 @@
+{
+  "name": "fireflo-omni-docs",
+  "private": true,
+  "description": "The FireFlo OMNI documentation site. Mintlify needs nothing installed; Playwright is for the screenshot script only.",
+  "type": "module",
+  "scripts": {
+    "dev": "mintlify dev --port 3300",
+    "check": "node scripts/check.mjs",
+    "screenshots": "node scripts/capture-screenshots.mjs"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.63.0"
+  }
+}

@@ -1,0 +1,71 @@
+---
+title: "Calls"
+description: "The call log, and ringing someone into one of your IVRs or having a voice agent call them."
+---
+
+When your account has Voice, the API reads every call — whichever way it went — and
+places calls of two kinds:
+
+| Target | What happens |
+| :--- | :--- |
+| `ivr` | We ring the person; whoever answers hears one of your IVRs — a reminder, a survey, a menu |
+| `voice_agent` | One of your voice agents rings them and holds the conversation |
+
+## What a call can go into
+
+`GET /v1/calls/targets` lists your **published** IVRs, and your voice agents:
+
+```json
+{
+  "data": [
+    { "type": "ivr", "id": "b29c671f-…", "name": "Delivery reminder" },
+    { "type": "voice_agent", "id": "a-1", "name": "Asha" }
+  ],
+  "unavailable": false
+}
+```
+
+<Note>
+Voice agents need your account's **own** voice organisation, which bills you for their
+calls. On FireFlo's shared voice service, only IVRs are offered.
+</Note>
+
+## Placing a call
+
+```bash
+curl https://api.fireflo.au/v1/calls \
+  -H "Authorization: Bearer $OMNI_API_KEY" \
+  -H "Idempotency-Key: reminder-A-1043" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "contact": "c5a1e2b4-…",
+    "target": {"type": "ivr", "id": "b29c671f-…"},
+    "variables": {"slot": "Tuesday 10:00"}
+  }'
+```
+
+Give `to` (a number) or `contact`; a contact's name reaches the IVR or agent as
+`{{name}}`, with your `variables`. The call is screened like any message — someone who
+asked never to be contacted isn't rung (`not_permitted`), and `"purpose": "marketing"`
+applies marketing consent.
+
+The answer is `202` with the call, `dialling`. Follow it with the
+[`call.*` webhooks](/developers/webhooks#a-call) or `GET /v1/calls/{call_id}`.
+
+## The call log
+
+`GET /v1/calls` lists every call, newest first; filter by `direction`, `status`
+(`dialling`, `started`, `ended`, `failed`, `missed`), `kind` or `contact`.
+`GET /v1/calls/{call_id}` adds what it cost, why it ended, and — for a voice agent's
+call — the summary and what was said.
+
+| Status | Meaning |
+| :--- | :--- |
+| `dialling` | We're placing it |
+| `started` | In progress — ringing, or answered (`answered_at` says) |
+| `ended` | It ended after being answered; `seconds` is how long |
+| `failed` | A call you placed wasn't answered |
+| `missed` | A call rang in and nobody took it |
+
+Calls also show in the panel's call log, on the person's contact page, and in
+[`/v1/usage`](/api-reference/usage/get) as minutes.

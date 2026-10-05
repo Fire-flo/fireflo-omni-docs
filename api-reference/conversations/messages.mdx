@@ -1,0 +1,130 @@
+---
+title: "GET /v1/conversations/{contact_id}/messages"
+description: "A conversation's messages on every channel, newest first."
+---
+
+A conversation's messages on every channel, both ways, newest first.
+
+<Note>Needs the `conversations:read` scope.</Note>
+
+## Path parameters
+
+| Field | Type | Required | Notes |
+| :--- | :--- | :--- | :--- |
+| `contact_id` | string | Yes | The person's contact id: it names their conversation. |
+
+## Query parameters
+
+| Field | Type | Required | Notes |
+| :--- | :--- | :--- | :--- |
+| `limit` | integer | No | How many to answer with, 1 to 100. Default 50. |
+| `starting_after` | string | No | The `next` of the previous page, to read the page after it. |
+
+Lists are paged: `has_more` says whether there is more, and `next` is what to pass as `starting_after` to read it (null on the last page).
+
+## Request
+
+<CodeGroup>
+
+```bash cURL
+curl "https://api.fireflo.au/v1/conversations/3f6b2a1e-8c4d-4e2a-9b7f-5d1c0e8a9f42/messages?limit=2" \
+  -H "Authorization: Bearer $OMNI_API_KEY"
+```
+
+```python Python
+import os
+
+import requests
+
+response = requests.get(
+    "https://api.fireflo.au/v1/conversations/3f6b2a1e-8c4d-4e2a-9b7f-5d1c0e8a9f42/messages",
+    headers={"Authorization": f"Bearer {os.environ['OMNI_API_KEY']}"},
+    params={
+        "limit": 2,
+    },
+)
+print(response.status_code, response.json())
+```
+
+```javascript Node
+const response = await fetch("https://api.fireflo.au/v1/conversations/3f6b2a1e-8c4d-4e2a-9b7f-5d1c0e8a9f42/messages?limit=2", {
+  headers: {
+    Authorization: `Bearer ${process.env.OMNI_API_KEY}`,
+  },
+});
+console.log(response.status, await response.json());
+```
+
+</CodeGroup>
+
+## Response
+
+`200 OK`
+
+```json
+{
+  "data": [
+    {
+      "id": "cm_918302",
+      "channel": "whatsapp",
+      "direction": "inbound",
+      "to": "+911140001234",
+      "from": "+919876543210",
+      "status": "received",
+      "text": "Hi, where is my order A-1042?",
+      "error": "",
+      "campaign": null,
+      "created": "2026-10-05T09:02:17.120531+00:00",
+      "status_at": null,
+      "author": null,
+      "media_url": null
+    },
+    {
+      "id": "cm_918273",
+      "channel": "whatsapp",
+      "direction": "outbound",
+      "to": "+919876543210",
+      "from": "+911140001234",
+      "status": "read",
+      "text": "Hi Asha, your order A-1042 has shipped.",
+      "error": "",
+      "campaign": null,
+      "created": "2026-10-05T08:51:02.774310+00:00",
+      "status_at": "2026-10-05T08:53:40.016224+00:00",
+      "author": {
+        "type": "system",
+        "name": "Acme Retail"
+      },
+      "media_url": null
+    }
+  ],
+  "has_more": true,
+  "next": "cm_918273"
+}
+```
+
+### A message
+
+| Field | Notes |
+| :--- | :--- |
+| `id` | `cm_` and a number. |
+| `channel` | The channel it went on: `sms`, `whatsapp`, `rcs`… |
+| `direction` | `inbound` (from the person) or `outbound`. |
+| `to`, `from` | The number or sender it went to and came from. |
+| `status`, `status_at` | Where it stands, and since when. |
+| `text`, `media_url` | What it said, and its attachment's address, if any. |
+| `error` | Why it failed, or empty. |
+| `campaign` | The broadcast it was part of, or null. |
+| `author` | Who sent an outbound message: `{type, name}`, or null. |
+
+## Errors
+
+Every refusal is `{"error": {"code", "message", "field"}}`; `field` is there when one input is at fault.
+
+| Status | Error code | When |
+| :--- | :--- | :--- |
+| 404 | `not_found` | No conversation has that id on this account. |
+| 400 | `invalid_request` | `limit` isn't 1 to 100, or `starting_after` isn't an id from this list (`field` names it). |
+| 403 | `scope_missing` | The key doesn't have the `conversations:read` scope. |
+
+Any request can also be refused for its key, its account or its rate (`key_required`, `invalid_key`, `account_suspended`, `plan_excludes_api`, `address_not_allowed`, `rate_limited`); see [the overview](/api-reference/overview).

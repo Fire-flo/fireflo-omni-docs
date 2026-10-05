@@ -1,0 +1,64 @@
+---
+title: "DELETE /v1/channels/sms/templates/{registration_id}"
+description: "Withdraw a DLT template request nobody has decided yet."
+---
+
+Withdraws a template request nobody has decided yet.
+
+<Note>Needs the `sms.templates:write` scope.</Note>
+
+## Path parameters
+
+| Field | Type | Required | Notes |
+| :--- | :--- | :--- | :--- |
+| `registration_id` | string | Yes | The registration's id, from the list. |
+
+## Request
+
+<CodeGroup>
+
+```bash cURL
+curl -X DELETE https://api.fireflo.au/v1/channels/sms/templates/5207 \
+  -H "Authorization: Bearer $OMNI_API_KEY"
+```
+
+```python Python
+import os
+
+import requests
+
+response = requests.delete(
+    "https://api.fireflo.au/v1/channels/sms/templates/5207",
+    headers={"Authorization": f"Bearer {os.environ['OMNI_API_KEY']}"},
+)
+print(response.status_code)
+```
+
+```javascript Node
+const response = await fetch("https://api.fireflo.au/v1/channels/sms/templates/5207", {
+  method: "DELETE",
+  headers: {
+    Authorization: `Bearer ${process.env.OMNI_API_KEY}`,
+  },
+});
+console.log(response.status);
+```
+
+</CodeGroup>
+
+## Response
+
+`204 No Content` — no body.
+
+## Errors
+
+Every refusal is `{"error": {"code", "message", "field"}}`; `field` is there when one input is at fault.
+
+| Status | Error code | When |
+| :--- | :--- | :--- |
+| 404 | `not_found` | No registration has that id on this account. |
+| 404 | `channel_off` | The account doesn't have SMS on. |
+| 409 | `provider_refused` | The gateway refused — it has already been decided, say; the message says why. |
+| 403 | `scope_missing` | The key doesn't have the `sms.templates:write` scope. |
+
+Any request can also be refused for its key, its account or its rate (`key_required`, `invalid_key`, `account_suspended`, `plan_excludes_api`, `address_not_allowed`, `rate_limited`); see [the overview](/api-reference/overview).

@@ -1,0 +1,114 @@
+---
+title: "Channels"
+description: "The four ways OMNI reaches people — SMS, WhatsApp, RCS and Voice — how each connects, what they all share, and what each battery adds on each one."
+---
+
+A **channel** is one way of reaching people. OMNI has four:
+
+<CardGroup cols={2}>
+  <Card title="SMS" icon="message" href="/channels/sms">
+    Text messages from your sender IDs, with approved templates and India's DLT when you
+    need it.
+  </Card>
+  <Card title="WhatsApp" icon="whatsapp" href="/channels/whatsapp">
+    Two-way conversations, approved templates, media, buttons and reactions.
+  </Card>
+  <Card title="RCS" icon="message-lines" href="/channels/rcs">
+    Rich cards, carousels and buttons in the phone's own messages app, sent by bots routed
+    by country.
+  </Card>
+  <Card title="Voice" icon="phone" href="/channels/voice">
+    Numbers, IVRs, click-to-call, voice broadcasts and voice agents, with a call log and
+    recordings.
+  </Card>
+</CardGroup>
+
+Each channel is a separate part of the plan. A channel appears in the menu only when the
+plan includes it; until it is connected, its section shows **Settings** alone, badged
+**Set up**.
+
+## Shared connection or your own
+
+Every channel connects one of two ways, chosen on its Settings page under **Connection**
+or **How you connect**:
+
+| | The shared connection | Your own connection |
+| :--- | :--- | :--- |
+| **SMS** | FireFlo's SMS gateway. Included, nothing to set up. | Your own gateway's address and login. |
+| **WhatsApp** | A number FireFlo hosts for you — or, until yours is set up, FireFlo's shared number. No Meta setup. | Your number, in your own WhatsApp Business Account (WABA) and Meta app. |
+| **RCS** | Bots FireFlo runs and routes by country. | Your own login at your RCS provider, and your own bots. |
+| **Voice** | FireFlo's FireTone organisation, with numbers FireFlo gives you. | Your own FireTone organisation, through its integration key. |
+
+The shared connection is the quickest start. Your own connection gives you everything on
+your provider account — and on Voice, it is required for
+[voice broadcasts and voice agents](/channels/voice#what-needs-your-own-voice-organisation).
+Switching back to the shared connection keeps your own details saved.
+
+<Note>
+  When FireFlo runs a channel for your account, the Settings page says so and there is
+  nothing to connect. If a shared connection reads "Not offered on this platform yet",
+  ask support@fireflo.au.
+</Note>
+
+The **Channels** page lists every channel with where it stands: **Not in plan**, **Not
+configured**, **Configured · untested**, **Connected** or **Error**. A channel is active
+when the plan includes it and a connection is configured — shared or your own.
+
+## What every channel shares
+
+The channels differ in what they carry, but the rest of OMNI treats them alike.
+
+<AccordionGroup>
+  <Accordion title="The Inbox">
+    Replies on SMS, WhatsApp and RCS land in one [Inbox](/using/inbox), in the person's
+    thread for that channel. You answer on whichever channel you pick under **Reply
+    via**. Calls appear on the contact's timeline instead.
+  </Accordion>
+  <Accordion title="Contacts and their timeline">
+    Every message and call is filed against the [contact](/using/contacts), so their
+    page shows one history across all four channels.
+  </Accordion>
+  <Accordion title="Consent">
+    Every channel honours **do-not-contact**, which stops everything, one-time codes
+    included, and **quiet hours** — the person's own, or else the account's — during
+    which promotional messages wait. When someone sends **STOP**, they stop hearing from
+    you on every channel; **START** brings them back. With the [Customer data](/batteries/customer-data) battery, a
+    person can instead stop one channel, or only its marketing.
+  </Accordion>
+  <Accordion title="Broadcasts">
+    A [broadcast](/using/broadcasts) can go out on any channel in the plan. People who
+    opted out are left out before anything is sent.
+  </Accordion>
+  <Accordion title="The delivery report">
+    What happened to each message — sent, delivered, read, failed and why — is on the
+    [delivery report](/using/delivery-report), whatever the channel.
+  </Accordion>
+  <Accordion title="The OMNI API">
+    The [OMNI API](/developers/overview) sends on every messaging channel, with
+    [failover](/developers/messages-with-failover) from one to the next, and
+    [places calls](/developers/calls) on Voice.
+  </Accordion>
+</AccordionGroup>
+
+## What each battery adds
+
+A [battery](/batteries/overview) is an optional boost. Every channel works without any.
+A battery adds the rows below only when it is in the account's plan.
+
+| Battery | SMS | WhatsApp | RCS | Voice |
+| :--- | :--- | :--- | :--- | :--- |
+| **AI Agents** | Agents reply by filling in an approved DLT template; draft new templates; run workflows ("Reply 1 or 2"); answer questions about broadcasts. | Agents reply in free text inside the 24-hour window and by template outside it; draft and submit templates; run workflows with reply buttons; answer questions about broadcasts. | Answer questions about broadcasts. Agents don't reply on RCS, since it carries approved templates only. | — |
+| **Calendar** | Reminders, confirmations and booking codes by SMS when there's no WhatsApp route and the text matches a DLT template. | Reminders with Confirm, Reschedule and Cancel buttons; a list of free times to book from; booking codes. | — | — |
+| **Catalogue** | Products as names, prices and a link to your catalogue page. | Products pushed to your Meta catalogue; product cards and lists people can order from (on your own number); carts become orders. | Products as names, prices and a link to your catalogue page. | — |
+| **Customer data** | Per-channel consent, opt-in for marketing, your own stop and start words, the preference page, audiences and traits. | The same. | The same. | Voice appears in consent and on the preference page, so someone can stop calls without stopping messages. |
+| **Pipelines** | Messages on a deal's timeline; a contact's deals beside their thread. | The same. | The same. | — |
+| **Tickets** | Raise a conversation as a ticket that stays in step with it. | The same. | The same. | — |
+
+The channel pages say more about each row.
+
+## Who may set up a channel
+
+Connecting a channel and changing its settings needs the permission to **configure
+channel modules**. By default the **Owner** and **Admin** roles have it. Sending needs
+the permission to **send messages** (Owner, Admin and Support by default). See
+[Team and roles](/using/team-and-roles) to change who holds what.

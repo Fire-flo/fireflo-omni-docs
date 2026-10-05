@@ -1,0 +1,86 @@
+---
+title: "GET /v1/channels/whatsapp/templates/{template_id}"
+description: "One WhatsApp template, its parts and its approval status."
+---
+
+One WhatsApp template: its parts and its approval status.
+
+<Note>Needs the `whatsapp.templates:read` scope.</Note>
+
+## Path parameters
+
+| Field | Type | Required | Notes |
+| :--- | :--- | :--- | :--- |
+| `template_id` | string | Yes | The template's id, from the list. |
+
+A template has `id`, `name`, `language`, `status` (`approved`, `pending`, `rejected`, `paused` or `disabled`), `category` (`utility`, `marketing` or `authentication`), `components` (its parts as WhatsApp holds them: header, body, footer, buttons) and `reason` (why it was rejected, or empty). On a number FireFlo hosts for you, you see and change only the templates you submitted.
+
+## Request
+
+<CodeGroup>
+
+```bash cURL
+curl https://api.fireflo.au/v1/channels/whatsapp/templates/1029384756473829 \
+  -H "Authorization: Bearer $OMNI_API_KEY"
+```
+
+```python Python
+import os
+
+import requests
+
+response = requests.get(
+    "https://api.fireflo.au/v1/channels/whatsapp/templates/1029384756473829",
+    headers={"Authorization": f"Bearer {os.environ['OMNI_API_KEY']}"},
+)
+print(response.status_code, response.json())
+```
+
+```javascript Node
+const response = await fetch("https://api.fireflo.au/v1/channels/whatsapp/templates/1029384756473829", {
+  headers: {
+    Authorization: `Bearer ${process.env.OMNI_API_KEY}`,
+  },
+});
+console.log(response.status, await response.json());
+```
+
+</CodeGroup>
+
+## Response
+
+`200 OK`
+
+```json
+{
+  "id": "1029384756473829",
+  "name": "order_shipped",
+  "language": "en",
+  "status": "approved",
+  "category": "utility",
+  "components": [
+    {
+      "type": "BODY",
+      "text": "Hi {{1}}, your order {{2}} has shipped."
+    },
+    {
+      "type": "FOOTER",
+      "text": "Acme Retail"
+    }
+  ],
+  "reason": ""
+}
+```
+
+## Errors
+
+Every refusal is `{"error": {"code", "message", "field"}}`; `field` is there when one input is at fault.
+
+| Status | Error code | When |
+| :--- | :--- | :--- |
+| 404 | `not_found` | No template has that id on this account. |
+| 404 | `channel_off` | The account doesn't have WhatsApp on. |
+| 409 | `provider_refused` | WhatsApp refused it; the message gives WhatsApp's reason. |
+| 403 | `scope_missing` | The key doesn't have the `whatsapp.templates:read` scope. |
+
+Any request can also be refused for its key, its account or its rate (`key_required`, `invalid_key`, `account_suspended`, `plan_excludes_api`, `address_not_allowed`, `rate_limited`); see [the overview](/api-reference/overview).

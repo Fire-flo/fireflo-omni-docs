@@ -1,0 +1,79 @@
+---
+title: "GET /v1/webhooks/{endpoint_id}"
+description: "One webhook endpoint."
+---
+
+One webhook endpoint. Its secret is never shown again.
+
+<Note>Needs the `webhooks:read` scope.</Note>
+
+## Path parameters
+
+| Field | Type | Required | Notes |
+| :--- | :--- | :--- | :--- |
+| `endpoint_id` | string | Yes | The endpoint's id. |
+
+`failing_since` is when deliveries to it started failing (null while they succeed). An endpoint that has failed for three days without one success is switched off: `enabled` turns false and `disabled_reason` says why.
+
+## Request
+
+<CodeGroup>
+
+```bash cURL
+curl https://api.fireflo.au/v1/webhooks/c4e8f2a6-1b3d-4c5e-9f7a-8b6d4e2c0a19 \
+  -H "Authorization: Bearer $OMNI_API_KEY"
+```
+
+```python Python
+import os
+
+import requests
+
+response = requests.get(
+    "https://api.fireflo.au/v1/webhooks/c4e8f2a6-1b3d-4c5e-9f7a-8b6d4e2c0a19",
+    headers={"Authorization": f"Bearer {os.environ['OMNI_API_KEY']}"},
+)
+print(response.status_code, response.json())
+```
+
+```javascript Node
+const response = await fetch("https://api.fireflo.au/v1/webhooks/c4e8f2a6-1b3d-4c5e-9f7a-8b6d4e2c0a19", {
+  headers: {
+    Authorization: `Bearer ${process.env.OMNI_API_KEY}`,
+  },
+});
+console.log(response.status, await response.json());
+```
+
+</CodeGroup>
+
+## Response
+
+`200 OK`
+
+```json
+{
+  "id": "c4e8f2a6-1b3d-4c5e-9f7a-8b6d4e2c0a19",
+  "url": "https://hooks.acme.in/omni",
+  "description": "Order service",
+  "events": [
+    "message.failed",
+    "message.succeeded"
+  ],
+  "enabled": true,
+  "failing_since": null,
+  "disabled_reason": "",
+  "created": "2026-09-12T08:02:51.774Z"
+}
+```
+
+## Errors
+
+Every refusal is `{"error": {"code", "message", "field"}}`; `field` is there when one input is at fault.
+
+| Status | Error code | When |
+| :--- | :--- | :--- |
+| 404 | `not_found` | No webhook endpoint has that id on this account. |
+| 403 | `scope_missing` | The key doesn't have the `webhooks:read` scope. |
+
+Any request can also be refused for its key, its account or its rate (`key_required`, `invalid_key`, `account_suspended`, `plan_excludes_api`, `address_not_allowed`, `rate_limited`); see [the overview](/api-reference/overview).

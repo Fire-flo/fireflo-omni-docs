@@ -1,0 +1,145 @@
+---
+title: "RCS"
+description: "How RCS reaches people with rich cards and buttons, how bots and routes by country decide who sends each message, and how to send RCS and read its figures."
+---
+
+RCS puts rich messages — cards, carousels, pictures and buttons — into the phone's own
+messages app, from a verified business sender called a **bot**. Each message goes out
+through the bot that sends to the person's **country**, using a **template** that bot has
+approved.
+
+**The plan must include RCS.** The menu then shows an **RCS** section with Dashboard,
+Send RCS, Templates and Settings.
+
+## How RCS sends
+
+Three things decide whether a message can go to a number:
+
+1. **A route for its country.** A route names the bot that sends to one country. A
+   number in a country with no route is skipped.
+2. **The bot.** Each bot is approved by the provider for some countries ("launched in")
+   and is of one type: **Promotional**, **Transactional** or **OTP**.
+3. **The template's approval on that bot.** Every bot approves templates separately. If
+   the routed bot hasn't approved the template yet, that number is skipped, with the
+   reason.
+
+Skipped numbers aren't sent and show the reason — "No RCS route for…" or "…isn't
+approved on… yet" — so you can fix the route or the approval.
+
+## How you connect
+
+Open **RCS → Settings**. Under **How you connect**, choose one of two:
+
+<Tabs>
+  <Tab title="FireFlo's bots">
+    Bots FireFlo runs and routes by country. Nothing to set up. The **Bots** section
+    lists the bots FireFlo shares with you; ask FireFlo to add one.
+
+    If Settings says FireFlo hasn't routed a bot for you yet, ask support@fireflo.au.
+  </Tab>
+  <Tab title="My own provider account">
+    Your provider login and your own bots. Choose your **provider** and enter the login
+    it asks for; **Save and test** checks it. Your provider must allow OMNI's server to
+    connect to your account.
+
+    Then copy the **Callback URL** from Settings and send it to your provider, asking
+    them to set it as the callback for your bots. It carries delivery reports, replies,
+    button taps and template approvals. The section turns green as soon as the provider's
+    first call arrives.
+
+    On your own account, only your own bots send: FireFlo's default routes don't apply.
+    **Remove** your login to go back to FireFlo's bots.
+  </Tab>
+</Tabs>
+
+### Bots
+
+On your own provider account, **Add bot** under **Bots**:
+
+- **Bot id** — from your provider;
+- **Name** — as the bot shows on phones;
+- **Type** — Promotional, Transactional or OTP;
+- **Launched in** — the countries the bot is approved for.
+
+### Routes
+
+The **Routes** section lists, for each country you can reach, the bot that sends there
+and whether the route is **Yours** or the **FireFlo default**. To add one, pick a
+**Country** and a **Bot**, then **Add route**. Your own route for a country takes the
+place of FireFlo's default; removing it brings the default back.
+
+Routing is by country. The **Operator** column reads "Any".
+
+## Write templates
+
+RCS sends approved templates only — never typed text. See
+[RCS templates](/channels/rcs-templates) to write one and submit it to your bots.
+
+## Send RCS
+
+**RCS → Send RCS** sends one approved template to people you type in.
+
+<Steps>
+  <Step title="Template">
+    Choose a template approved by at least one of your bots.
+  </Step>
+  <Step title="To">
+    Enter numbers, up to 500. Each goes through the bot its country routes to.
+  </Step>
+  <Step title="Fill the variables">
+    Give a value for each `{{variable}}` in the template, then send.
+  </Step>
+</Steps>
+
+For more people, send a [broadcast](/using/broadcasts) on RCS: choose the template and
+fill each variable from a column of your list or with your own text. The preview shows
+the message as the first person will see it, and each row goes from the bot its country
+routes to.
+
+A broadcast on RCS also shows **Button taps**: how many people tapped a button, as a
+share of those sent, and which buttons.
+
+## Replies and taps
+
+- A reply lands in the [Inbox](/using/inbox), in the person's RCS thread, with the
+  broadcasts they were sent filed into it.
+- A tap on a **quick reply** button counts as an answer, so it shows in the thread too.
+  Taps on every kind of button are counted for the broadcast's figures.
+- RCS takes no typed replies: in the Inbox, the reply box points you to **Send RCS** to
+  send an approved template instead.
+
+## The RCS dashboard
+
+**RCS → Dashboard** shows what went out, what came back and what was tapped, for the
+period you pick: **Messages sent**; **Delivered** (phones that showed it); **Read** (with
+replies); **Button taps** and how many people tapped; a **Traffic** chart of sent, failed
+and replies; and the **Most tapped buttons**.
+
+## Opt-outs
+
+**STOP** stops a person on every channel; do-not-contact and quiet hours are always
+honoured. With the [Customer data](/batteries/customer-data) battery, people can stop
+RCS alone, or RCS marketing alone.
+
+## What batteries add on RCS
+
+RCS works with no battery at all. Each one below adds to it when it is in your plan.
+
+| Battery | What it adds on RCS |
+| :--- | :--- |
+| [AI Agents](/batteries/ai-agents) | Ask about an RCS broadcast's results in plain words. Agents don't reply on RCS, since it carries approved templates rather than typed text. |
+| [Catalogue](/batteries/catalogue) | Products are sent as names and prices with a link to your public catalogue page. |
+| [Customer data](/batteries/customer-data) | Someone can stop RCS marketing or RCS updates without stopping everything. You can require a recorded opt-in before RCS marketing, add your own stop and start words with an optional confirmation reply, show RCS on the preference page, use an audience as an RCS broadcast's recipients, and build audience rules on RCS consent. Messages feed last engaged, reply rate and preferred channel. |
+| [Pipelines](/batteries/pipelines) | RCS messages show on a deal's timeline; a contact's deals show beside their RCS thread. |
+| [Tickets](/batteries/tickets) | An RCS conversation can be raised as a ticket, and closing or assigning it keeps the ticket in step. |
+
+Calendar adds nothing on RCS.
+
+## Who may
+
+| To | Permission | Roles by default |
+| :--- | :--- | :--- |
+| Connect RCS, add bots and routes | Configure channel modules | Owner, Admin |
+| Write, submit and delete RCS templates | Manage RCS templates | Owner, Admin |
+| Send RCS | Send messages | Owner, Admin, Support |
+| See the RCS dashboard | View the message log and delivery reports | Owner, Admin, Support, Viewer |

@@ -1,0 +1,68 @@
+---
+title: "Scopes and events"
+description: "Everything a key can be allowed to do, and everything a webhook can be told."
+---
+
+## Scopes
+
+A key may only do what its scopes allow; anything else is refused with `scope_missing`.
+`GET /v1/me` needs none.
+
+| Scope | Lets a key |
+| :--- | :--- |
+| `account:read` | See which account and plan the key belongs to |
+| `messages:send` | Send messages, with failover between channels, and cancel them |
+| `messages:read` | Read messages and their attempts |
+| `routes:read` | See routes |
+| `routes:write` | Add, change and remove routes |
+| `templates:read` | See message templates |
+| `templates:write` | Add, change and remove message templates |
+| `contacts:read` | Look up and list contacts |
+| `contacts:write` | Add and change contacts, their tags and their consent |
+| `conversations:read` | Read Inbox conversations and their messages |
+| `conversations:write` | Reply in conversations, and close, assign or label them |
+| `senders:read` | See the sender IDs, numbers and bots messages can come from |
+| `calls:read` | See calls, what was said on them, and what a call can go into |
+| `calls:write` | Ring people into an IVR or have a voice agent call them |
+| `usage:read` | See what was sent, received and called, and what it cost |
+| `webhooks:read` | See webhook endpoints and what was sent to them |
+| `webhooks:write` | Add, change and remove webhook endpoints |
+
+### A channel's own
+
+Present when the account has the channel.
+
+| Scope | Lets a key |
+| :--- | :--- |
+| `whatsapp.templates:read` | See WhatsApp message templates and their approval |
+| `whatsapp.templates:write` | Submit, edit and delete WhatsApp message templates |
+| `sms.senders:read` | See SMS sender ID registrations |
+| `sms.senders:write` | Request and withdraw SMS sender IDs |
+| `sms.templates:read` | See SMS DLT template registrations |
+| `sms.templates:write` | Request and withdraw SMS DLT templates |
+| `sms.balance:read` | See the SMS gateway's balance |
+
+## Webhook events
+
+How they are delivered, signed and retried: [Webhooks](/developers/webhooks).
+`GET /v1/events` lists them too.
+
+| Event | `data` carries | When |
+| :--- | :--- | :--- |
+| `message.attempted` | `message` | A message was handed to a channel |
+| `message.failed_over` | `message` | A channel didn't get it there; the next one is trying |
+| `message.succeeded` | `message` | A message reached the person as its route asked |
+| `message.failed` | `message` | Every channel was tried, or the person may not be reached |
+| `message.expired` | `message` | A message ran out of time before it got there |
+| `message.canceled` | `message` | A message was canceled before it got there |
+| `channel_message.received` | `channel_message` | Someone sent a message, on any channel |
+| `channel_message.sent` | `channel_message` | A channel message was handed to the channel |
+| `channel_message.delivered` | `channel_message` | A channel message reached the phone |
+| `channel_message.read` | `channel_message` | A channel message was read |
+| `channel_message.failed` | `channel_message` | A channel message could not be delivered |
+| `call.started` | `call` | A call started, either way |
+| `call.answered` | `call` | A call was answered |
+| `call.ended` | `call` | A call ended after being answered |
+| `call.failed` | `call` | A call you placed wasn't answered |
+| `call.missed` | `call` | A call rang in and nobody took it |
+| `webhook.test` | `endpoint` | A test, sent from the endpoint's screen or the API |

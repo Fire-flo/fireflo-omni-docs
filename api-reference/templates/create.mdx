@@ -1,0 +1,155 @@
+---
+title: "POST /v1/templates"
+description: "Add a template: one message, written once per channel, with values to fill in."
+---
+
+Adds a template: one message written once per channel, with `{{values}}`. A message names it by `template` and gives the values in `values`.
+
+<Note>Needs the `templates:write` scope.</Note>
+
+## Body
+
+| Field | Type | Required | Notes |
+| :--- | :--- | :--- | :--- |
+| `name` | string | Yes | Up to 100 characters, unique on the account. |
+| `variants` | object | Yes | At least one channel's content. |
+| `description` | string | No | A note, up to 200 characters. |
+
+`variants` holds one object per channel, keyed `sms` or `whatsapp`, in that channel's content shape: SMS takes `text`; WhatsApp takes `text` (inside the 24-hour window) and `template`, `language` and `params` (an approved WhatsApp template, used outside it). Write `{{name}}` wherever a value goes; `variables` in the answer lists every name the template needs.
+
+Send an `Idempotency-Key` header to make a retry safe: the same key with the same body is answered once, and the first answer repeated (with `Idempotent-Replayed: true`).
+
+## Request
+
+<CodeGroup>
+
+```bash cURL
+curl -X POST https://api.fireflo.au/v1/templates \
+  -H "Authorization: Bearer $OMNI_API_KEY" \
+  -H "Content-Type: application/json" \
+  -H "Idempotency-Key: template-order-shipped" \
+  -d '{
+    "name": "order_shipped",
+    "description": "Sent when the warehouse ships an order",
+    "variants": {
+      "whatsapp": {
+        "text": "Hi {{name}}, your order {{order}} has shipped.",
+        "template": "order_shipped",
+        "language": "en",
+        "params": [
+          "{{name}}",
+          "{{order}}"
+        ]
+      },
+      "sms": {
+        "text": "Hi {{name}}, your order {{order}} has shipped. - Acme"
+      }
+    }
+  }'
+```
+
+```python Python
+import os
+
+import requests
+
+response = requests.post(
+    "https://api.fireflo.au/v1/templates",
+    headers={
+        "Authorization": f"Bearer {os.environ['OMNI_API_KEY']}",
+        "Idempotency-Key": "template-order-shipped",
+    },
+    json={
+        "name": "order_shipped",
+        "description": "Sent when the warehouse ships an order",
+        "variants": {
+            "whatsapp": {
+                "text": "Hi {{name}}, your order {{order}} has shipped.",
+                "template": "order_shipped",
+                "language": "en",
+                "params": ["{{name}}", "{{order}}"],
+            },
+            "sms": {
+                "text": "Hi {{name}}, your order {{order}} has shipped. - Acme",
+            },
+        },
+    },
+)
+print(response.status_code, response.json())
+```
+
+```javascript Node
+const response = await fetch("https://api.fireflo.au/v1/templates", {
+  method: "POST",
+  headers: {
+    Authorization: `Bearer ${process.env.OMNI_API_KEY}`,
+    "Content-Type": "application/json",
+    "Idempotency-Key": "template-order-shipped",
+  },
+  body: JSON.stringify({
+    "name": "order_shipped",
+    "description": "Sent when the warehouse ships an order",
+    "variants": {
+      "whatsapp": {
+        "text": "Hi {{name}}, your order {{order}} has shipped.",
+        "template": "order_shipped",
+        "language": "en",
+        "params": [
+          "{{name}}",
+          "{{order}}"
+        ]
+      },
+      "sms": {
+        "text": "Hi {{name}}, your order {{order}} has shipped. - Acme"
+      }
+    }
+  }),
+});
+console.log(response.status, await response.json());
+```
+
+</CodeGroup>
+
+## Response
+
+`201 Created`
+
+```json
+{
+  "id": "7a2c9e14-5b3d-4f6a-8c1e-2d9b0f7e6a53",
+  "name": "order_shipped",
+  "description": "Sent when the warehouse ships an order",
+  "variants": {
+    "whatsapp": {
+      "text": "Hi {{name}}, your order {{order}} has shipped.",
+      "template": "order_shipped",
+      "language": "en",
+      "params": [
+        "{{name}}",
+        "{{order}}"
+      ]
+    },
+    "sms": {
+      "text": "Hi {{name}}, your order {{order}} has shipped. - Acme"
+    }
+  },
+  "variables": [
+    "name",
+    "order"
+  ],
+  "updated": "2026-10-01T06:12:44.580Z"
+}
+```
+
+## Errors
+
+Every refusal is `{"error": {"code", "message", "field"}}`; `field` is there when one input is at fault.
+
+| Status | Error code | When |
+| :--- | :--- | :--- |
+| 400 | `invalid_request` | The name is missing, `variants` is empty, or names something that isn't a channel taking messages (`field` is `name` or `variants`). |
+| 409 | `name_taken` | Another template has that name. |
+| 400 | `invalid_json` | The body isn't valid JSON. |
+| 403 | `scope_missing` | The key doesn't have the `templates:write` scope. |
+
+Any request can also be refused for its key, its account or its rate (`key_required`, `invalid_key`, `account_suspended`, `plan_excludes_api`, `address_not_allowed`, `rate_limited`); see [the overview](/api-reference/overview).
