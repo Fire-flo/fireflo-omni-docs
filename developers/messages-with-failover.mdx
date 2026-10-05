@@ -44,8 +44,8 @@ done on it, and how long to wait:
 | `succeed_on` | Done when | Channels that can report it |
 | :--- | :--- | :--- |
 | `sent` | the channel took it | every channel |
-| `delivered` | it reached the phone | SMS, WhatsApp |
-| `read` | the person read it | WhatsApp |
+| `delivered` | it reached the phone | SMS, WhatsApp, RCS |
+| `read` | the person read it | WhatsApp, RCS |
 | `answered` | the person picked up the call | Voice |
 
 `within` is in seconds, from 30 to 7 days; 15 minutes when left out. A step can only wait
@@ -115,6 +115,7 @@ channel instead of a template — or as well, to change one part of it:
 | :--- | :--- |
 | SMS | `text` |
 | WhatsApp | `text` (sent inside the 24-hour window), and `template`, `language`, `params` — an approved WhatsApp template, sent outside it |
+| RCS | `template` — the name of an RCS template approved on the bot that serves the person's country — and its `values` by name (or `params` in order). The number's country picks the bot; a number with no RCS route, or a template not approved on that bot, is refused (`no_rcs_route`, `not_approved`) and the next step runs |
 | Voice (`firetone`) | `ivr` — the id of one of your IVRs to ring them into — or `voice_agent`, one of your voice agents to call them; and `variables`, what the IVR or agent says back. Ids from [`GET /v1/calls/targets`](/api-reference/calls/targets) |
 
 ## Consent and quiet hours

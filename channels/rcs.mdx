@@ -99,6 +99,16 @@ routes to.
 A broadcast on RCS also shows **Button taps**: how many people tapped a button, as a
 share of those sent, and which buttons.
 
+## One message to one person, through the API
+
+Your own systems can send one RCS message to one person with the OMNI API's
+[messages](/developers/messages-with-failover) — on its own, or as a step in a route
+such as *RCS, then SMS*. It goes the same way a broadcast's row does: the person's
+country picks the bot, and the template must be approved on that bot. When it can't go
+— no route for their country, the template not approved there — the next channel in
+the route is tried. Delivery and reads are reported, so a step can wait for either, and
+the message is filed in the person's Inbox thread.
+
 ## Replies and taps
 
 - A reply lands in the [Inbox](/using/inbox), in the person's RCS thread, with the

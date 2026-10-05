@@ -15,7 +15,7 @@ Adds a route: the channels a message is tried on, in order, and what counts as d
 | `steps` | array | Yes | 1 to 6 steps, tried in order. |
 | `default` | boolean | No | Use it for messages that name no route. Default false. |
 
-Each step is `{"channel", "succeed_on", "within"}`: `channel` is `sms`, `whatsapp` or `firetone` (Voice, when your account has it); `succeed_on` is `sent`, `delivered` (the default), `read` or `answered` — only what that channel reports (SMS reports delivery, WhatsApp delivery and reads, Voice whether the call was answered); `within` is how many seconds to wait for it, from 30 to 604800 (default 900). A route has 1 to 6 steps.
+Each step is `{"channel", "succeed_on", "within"}`: `channel` is `sms`, `whatsapp`, `rcs` or `firetone` (Voice) — the channels your account has; `succeed_on` is `sent`, `delivered` (the default), `read` or `answered` — only what that channel reports (SMS reports delivery, WhatsApp and RCS delivery and reads, Voice whether the call was answered); `within` is how many seconds to wait for it, from 30 to 604800 (default 900). A route has 1 to 6 steps.
 
 Send an `Idempotency-Key` header to make a retry safe: the same key with the same body is answered once, and the first answer repeated (with `Idempotent-Replayed: true`).
 
