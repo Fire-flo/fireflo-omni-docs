@@ -114,9 +114,38 @@ channel instead of a template — or as well, to change one part of it:
 | Channel | What `content` may hold |
 | :--- | :--- |
 | SMS | `text` |
-| WhatsApp | `text` (sent inside the 24-hour window), and `template`, `language`, `params` — an approved WhatsApp template, sent outside it |
+| WhatsApp | Inside the 24-hour window: `text`, and as well `media`, `buttons` or `list` (see [WhatsApp media and buttons](#whatsapp-media-and-buttons)). Outside it: `template`, `language`, `params` — an approved WhatsApp template |
 | RCS | `template` — the name of an RCS template approved on the bot that serves the person's country — and its `values` by name (or `params` in order). The number's country picks the bot; a number with no RCS route, or a template not approved on that bot, is refused (`no_rcs_route`, `not_approved`) and the next step runs |
 | Voice (`firetone`) | `ivr` — the id of one of your IVRs to ring them into — or `voice_agent`, one of your voice agents to call them; and `variables`, what the IVR or agent says back. Ids from [`GET /v1/calls/targets`](/api-reference/calls/targets) |
+
+### WhatsApp media and buttons
+
+Inside the 24-hour window, a WhatsApp step can send more than text. Give one of these
+with `text`; if you give several, media goes first, then a list, then buttons.
+
+```json
+"whatsapp": {
+  "text": "Your receipt for order A-1",
+  "media": { "url": "https://files.example.com/receipts/a-1.pdf", "kind": "document",
+             "filename": "receipt-a-1.pdf" },
+  "template": "order_update", "language": "en", "params": ["A-1"]
+}
+```
+
+| Field | What it sends |
+| :--- | :--- |
+| `media` | A file OMNI fetches from your link: `url` (https, a public address, 16 MB at most; a signed link works), and optionally `kind` — `image`, `video`, `audio` or `document`, otherwise taken from the file — `caption` (otherwise the `text`) and `filename` |
+| `buttons` | Up to 3 reply buttons under the `text`, each a title (20 characters at most) or `{ "id", "title" }`. A tap comes back as the person's reply |
+| `list` | A menu under the `text`: `{ "button": "Slots", "sections": [{ "title": "Tomorrow", "rows": [{ "id": "am", "title": "Morning" }] }] }` — up to 10 rows in all |
+| `header`, `footer` | Short lines above and below the `text` of a list or buttons |
+
+Outside the window, WhatsApp only allows an approved template. Give `template` as well,
+as above, and that goes instead. Without one the step is refused (`window_closed`) and
+the next step runs.
+
+A step is also refused when the link can't be fetched, isn't public or is too large
+(`media_unavailable`), or when the buttons or list break WhatsApp's limits
+(`invalid_content`).
 
 ## Consent and quiet hours
 
