@@ -22,7 +22,7 @@ minutes.
     the API's **Base URL**. Copy it: every request below starts with it.
   </Step>
   <Step title="Create a key">
-    Open **Developers** from the icons at the top of the panel, and choose **New key**. Give it a name that says which server uses it, tick what it
+    Open **Developer Tools → API keys** in the side menu, and choose **New key**. Give it a name that says which server uses it, tick what it
     may do, and optionally limit the addresses it works from. For this guide, tick
     `messages:send` and `messages:read`.
 
@@ -35,7 +35,7 @@ minutes.
   </Step>
 </Steps>
 
-<Frame caption="Developers: your keys, what each may do, and where it works from.">
+<Frame caption="Developer Tools → API keys: your keys, what each may do, and where it works from.">
   <img src="/images/developers/api-keys.png" alt="The API keys screen listing keys with their scopes and allowed addresses" />
 </Frame>
 
@@ -157,7 +157,7 @@ with a code that never changes. See [Errors](/developers/errors).
 
 <Steps>
   <Step title="Add an endpoint">
-    In **Developers → Webhooks**, choose **Add an endpoint**. Give an `https://`
+    In **Developer Tools → Webhooks**, choose **Add an endpoint**. Give an `https://`
     address on your server that answers with a 2xx, and pick the events it wants, or
     **All events**. Copy the **signing secret**; it starts `whsec_` and is shown once.
   </Step>

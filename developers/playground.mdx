@@ -3,7 +3,7 @@ title: "API & playground"
 description: "Every endpoint, run in the panel as one of your own keys, on your own data, with the code to take away."
 ---
 
-**API & playground** is at the bottom of the side menu, in the **OMNI API** group. It is
+**API & playground** is in **Developer Tools**, the last entry in the side menu. It is
 for Owners and Admins, on accounts whose plan includes the API.
 
 <Frame caption="API & playground">
@@ -39,9 +39,10 @@ for Owners and Admins, on accounts whose plan includes the API.
   </Step>
 </Steps>
 
-## Debug
+## The answer, and Debug
 
-Under the answer, **Debug** opens the exact request that was sent (the key shown by its
-start only), the answer's headers, how long it took, and — for a refusal — its code and
-what to do about it. **Find in the request log** opens that one request in
-**Developers → Requests**, where runs from the playground carry a *Playground* badge.
+The answer shows its status, how long it took and its request id, with three tabs:
+**Body**, the answer itself; **Headers**, what came back with it; and **Debug**, the exact
+request that was sent (the key shown by its start only) beside the answer's headers and
+timing. A refusal shows its code and what to do about it above the body. In Debug, **Find in the request log** opens that one request in
+**Developer Tools → Requests**, where runs from the playground carry a *Playground* badge.

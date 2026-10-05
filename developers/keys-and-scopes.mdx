@@ -9,8 +9,8 @@ Every request carries one key: `Authorization: Bearer ff_live_…`. The key is t
 ## Making a key
 
 <Steps>
-  <Step title="Open Developers → API keys">
-    Owners and Admins can make keys. **Developers** is in your account menu.
+  <Step title="Open Developer Tools → API keys">
+    Owners and Admins can make keys. **Developer Tools** is the last entry in the side menu.
   </Step>
   <Step title="Name it, and choose what it may do">
     Give each system its own key ("Billing server", "Website") with only the scopes it
@@ -26,7 +26,7 @@ Every request carries one key: `Authorization: Bearer ff_live_…`. The key is t
   </Step>
 </Steps>
 
-<Frame caption="Developers → API keys">
+<Frame caption="Developer Tools → API keys">
   <img src="/images/developers/api-keys.png" alt="The API keys screen, listing keys with what each may do and when it was last used" />
 </Frame>
 
@@ -61,8 +61,8 @@ A key may only do what its scopes allow. A request outside them is refused with
 
 ## Retiring a key
 
-**Revoke** it in Developers → API keys. It stops working at once. A key can also be
+**Revoke** it in Developer Tools → API keys. It stops working at once. A key can also be
 given an expiry when it is made; after it, requests are refused with `invalid_key`.
 
-Every request a key makes is in **Developers → Requests** for 30 days — the time, the
+Every request a key makes is in **Developer Tools → Requests** for 30 days — the time, the
 key, the call, the answer and its request id.

@@ -4,10 +4,10 @@ description: "One signed stream of events to your server: messages, every channe
 ---
 
 A webhook endpoint is an `https://` address on your server that OMNI tells about what
-happened. Add endpoints in **Developers → Webhooks**, or with `POST /v1/webhooks`; each
+happened. Add endpoints in **Developer Tools → Webhooks**, or with `POST /v1/webhooks`; each
 asks for the events it wants, or `*` for all of them, including events added later.
 
-<Frame caption="Developers → Webhooks">
+<Frame caption="Developer Tools → Webhooks">
   <img src="/images/developers/webhooks.png" alt="The webhooks screen, listing endpoints with their events and whether each is working" />
 </Frame>
 
@@ -107,7 +107,7 @@ Deliveries can arrive more than once and out of order. Use `X-FireFlo-Delivery` 
 event's `id`) to ignore a repeat, and the times in `data` rather than arrival order.
 
 Every endpoint's deliveries — each event, its answer and its tries — are in
-**Developers → Webhooks → the endpoint**, where any of them can be sent again, and in
+**Developer Tools → Webhooks → the endpoint**, where any of them can be sent again, and in
 `GET /v1/webhooks/{endpoint_id}/deliveries`. **Send a test** sends a `webhook.test` event
 at once.
 
