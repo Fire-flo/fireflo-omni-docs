@@ -21,7 +21,7 @@ Changes a route. Only what the body gives changes; `steps`, when given, replace 
 | `steps` | array | No | 1 to 6 steps, replacing the current ones. |
 | `default` | boolean | No | True makes it the default (and unsets the previous one). |
 
-Each step is `{"channel", "succeed_on", "within"}`: `channel` is `sms` or `whatsapp`; `succeed_on` is `sent`, `delivered` (the default) or `read` — only what that channel reports (SMS reports delivery, WhatsApp delivery and reads); `within` is how many seconds to wait for it, from 30 to 604800 (default 900). A route has 1 to 6 steps.
+Each step is `{"channel", "succeed_on", "within"}`: `channel` is `sms`, `whatsapp` or `firetone` (Voice, when your account has it); `succeed_on` is `sent`, `delivered` (the default), `read` or `answered` — only what that channel reports (SMS reports delivery, WhatsApp delivery and reads, Voice whether the call was answered); `within` is how many seconds to wait for it, from 30 to 604800 (default 900). A route has 1 to 6 steps.
 
 ## Request
 

@@ -46,6 +46,7 @@ done on it, and how long to wait:
 | `sent` | the channel took it | every channel |
 | `delivered` | it reached the phone | SMS, WhatsApp |
 | `read` | the person read it | WhatsApp |
+| `answered` | the person picked up the call | Voice |
 
 `within` is in seconds, from 30 to 7 days; 15 minutes when left out. A step can only wait
 for what its channel reports — asking SMS for `read` is refused.
@@ -55,7 +56,20 @@ message itself. One route can be the **default**, used when a message names none
 Without a default, a message is tried on your channels in their usual order (WhatsApp,
 then SMS), each done when delivered, within 15 minutes.
 
-## The four ways a step hands over
+## Calls as a step
+
+When your account has Voice, a route can end with a call: *WhatsApp, then SMS, then ring
+them into an IVR, done when answered*.
+
+```json
+{ "channel": "firetone", "succeed_on": "answered", "within": 120 }
+```
+
+The call is placed like one from [`POST /v1/calls`](/developers/calls) — screened for
+consent the same way — and the attempt carries its `call` id. A message that names no
+route is never turned into a phone call: calls happen only when a route asks for them.
+
+## How a step hands over
 
 | Trigger | What happens | Attempt status |
 | :--- | :--- | :--- |
@@ -63,6 +77,7 @@ then SMS), each done when delivered, within 15 minutes.
 | **Failed** — the channel reports it couldn't deliver | The next step runs at once | `failed` |
 | **Not delivered in time** | When `within` passes, the next step runs | `timed_out` |
 | **Not read in time** | Delivered isn't enough for a `read` step; when `within` passes, the next runs | `timed_out` |
+| **Call not answered** | Nobody picked up the call (or it rang past `within`): the next step runs | `failed` or `timed_out` |
 
 A step is refused, for example, when WhatsApp's 24-hour window is closed and no
 approved template was given (`window_closed`), when an SMS's text fills in none of your
@@ -100,6 +115,7 @@ channel instead of a template — or as well, to change one part of it:
 | :--- | :--- |
 | SMS | `text` |
 | WhatsApp | `text` (sent inside the 24-hour window), and `template`, `language`, `params` — an approved WhatsApp template, sent outside it |
+| Voice (`firetone`) | `ivr` — the id of one of your IVRs to ring them into — or `voice_agent`, one of your voice agents to call them; and `variables`, what the IVR or agent says back. Ids from [`GET /v1/calls/targets`](/api-reference/calls/targets) |
 
 ## Consent and quiet hours
 

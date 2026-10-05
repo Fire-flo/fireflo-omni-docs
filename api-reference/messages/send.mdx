@@ -3,7 +3,7 @@ title: "POST /v1/messages"
 description: "Send one message to one person, trying each channel of a route until one gets there."
 ---
 
-Sends one message to one person, with failover: each step of the route names a channel, what counts as done on it (`sent`, `delivered` or `read`) and how long to wait. A channel that refuses, fails or runs out of time hands over to the next. The first step is tried before the answer comes back; what happens next arrives as `message.*` webhook events, or read it back with [GET /v1/messages/`{message_id}`](/api-reference/messages/get).
+Sends one message to one person, with failover: each step of the route names a channel, what counts as done on it (`sent`, `delivered`, `read`, or `answered` for a call) and how long to wait. A channel that refuses, fails or runs out of time hands over to the next. The first step is tried before the answer comes back; what happens next arrives as `message.*` webhook events, or read it back with [GET /v1/messages/`{message_id}`](/api-reference/messages/get).
 
 <Note>Needs the `messages:send` scope.</Note>
 
@@ -148,10 +148,10 @@ console.log(response.status, await response.json());
 | `to` | The number, in international format. |
 | `reference`, `purpose` | As sent. |
 | `test` | True when sent with a test key: no channel is reached, and the first step succeeds at once. |
-| `outcome` | Once it succeeded: `{"channel", "status"}` — the channel that got there and how far (`sent`, `delivered` or `read`). Otherwise null. |
+| `outcome` | Once it succeeded: `{"channel", "status"}` — the channel that got there and how far (`sent`, `delivered`, `read` or `answered`). Otherwise null. |
 | `error` | Once it failed, expired or was canceled: `{"code", "message"}`, with code `not_permitted` (the person may not be contacted), `no_channel_left`, `expired` or `canceled`. Otherwise null. |
 | `steps` | The route it follows: each `{"channel", "succeed_on", "within"}`. |
-| `attempts` | One per channel tried: `step` (from 0), `channel`, `status` (`refused`, `sent`, `delivered`, `read`, `failed` or `timed_out`), `code` and `reason` when refused, `channel_message` (the `cm_` id of the message it sent, or null), `at`, `updated`. |
+| `attempts` | One per channel tried: `step` (from 0), `channel`, `status` (`refused`, `sent`, `delivered`, `read`, `answered`, `failed` or `timed_out`), `code` and `reason` when refused, `channel_message` (the `cm_` id of the message it sent, or null), `call` (the id of the call a Voice step placed, or null), `at`, `updated`. |
 | `created`, `finished_at` | When it was asked for, and when it settled (null until then). |
 
 An attempt is `refused` when its channel can't take the message now and the next step runs at once. Its `code` says why: `channel_off`, `no_content`, `window_closed` (WhatsApp's 24-hour window is closed and no approved template was given), `no_dlt_match` (the SMS text fills in none of your registered DLT templates), `not_permitted` or `provider_refused`.
