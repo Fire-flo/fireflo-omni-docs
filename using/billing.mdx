@@ -24,10 +24,32 @@ to see the ledger, which the same four roles have.
 - **Your prices**: what each message costs, per channel and country, for the channels
   your account has. Until prices are published for your account, this card says so.
 
-<Note>
-  The volumes and prices on this screen are not a bill. The **Balance** card says
-  whether messages are being charged to your balance; check it there.
-</Note>
+## How sends are charged
+
+Each message and call that goes through **FireFlo's connections** is charged to the
+balance as it goes, at your prices for the recipient's country:
+
+| Channel | Charged per | Priced as |
+| :--- | :--- | :--- |
+| SMS | part (a long SMS is several) | per part |
+| WhatsApp | message | the template's kind — marketing, utility or authentication — or *service* for a message typed inside the 24-hour window. Reactions are free. |
+| RCS | message | *basic* (text up to 160 characters), *single* (longer text) or *rich* (cards, carousels, pictures, PDFs) |
+| Voice | started minute | per minute, charged when the call ends |
+
+- **When.** A message is charged as it is handed to its channel. If the channel refuses
+  it outright, the charge is refunded. A message the channel took but the phone never
+  received stays charged, as the channel charges for it.
+- **Your own connections aren't charged.** Messages through your own SMS gateway,
+  WhatsApp account or RCS provider, and calls on your own Voice organisation, are billed
+  to you by that provider directly.
+- **When the balance runs out.** A message the balance can't cover isn't sent, and says
+  why. A broadcast pauses itself and carries on, by itself, as soon as credit is added.
+  A call isn't placed on an empty balance; one already under way finishes, and may take
+  the balance a little below zero.
+- **Not priced, not charged.** A channel or country with no price on your list costs
+  nothing.
+
+The Balance card shows what has been charged this month.
 
 ## Transactions
 
@@ -44,6 +66,11 @@ balance after it. Search the descriptions, and filter by kind:
 | **Adjustment** | A correction made by FireFlo |
 | **Credit received** | Credit a reseller moved to you |
 | **Credit allocated** | Credit you, as a reseller, moved to a customer |
+| **Usage** | What messages and calls cost — grouped, like "WhatsApp · 214 messages" or a broadcast's own line |
+| **Refund** | What came back for messages a channel refused |
+
+Usage is grouped so the ledger stays readable: a line grows while nothing else happens
+on the account, for up to an hour, and the next movement starts a new one.
 
 ## Paying
 

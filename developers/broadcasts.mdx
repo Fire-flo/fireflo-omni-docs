@@ -118,5 +118,8 @@ Asking for one at the wrong moment — pausing a finished broadcast, say — is 
 
 <Note>
 An account sends a few broadcasts at a time; others wait their turn, `queued`. A
-broadcast's messages are charged like any other send.
+broadcast's messages are charged like any other send, chunk by chunk as they go. When
+the balance can't cover the next chunk, the broadcast pauses itself
+(`broadcast.paused`, with the reason in `error`) and resumes by itself when credit is
+added (`broadcast.resumed`).
 </Note>

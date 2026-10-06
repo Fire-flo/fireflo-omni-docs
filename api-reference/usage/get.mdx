@@ -54,7 +54,7 @@ console.log(response.status, await response.json());
 
 ## Response
 
-`200 OK` — `delivered` counts messages delivered, read or replied to. `calls` is null without Voice. `api.messages` counts messages sent through [POST /v1/messages](/api-reference/messages/send). Money is in minor units (paise, cents): `charged` is usage debits only — top-ups and refunds aren't spend — and `balance` is what the account holds now. `days` is there with `by=day` only.
+`200 OK` — `delivered` counts messages delivered, read or replied to. `calls` is null without Voice. `api.messages` counts messages sent through [POST /v1/messages](/api-reference/messages/send). Money is in minor units (paise, cents): `charged` is what sends cost, net of refunds for messages a channel refused — top-ups aren't spend — and `balance` is what the account holds now. `days` is there with `by=day` only.
 
 ```json
 {

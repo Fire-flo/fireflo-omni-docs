@@ -82,8 +82,8 @@ route is never turned into a phone call: calls happen only when a route asks for
 A step is refused, for example, when WhatsApp's 24-hour window is closed and no
 approved template was given (`window_closed`), when an SMS's text fills in none of your
 registered DLT templates (`no_dlt_match`), when nothing was written for that channel
-(`no_content`), when the channel is off (`channel_off`), or when the provider says no
-(`provider_refused`).
+(`no_content`), when the channel is off (`channel_off`), when the balance can't cover it
+(`insufficient_balance`), or when the provider says no (`provider_refused`).
 
 If a channel gets there after its step has timed out, that is recorded on its attempt
 — but nothing is sent again.
@@ -174,8 +174,9 @@ arrive as `channel_message.*` events.
 
 <Note>
 **Charging.** Every attempt a channel actually took is a message sent on that channel
-and is charged like one. Refused steps cost nothing. A test key's messages reach no
-channel and cost nothing.
+and is charged like one. Refused steps cost nothing. A step the balance can't cover is
+refused with `insufficient_balance`, and the next step runs. A test key's messages reach
+no channel and cost nothing.
 </Note>
 
 ## Test keys
