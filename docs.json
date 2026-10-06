@@ -135,6 +135,8 @@
                 "pages": [
                   "batteries/overview",
                   "batteries/ai-agents",
+                  "batteries/analytics",
+                  "batteries/analytics-schedules",
                   "batteries/knowledge",
                   "batteries/calendar",
                   "batteries/catalogue",
@@ -166,6 +168,7 @@
                   "developers/contacts-and-consent",
                   "developers/conversations",
                   "developers/calls",
+                  "developers/reports",
                   "developers/channel-extensions"
                 ]
               }
@@ -248,6 +251,16 @@
               {
                 "group": "Usage",
                 "pages": ["api-reference/usage/get"]
+              },
+              {
+                "group": "Reports",
+                "pages": [
+                  "api-reference/reports/list",
+                  "api-reference/reports/sources",
+                  "api-reference/reports/get",
+                  "api-reference/reports/run",
+                  "api-reference/reports/file"
+                ]
               },
               {
                 "group": "Webhooks",

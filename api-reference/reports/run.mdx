@@ -1,0 +1,128 @@
+---
+title: "POST /v1/reports/run"
+description: "Figures for a query of your own — a source, its measures, groups, filters and a period — without saving a report."
+---
+
+Count anything a source offers, without saving a report: choose the source, up to six
+measures, up to two groups (one time at most), filters, a period and a sort. The fields
+come from [GET /v1/reports/sources](/api-reference/reports/sources); the answer has the
+shape of [GET /v1/reports/\{report_id\}](/api-reference/reports/get).
+
+<Note>Needs the `reports:read` scope, and Analytics on the account.</Note>
+
+## Body
+
+| Field | Type | Required | Notes |
+| :--- | :--- | :--- | :--- |
+| `query` | object | Yes | The query, below. |
+| `title` | string | No | A name for the answer and its CSV file. Default: `Report`. |
+| `format` | string | No | `json` (the default) or `csv`. |
+
+`query` holds:
+
+| Field | Type | Required | Notes |
+| :--- | :--- | :--- | :--- |
+| `source` | string | Yes | A source's `key`. |
+| `measures` | array | Yes | One to six measure keys of that source. |
+| `group_by` | array | No | Up to two: dimension keys, or a time — `day`, `week`, `month`, `hour`, `weekday` (one at most). |
+| `filters` | array | No | Up to ten `{ "field", "op", "value" }`: `op` is `is`, `is_not`, `in` or `not_in`; `value` a value or a list. |
+| `period` | object | No | `{ "preset": "30d" }` or `{ "from": "2026-09-01", "to": "2026-09-30" }`. Default: the last 30 days. |
+| `compare` | boolean | No | Add the period before and the change. |
+| `sort` | string | No | A measure or group to sort by; `-` first for largest first. |
+| `limit` | integer | No | Rows to keep before the rest are added up as `Other`, 1 to 1,000. Default 50; a report over time keeps every slot. |
+
+## Request
+
+<CodeGroup>
+
+```bash cURL
+curl -X POST "https://api.fireflo.au/v1/reports/run" \
+  -H "Authorization: Bearer $OMNI_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "query": {
+      "source": "messages",
+      "measures": ["sent", "delivery_rate"],
+      "group_by": ["week", "channel"],
+      "filters": [{"field": "direction", "op": "is", "value": "out"}],
+      "period": {"preset": "90d"}
+    }
+  }'
+```
+
+```python Python
+import os
+
+import requests
+
+response = requests.post(
+    "https://api.fireflo.au/v1/reports/run",
+    headers={"Authorization": f"Bearer {os.environ['OMNI_API_KEY']}"},
+    json={
+        "query": {
+            "source": "messages",
+            "measures": ["sent", "delivery_rate"],
+            "group_by": ["week", "channel"],
+            "filters": [{"field": "direction", "op": "is", "value": "out"}],
+            "period": {"preset": "90d"},
+        },
+    },
+)
+print(response.status_code, response.json())
+```
+
+```javascript Node
+const response = await fetch("https://api.fireflo.au/v1/reports/run", {
+  method: "POST",
+  headers: {
+    Authorization: `Bearer ${process.env.OMNI_API_KEY}`,
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({
+    query: {
+      source: "messages",
+      measures: ["sent", "delivery_rate"],
+      group_by: ["week", "channel"],
+      filters: [{ field: "direction", op: "is", value: "out" }],
+      period: { preset: "90d" },
+    },
+  }),
+});
+console.log(response.status, await response.json());
+```
+
+</CodeGroup>
+
+## Response
+
+`200 OK` — the answer of [GET /v1/reports/\{report_id\}](/api-reference/reports/get#response),
+with `title` as you sent it. A week is keyed by its Monday.
+
+```json
+{
+  "title": "Report",
+  "source": "messages",
+  "period": { "from": "2026-07-09", "to": "2026-10-06", "label": "Last 90 days" },
+  "columns": [
+    { "key": "week", "label": "Week", "kind": "time" },
+    { "key": "channel", "label": "Channel", "kind": "category" },
+    { "key": "sent", "label": "Sent", "kind": "measure", "format": "number" },
+    { "key": "delivery_rate", "label": "Delivery rate", "kind": "measure", "format": "percent" }
+  ],
+  "rows": [
+    { "week": "2026-07-06", "channel": "SMS", "sent": 2104, "delivery_rate": 0.9182 },
+    { "week": "2026-07-06", "channel": "WhatsApp", "sent": 988, "delivery_rate": 0.9676 }
+  ],
+  "totals": { "sent": 38211, "delivery_rate": 0.9341 },
+  "chart": "table",
+  "cut": false,
+  "currency": "INR"
+}
+```
+
+## Errors
+
+| Status | Error code | When |
+| :--- | :--- | :--- |
+| 400 | `invalid_request` | The query isn't one this account can run: `field` names what is wrong — `source`, `measures`, `group_by`, `filters`, `period`, `sort`, `limit`, `chart` or `query`. |
+| 403 | `scope_missing` | The key doesn't have the `reports:read` scope. |

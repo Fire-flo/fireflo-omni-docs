@@ -1,0 +1,126 @@
+---
+title: "Reports"
+description: "Run Analytics reports from your own systems and BI tools, count anything a source offers, and receive scheduled reports at your webhooks."
+---
+
+Everything [Analytics](/batteries/analytics) counts is open to your own systems: list the
+reports your account can run, run one for any period as JSON or CSV, count anything a
+source offers with a query of your own, and have
+[scheduled reports](/batteries/analytics-schedules) arrive at your webhooks.
+
+You need a key with the **`reports:read`** scope (see
+[Keys and scopes](/developers/keys-and-scopes)). Keys made before reports existed don't
+have it: add it to the key.
+
+## The reports you can run
+
+[GET /v1/reports](/api-reference/reports/list) lists the built-in reports and those your
+team saved and shared with everyone. A key has no person behind it, so it never sees a
+report someone kept to themselves — share it in the panel to run it here.
+
+```bash
+curl "https://api.fireflo.au/v1/reports" -H "Authorization: Bearer $OMNI_API_KEY"
+```
+
+## Running one
+
+[GET /v1/reports/\{report_id\}](/api-reference/reports/get) answers a report's columns,
+rows and totals — for the period it is saved with, or another:
+
+```bash
+# Last month's delivery by channel, compared with the month before
+curl "https://api.fireflo.au/v1/reports/messages.delivery?preset=last_month&compare=true" \
+  -H "Authorization: Bearer $OMNI_API_KEY"
+
+# The same days as a CSV file
+curl -o delivery.csv \
+  "https://api.fireflo.au/v1/reports/messages.delivery?from=2026-09-01&to=2026-09-30&format=csv" \
+  -H "Authorization: Bearer $OMNI_API_KEY"
+```
+
+Reading an answer:
+
+- **Rates are fractions** (`0.926` is 92.6%), **money is in minor units** of `currency`,
+  **durations are in seconds**. Each column's `format` says which.
+- **Days are the account's**, in its time zone.
+- A report grouped by something other than time keeps its top rows and adds up the rest in
+  one `Other` row.
+- In a CSV file, figures are written as people read them instead: rates as percentages,
+  money in whole units.
+
+## A query of your own
+
+When no saved report fits, [POST /v1/reports/run](/api-reference/reports/run) counts
+whatever a source offers, without saving anything.
+[GET /v1/reports/sources](/api-reference/reports/sources) lists each source's
+**dimensions** (to group and filter by) and **measures** (to count):
+
+```json
+{
+  "query": {
+    "source": "tickets",
+    "measures": ["tickets", "first_response", "solve_rate"],
+    "group_by": ["assigned"],
+    "filters": [{ "field": "priority", "op": "in", "value": ["high", "urgent"] }],
+    "period": { "preset": "30d" },
+    "sort": "-tickets"
+  }
+}
+```
+
+A query that asks for something a source doesn't have is refused with `invalid_request`,
+and `field` names what is wrong.
+
+## In a BI tool
+
+Any tool that can read a web address with an `Authorization` header can pull a report —
+the JSON answer for tools that read JSON, `format=csv` for those that read files. Save a
+report in the panel with the measures and groups you want, share it, and point the tool at
+its address with a relative period (`preset=30d`, `preset=last_month`) so each refresh
+brings the latest figures.
+
+<Tip>
+Give the tool its own key with only `reports:read`, so it can read figures and nothing
+else. A refresh counts towards the key's rate limit like any request.
+</Tip>
+
+## Scheduled reports to your webhooks
+
+A [schedule](/batteries/analytics-schedules) can send its report to your
+[webhook endpoints](/developers/webhooks) as a **`report.delivered`** event, signed and
+retried like every other. Add the event to an endpoint first; a schedule can only send
+to webhooks once one listens.
+
+```json
+{
+  "id": "evt_5b9c0e7a2f4d4a8e9c1b3d6f7a8e9c0d",
+  "event": "report.delivered",
+  "created": "2026-10-06T02:35:04+00:00",
+  "data": {
+    "report": { "id": "6f0c2a1e-8b1d-4c39-9a52-0d7e5b3c1f44", "name": "Weekly delivery for the board" },
+    "schedule": "a3d1f6c2-5e47-4b8a-9f10-2c6d8e4b7a91",
+    "period": { "from": "2026-09-28", "to": "2026-10-04", "label": "Last week" },
+    "currency": "INR",
+    "columns": [
+      { "key": "channel", "label": "Channel", "kind": "category" },
+      { "key": "sent", "label": "Sent", "kind": "measure", "format": "number" },
+      { "key": "delivery_rate", "label": "Delivery rate", "kind": "measure", "format": "percent" }
+    ],
+    "totals": { "sent": 4630, "delivery_rate": 0.9341 },
+    "rows": [
+      { "channel": "SMS", "sent": 3102, "delivery_rate": 0.9182 },
+      { "channel": "WhatsApp", "sent": 1528, "delivery_rate": 0.9676 }
+    ],
+    "rows_total": 2,
+    "rows_complete": true,
+    "file": { "id": 4182, "name": "Weekly delivery for the board 2026-09-28 to 2026-10-04.csv", "url": "/v1/reports/files/4182" }
+  }
+}
+```
+
+- `rows` carries up to **1,000** rows. When there are more, `rows_complete` is false and
+  `rows_total` says how many: fetch the whole file from `file.url` with
+  [GET /v1/reports/files/\{file_id\}](/api-reference/reports/file), using your key.
+- `previous` and `change` are there when the report compares.
+- If no endpoint listens for the event when the schedule runs, the run fails and says so;
+  after five failures in a row the schedule is switched off.

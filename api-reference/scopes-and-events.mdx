@@ -28,6 +28,14 @@ A key may only do what its scopes allow; anything else is refused with `scope_mi
 | `webhooks:read` | See webhook endpoints and what was sent to them |
 | `webhooks:write` | Add, change and remove webhook endpoints |
 
+### Analytics
+
+Present when the account has [Analytics](/batteries/analytics).
+
+| Scope | Lets a key |
+| :--- | :--- |
+| `reports:read` | Run Analytics reports and fetch the files scheduled reports write |
+
 ### A channel's own
 
 Present when the account has the channel.
@@ -65,4 +73,5 @@ How they are delivered, signed and retried: [Webhooks](/developers/webhooks).
 | `call.ended` | `call` | A call ended after being answered |
 | `call.failed` | `call` | A call you placed wasn't answered |
 | `call.missed` | `call` | A call rang in and nobody took it |
+| `report.delivered` | `report`, `schedule`, `period`, `columns`, `totals`, `rows`, `file` | A [scheduled report](/developers/reports#scheduled-reports-to-your-webhooks) was sent — with Analytics |
 | `webhook.test` | `endpoint` | A test, sent from the endpoint's screen or the API |

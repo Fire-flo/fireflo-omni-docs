@@ -1,0 +1,64 @@
+---
+title: "GET /v1/reports/files/{file_id}"
+description: "A file a scheduled report wrote, CSV or Excel — the one a report.delivered event points to."
+---
+
+Download a file a [scheduled report](/batteries/analytics-schedules) wrote. A
+`report.delivered` [webhook event](/developers/reports#scheduled-reports-to-your-webhooks)
+names it in `file` — fetch it when the event's rows are not all of them
+(`rows_complete` is false). Files are kept while they are among the account's most recent
+in Downloads.
+
+<Note>Needs the `reports:read` scope, and Analytics on the account.</Note>
+
+## Path parameters
+
+| Field | Type | Required | Notes |
+| :--- | :--- | :--- | :--- |
+| `file_id` | integer | Yes | The `file.id` of a `report.delivered` event. |
+
+## Request
+
+<CodeGroup>
+
+```bash cURL
+curl -o report.csv "https://api.fireflo.au/v1/reports/files/4182" \
+  -H "Authorization: Bearer $OMNI_API_KEY"
+```
+
+```python Python
+import os
+
+import requests
+
+response = requests.get(
+    "https://api.fireflo.au/v1/reports/files/4182",
+    headers={"Authorization": f"Bearer {os.environ['OMNI_API_KEY']}"},
+)
+with open("report.csv", "wb") as file:
+    file.write(response.content)
+```
+
+```javascript Node
+import { writeFile } from "node:fs/promises";
+
+const response = await fetch("https://api.fireflo.au/v1/reports/files/4182", {
+  headers: { Authorization: `Bearer ${process.env.OMNI_API_KEY}` },
+});
+await writeFile("report.csv", Buffer.from(await response.arrayBuffer()));
+```
+
+</CodeGroup>
+
+## Response
+
+`200 OK` — the file itself: `text/csv`, or an Excel workbook
+(`application/vnd.openxmlformats-officedocument.spreadsheetml.sheet`) when the schedule
+sends Excel. `Content-Disposition` gives its name.
+
+## Errors
+
+| Status | Error code | When |
+| :--- | :--- | :--- |
+| 403 | `scope_missing` | The key doesn't have the `reports:read` scope. |
+| 404 | `not_found` | The account has no report file with that id — or it has been removed to make room for newer ones. |

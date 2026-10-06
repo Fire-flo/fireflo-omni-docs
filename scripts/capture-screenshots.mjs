@@ -88,6 +88,11 @@ function tidy() {
     }
   }
   for (const badge of document.querySelectorAll("nextjs-portal, [data-nextjs-toast], #__next-build-watcher")) badge.remove();
+  // The build footer names versions, a commit and the API paths modules answer on:
+  // internal, so never on the public site.
+  for (const footer of document.querySelectorAll("footer")) {
+    if (/FireFlo OMNI v\d|api\//.test(footer.textContent ?? "")) footer.remove();
+  }
 }
 
 let saved = 0;

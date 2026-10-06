@@ -27,7 +27,7 @@ do not have the source and must never need it.
 - Facts come from the product's behaviour as it is today. Never invent a feature,
   field, limit or screen; if unsure, leave it out.
 - The product is "FireFlo OMNI" (then "OMNI"). Modules are **channels** (SMS, WhatsApp,
-  RCS, Voice), **batteries** (AI Agents, Calendar, Catalogue, Customer data, Pipelines,
+  RCS, Voice), **batteries** (AI Agents, Analytics, Calendar, Catalogue, Customer data, Pipelines,
   Tickets) and the **OMNI API**. Voice is FireFlo's voice service; call it Voice.
 - API reference pages: the `title` is the method and path exactly as published
   (`POST /v1/messages`); the check script pairs pages with the published operations by it.

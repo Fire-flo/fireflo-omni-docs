@@ -773,6 +773,121 @@
         ]
       }
     },
+    "/v1/reports": {
+      "get": {
+        "operationId": "list_reports",
+        "description": "Every report this account can run: the built-in ones, and the ones the team saved and shared. Run one with GET /v1/reports/{id}.",
+        "tags": [
+          "reports"
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/reports/{report_id}": {
+      "get": {
+        "operationId": "run_report",
+        "description": "One report's figures: its columns, rows and totals. For its own period, or another — preset (30d, last_month…), or from and to (YYYY-MM-DD, in the account's time zone). compare=true adds the period before and the change. format=csv answers a CSV file.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "report_id",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "tags": [
+          "reports"
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/reports/files/{file_id}": {
+      "get": {
+        "operationId": "get_report_file",
+        "description": "A file a scheduled report wrote, CSV or Excel — the one a report.delivered event names when its rows were too many to send inline. Files are kept while they're among the account's most recent.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "file_id",
+            "schema": {
+              "type": "integer"
+            },
+            "required": true
+          }
+        ],
+        "tags": [
+          "reports"
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/reports/run": {
+      "post": {
+        "operationId": "run_report_query",
+        "description": "Figures for a query of your own: a source, its measures, up to two groups, filters, a period and a sort — the fields GET /v1/reports/sources lists. Nothing is saved. format=csv answers a CSV file.",
+        "tags": [
+          "reports"
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/reports/sources": {
+      "get": {
+        "operationId": "list_report_sources",
+        "description": "What reports can be made of: each source with the dimensions it can be grouped and filtered by, and the measures it counts — the fields POST /v1/reports/run takes. With the periods and charts allowed.",
+        "tags": [
+          "reports"
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
     "/v1/routes": {
       "get": {
         "operationId": "list_routes",

@@ -1,0 +1,81 @@
+---
+title: "GET /v1/reports/sources"
+description: "What reports can be made of: each source's dimensions and measures, and the limits of a query."
+---
+
+Each source the account can report on, with the **dimensions** it can be grouped and
+filtered by and the **measures** it counts — the fields
+[POST /v1/reports/run](/api-reference/reports/run) takes. Every source also offers the
+time dimensions `day`, `week`, `month`, `hour` (of the day) and `weekday`.
+
+<Note>Needs the `reports:read` scope, and Analytics on the account.</Note>
+
+## Request
+
+<CodeGroup>
+
+```bash cURL
+curl "https://api.fireflo.au/v1/reports/sources" \
+  -H "Authorization: Bearer $OMNI_API_KEY"
+```
+
+```python Python
+import os
+
+import requests
+
+response = requests.get(
+    "https://api.fireflo.au/v1/reports/sources",
+    headers={"Authorization": f"Bearer {os.environ['OMNI_API_KEY']}"},
+)
+print(response.status_code, response.json())
+```
+
+```javascript Node
+const response = await fetch("https://api.fireflo.au/v1/reports/sources", {
+  headers: { Authorization: `Bearer ${process.env.OMNI_API_KEY}` },
+});
+console.log(response.status, await response.json());
+```
+
+</CodeGroup>
+
+## Response
+
+`200 OK` — a measure's `format` says how to read it: `number`, `percent` (a fraction:
+`0.926` is 92.6%), `money` (minor units: paise, cents) or `duration` (seconds). A
+dimension with `filterable: false` can be grouped by but not filtered on. `periods` are
+the presets a query's `period` may name; `limits` cap a query.
+
+```json
+{
+  "data": [
+    {
+      "key": "messages",
+      "label": "Messages",
+      "category": "Messaging",
+      "description": "Every message sent and received, on every channel.",
+      "dimensions": [
+        { "key": "day", "label": "Day", "kind": "time" },
+        { "key": "channel", "label": "Channel", "kind": "category", "filterable": true },
+        { "key": "status", "label": "Status", "kind": "category", "filterable": true }
+      ],
+      "measures": [
+        { "key": "sent", "label": "Sent", "format": "number" },
+        { "key": "delivery_rate", "label": "Delivery rate", "format": "percent" }
+      ]
+    }
+  ],
+  "periods": ["today", "yesterday", "7d", "30d", "90d", "this_week", "last_week", "this_month", "last_month", "this_year", "12m"],
+  "charts": ["line", "bar", "stacked", "area", "pie", "number", "table"],
+  "limits": { "measures": 6, "group_by": 2, "filters": 10, "rows": 1000, "days": 800 }
+}
+```
+
+The example shortens each source's lists; the answer has all of them.
+
+## Errors
+
+| Status | Error code | When |
+| :--- | :--- | :--- |
+| 403 | `scope_missing` | The key doesn't have the `reports:read` scope. |
