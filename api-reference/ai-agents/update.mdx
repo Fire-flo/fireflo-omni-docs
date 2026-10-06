@@ -1,0 +1,252 @@
+---
+title: "PATCH /v1/agents/{agent_id}"
+description: "Change an agent's setup: instructions, channels, knowledge, approvals, working hours and limits."
+---
+
+Changes an agent's setup. Only what the body gives changes. Each change is logged in the agent's activity as made by `API · <key name>`.
+
+The AI key an agent uses is chosen on the panel only: a body with `credential` is refused. A new `model` must be one the agent's key allows, and changing it means the agent must be [verified](/api-reference/ai-agents/verify) again — a live agent goes back to `draft` until then. A `draft` agent whose key and model are verified becomes `ready`.
+
+<Note>Needs the `agents:write` scope.</Note>
+
+## Body
+
+| Field | Type | Required | Notes |
+| :--- | :--- | :--- | :--- |
+| `name` | string | No | Up to 100 characters. |
+| `objective` | string | No | Up to 2,000 characters. |
+| `role` | string | No | Only while the agent is a `draft`. Changing it resets `action_policy` to the new role's defaults. |
+| `model` | string | No | A model the agent's key allows. Up to 100 characters. |
+| `instructions` | string | No | Who the agent is, what it may promise and what it must never say. Up to 8,000 characters. |
+| `channels` | array | No | Where it may message customers: `whatsapp`, `sms`. |
+| `knowledge_collections` | array | No | Ids of [knowledge collections](/api-reference/ai-agents/list-collections) it answers from; `[]` means all of them. |
+| `answer_threshold` | integer | No | How sure, from 50 to 100 (per cent), an answer from knowledge must be before it is sent. |
+| `handoff_assignees` | array | No | Ids of up to 50 active teammates a hand-over goes to — whoever has the fewest open. `[]` leaves hand-overs unassigned. |
+| `booking_types` | array | No | With Calendar: ids of the booking types it may offer and book; `[]` means every active one. |
+| `action_policy` | object | No | Each action → `off`, `auto` (on its own) or `approval`. Actions left out go back to the role's default, so send the whole policy. Actions outside the role stay off, and `handoff_to_human` is always `auto`. |
+| `approval_mode` | string | No | `plan` — nothing runs until the whole plan is approved — or `step` — automatic steps run, and a step needing approval waits when it is due. |
+| `replan` | object | No | When it plans again: `triggers` — one or more of `on_inbound`, `on_stage_change`, `on_plan_complete`, `every_n_hours`, or `manual_only` alone; `every_n_hours` (1 to 168, with that trigger); `max_replans_per_contact_per_day` (1 to 50, 6 by default). |
+| `working_hours` | object | No | `days` (0 is Monday … 6 Sunday), `start` and `end` as `HH:MM`, end after start. Messages go out only inside these hours. |
+| `limits` | object | No | Any of `daily_token_limit` (1,000 to 100,000,000, or null for none), `max_steps_per_plan` (1 to 10), `max_messages_per_contact_per_day` (1 to 20), `max_broadcast_audience` (0 to 100,000). |
+| `auto_assign_inbound` | boolean | No | Support and appointment agents: take new conversations from contacts nobody is working. |
+| `pause_on_human_reply` | boolean | No | Step back when someone on the team replies or takes the conversation. |
+| `pause_minutes` | integer | No | How long it steps back, 0 to 1,440 minutes; 0 waits until someone hands the conversation back. |
+| `after_pause` | string | No | When the pause runs out: `resume` (take over again) or `keep` (stay with the team). |
+
+## Request
+
+<CodeGroup>
+
+```bash cURL
+curl -X PATCH "https://api.fireflo.au/v1/agents/12" \
+  -H "Authorization: Bearer $OMNI_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "instructions": "You are Priya from Sharma Electronics, Pune. Reply in the customer'\''s language — English, Hindi or Hinglish. Never promise a refund date.",
+    "knowledge_collections": [
+      3
+    ],
+    "working_hours": {
+      "days": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "start": "09:00",
+      "end": "19:00"
+    },
+    "limits": {
+      "max_messages_per_contact_per_day": 3
+    }
+  }'
+```
+
+```python Python
+import os
+
+import requests
+
+response = requests.patch(
+    "https://api.fireflo.au/v1/agents/12",
+    headers={"Authorization": f"Bearer {os.environ['OMNI_API_KEY']}"},
+    json={
+        "instructions": "You are Priya from Sharma Electronics, Pune. Reply in the customer's language — English, Hindi or Hinglish. Never promise a refund date.",
+        "knowledge_collections": [
+            3
+        ],
+        "working_hours": {
+            "days": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5
+            ],
+            "start": "09:00",
+            "end": "19:00"
+        },
+        "limits": {
+            "max_messages_per_contact_per_day": 3
+        }
+    },
+)
+print(response.status_code, response.json())
+```
+
+```javascript Node
+const response = await fetch("https://api.fireflo.au/v1/agents/12", {
+  method: "PATCH",
+  headers: {
+    Authorization: `Bearer ${process.env.OMNI_API_KEY}`,
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({
+    "instructions": "You are Priya from Sharma Electronics, Pune. Reply in the customer's language — English, Hindi or Hinglish. Never promise a refund date.",
+    "knowledge_collections": [
+      3
+    ],
+    "working_hours": {
+      "days": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "start": "09:00",
+      "end": "19:00"
+    },
+    "limits": {
+      "max_messages_per_contact_per_day": 3
+    }
+  }),
+});
+console.log(response.status, await response.json());
+```
+
+</CodeGroup>
+
+## Response
+
+`200 OK` — the agent as it is now, in the shape [GET /v1/agents/\{agent_id\}](/api-reference/ai-agents/get) answers.
+
+```json
+{
+  "id": 12,
+  "name": "Priya",
+  "role": "support",
+  "workflow": {
+    "version": 3,
+    "blocks": 4,
+    "ai_blocks": 1,
+    "unpublished": false
+  },
+  "status": "active",
+  "objective": "Answer order and refund questions within minutes and hand complaints to the team.",
+  "provider": {
+    "id": 4,
+    "label": "OpenAI — main",
+    "provider": "openai"
+  },
+  "model": "gpt-4o-mini",
+  "instructions": "You are Priya from Sharma Electronics, Pune. Reply in the customer's language — English, Hindi or Hinglish. Never promise a refund date.",
+  "channels": [
+    "whatsapp",
+    "sms"
+  ],
+  "booking_types": [],
+  "knowledge_collections": [
+    3
+  ],
+  "answer_threshold": 80,
+  "handoff_assignees": [
+    21,
+    34
+  ],
+  "channels_available": [
+    "whatsapp",
+    "sms"
+  ],
+  "channels_missing": [],
+  "action_policy": {
+    "send_message": "auto",
+    "send_whatsapp_template": "approval",
+    "send_broadcast": "approval",
+    "request_template": "approval",
+    "create_deal": "off",
+    "move_deal_stage": "auto",
+    "mark_deal_won": "off",
+    "mark_deal_lost": "off",
+    "update_deal_value": "off",
+    "add_note": "auto",
+    "update_contact": "auto",
+    "follow_up": "auto",
+    "close_conversation": "auto",
+    "handoff_to_human": "auto"
+  },
+  "approval_mode": "plan",
+  "replan": {
+    "triggers": [
+      "on_inbound"
+    ],
+    "every_n_hours": null,
+    "max_replans_per_contact_per_day": 6
+  },
+  "working_hours": {
+    "days": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "start": "09:00",
+    "end": "19:00"
+  },
+  "limits": {
+    "daily_token_limit": 100000,
+    "max_steps_per_plan": 6,
+    "max_messages_per_contact_per_day": 3,
+    "max_broadcast_audience": 500
+  },
+  "auto_assign_inbound": true,
+  "pause_on_human_reply": true,
+  "pause_minutes": 30,
+  "after_pause": "resume",
+  "pipelines": [
+    {
+      "id": 2,
+      "name": "Service requests",
+      "engaged": true,
+      "entry_stage": "New"
+    }
+  ],
+  "stats": {
+    "tokens_today": 18450,
+    "active_contacts": 27,
+    "awaiting_approval": 2,
+    "plans_today": 41
+  },
+  "verified_at": "2026-09-28T11:04:52+05:30",
+  "created_at": "2026-09-28T10:41:07+05:30"
+}
+```
+
+## Errors
+
+Every refusal is `{"error": {"code", "message", "field"}}`; `field` is there when one input is at fault.
+
+| Status | Error code | When |
+| :--- | :--- | :--- |
+| 400 | `invalid_request` | A value isn't allowed — `field` names it. Also when the body has `credential` (chosen on the panel), or `role` on an agent that isn't a draft. |
+| 404 | `not_found` | No agent of this account's has that id. |
+| 404 | `module_off` | The account doesn't have AI agents on: they aren't in its plan, or are switched off for it. |
+| 403 | `scope_missing` | The key doesn't have the `agents:write` scope. |
+
+Any request can also be refused for its key, its account or its rate (`key_required`, `invalid_key`, `account_suspended`, `plan_excludes_api`, `address_not_allowed`, `rate_limited`); see [the overview](/api-reference/overview).

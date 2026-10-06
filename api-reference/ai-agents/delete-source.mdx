@@ -1,0 +1,61 @@
+---
+title: "DELETE /v1/agents/knowledge/sources/{source_id}"
+description: "Remove a source from Knowledge; agents stop answering from it."
+---
+
+Removes a source from Knowledge, with everything read from it. Agents no longer answer from it. To keep it but have agents ignore it, set `active` to false with [PATCH](/api-reference/ai-agents/update-source) instead.
+
+<Note>Needs the `agents.knowledge:write` scope.</Note>
+
+## Path parameters
+
+| Field | Type | Required | Notes |
+| :--- | :--- | :--- | :--- |
+| `source_id` | string | Yes | The source's id. |
+
+## Request
+
+<CodeGroup>
+
+```bash cURL
+curl -X DELETE "https://api.fireflo.au/v1/agents/knowledge/sources/b7e4c1d2-5a3f-4e8b-9c6d-1a2f3e4b5c6d" \
+  -H "Authorization: Bearer $OMNI_API_KEY"
+```
+
+```python Python
+import os
+
+import requests
+
+response = requests.delete(
+    "https://api.fireflo.au/v1/agents/knowledge/sources/b7e4c1d2-5a3f-4e8b-9c6d-1a2f3e4b5c6d",
+    headers={"Authorization": f"Bearer {os.environ['OMNI_API_KEY']}"},
+)
+print(response.status_code)
+```
+
+```javascript Node
+const response = await fetch("https://api.fireflo.au/v1/agents/knowledge/sources/b7e4c1d2-5a3f-4e8b-9c6d-1a2f3e4b5c6d", {
+  method: "DELETE",
+  headers: { Authorization: `Bearer ${process.env.OMNI_API_KEY}` },
+});
+console.log(response.status);
+```
+
+</CodeGroup>
+
+## Response
+
+`204 No Content` — no body.
+
+## Errors
+
+Every refusal is `{"error": {"code", "message", "field"}}`; `field` is there when one input is at fault.
+
+| Status | Error code | When |
+| :--- | :--- | :--- |
+| 404 | `not_found` | No knowledge source of this account's has that id. |
+| 404 | `module_off` | The account doesn't have AI agents on: they aren't in its plan, or are switched off for it. |
+| 403 | `scope_missing` | The key doesn't have the `agents.knowledge:write` scope. |
+
+Any request can also be refused for its key, its account or its rate (`key_required`, `invalid_key`, `account_suspended`, `plan_excludes_api`, `address_not_allowed`, `rate_limited`); see [the overview](/api-reference/overview).

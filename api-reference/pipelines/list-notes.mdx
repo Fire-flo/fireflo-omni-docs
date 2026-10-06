@@ -1,0 +1,91 @@
+---
+title: "GET /v1/crm/deals/{deal_id}/notes"
+description: "A deal's notes, newest first."
+---
+
+A deal's notes, newest first — the ones your team wrote on the deal's page and the ones added through the API.
+
+<Note>Needs the `crm.deals:read` scope.</Note>
+
+## Path parameters
+
+| Field | Type | Required | Notes |
+| :--- | :--- | :--- | :--- |
+| `deal_id` | string | Yes | The deal's id. |
+
+## Query parameters
+
+| Field | Type | Required | Notes |
+| :--- | :--- | :--- | :--- |
+| `limit` | integer | No | 1 to 100; 50 by default. |
+| `starting_after` | string | No | The last id of the previous page — `next` from it. |
+
+A note has `id`, `body`, `author` — the team member who wrote it, or `API · <key name>` for one added through the API — and `created_at`.
+
+## Request
+
+<CodeGroup>
+
+```bash cURL
+curl "https://api.fireflo.au/v1/crm/deals/5b2e8c1d-7a4f-4e3b-9c6d-1f0a2b3c4d5e/notes?limit=20" \
+  -H "Authorization: Bearer $OMNI_API_KEY"
+```
+
+```python Python
+import os
+
+import requests
+
+response = requests.get(
+    "https://api.fireflo.au/v1/crm/deals/5b2e8c1d-7a4f-4e3b-9c6d-1f0a2b3c4d5e/notes?limit=20",
+    headers={"Authorization": f"Bearer {os.environ['OMNI_API_KEY']}"},
+)
+print(response.status_code, response.json())
+```
+
+```javascript Node
+const response = await fetch("https://api.fireflo.au/v1/crm/deals/5b2e8c1d-7a4f-4e3b-9c6d-1f0a2b3c4d5e/notes?limit=20", {
+  headers: { Authorization: `Bearer ${process.env.OMNI_API_KEY}` },
+});
+console.log(response.status, await response.json());
+```
+
+</CodeGroup>
+
+## Response
+
+`200 OK` — `has_more` says whether there is another page, and `next` is the `starting_after` for it.
+
+```json
+{
+  "data": [
+    {
+      "id": 213,
+      "body": "Quote sent: ₹1,18,000 incl. installation.",
+      "author": "API · Billing sync",
+      "created_at": "2026-10-06T09:30:41+05:30"
+    },
+    {
+      "id": 212,
+      "body": "Called Ravi — he wants a quote with installation included.",
+      "author": "Asha Menon",
+      "created_at": "2026-10-05T14:47:20+05:30"
+    }
+  ],
+  "has_more": false,
+  "next": null
+}
+```
+
+## Errors
+
+Every refusal is `{"error": {"code", "message", "field"}}`; `field` is there when one input is at fault.
+
+| Status | Error code | When |
+| :--- | :--- | :--- |
+| 400 | `invalid_request` | `limit` is out of range (`field` is `limit`), or `starting_after` isn't a note id from this list. |
+| 404 | `not_found` | No deal of this account's has that id. |
+| 404 | `module_off` | The account doesn't have Pipelines on. |
+| 403 | `scope_missing` | The key doesn't have the `crm.deals:read` scope. |
+
+Any request can also be refused for its key, its account or its rate (`key_required`, `invalid_key`, `account_suspended`, `plan_excludes_api`, `address_not_allowed`, `rate_limited`); see [the overview](/api-reference/overview).

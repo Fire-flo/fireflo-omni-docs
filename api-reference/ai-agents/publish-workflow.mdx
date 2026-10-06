@@ -1,0 +1,100 @@
+---
+title: "POST /v1/agents/{agent_id}/workflow/publish"
+description: "Make an agent's draft workflow live as a new version, with a note."
+---
+
+Publishes the draft as a new, numbered version and makes it live. Published versions never change; conversations already under way carry on, and new ones follow the new version. Nothing `broken` may be left in the draft's checks.
+
+<Note>Needs the `agents:write` scope.</Note>
+
+## Path parameters
+
+| Field | Type | Required | Notes |
+| :--- | :--- | :--- | :--- |
+| `agent_id` | integer | Yes | The agent's id. |
+
+## Body
+
+| Field | Type | Required | Notes |
+| :--- | :--- | :--- | :--- |
+| `revision` | integer | Yes | The `revision` you read: publishing is refused if someone saved since. |
+| `note` | string | Yes | What changed, for the team. Up to 200 characters. |
+
+## Request
+
+<CodeGroup>
+
+```bash cURL
+curl -X POST "https://api.fireflo.au/v1/agents/12/workflow/publish" \
+  -H "Authorization: Bearer $OMNI_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "revision": 19,
+    "note": "Hand refund questions to the team after hours"
+  }'
+```
+
+```python Python
+import os
+
+import requests
+
+response = requests.post(
+    "https://api.fireflo.au/v1/agents/12/workflow/publish",
+    headers={"Authorization": f"Bearer {os.environ['OMNI_API_KEY']}"},
+    json={
+        "revision": 19,
+        "note": "Hand refund questions to the team after hours"
+    },
+)
+print(response.status_code, response.json())
+```
+
+```javascript Node
+const response = await fetch("https://api.fireflo.au/v1/agents/12/workflow/publish", {
+  method: "POST",
+  headers: {
+    Authorization: `Bearer ${process.env.OMNI_API_KEY}`,
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({
+    "revision": 19,
+    "note": "Hand refund questions to the team after hours"
+  }),
+});
+console.log(response.status, await response.json());
+```
+
+</CodeGroup>
+
+## Response
+
+`201 Created` — the new version, now live. A version has its `number`, the `note` it was published with, who published it (`by`; null when published through the API), when (`at`), how many `blocks` it has and how many call the AI (`ai_blocks`), and whether it is the `live` one.
+
+```json
+{
+  "number": 4,
+  "note": "Hand refund questions to the team after hours",
+  "by": null,
+  "at": "2026-10-06T10:04:17+05:30",
+  "blocks": 4,
+  "ai_blocks": 1,
+  "live": true,
+  "running": 0
+}
+```
+
+## Errors
+
+Every refusal is `{"error": {"code", "message", "field"}}`; `field` is there when one input is at fault.
+
+| Status | Error code | When |
+| :--- | :--- | :--- |
+| 400 | `invalid_request` | `revision` isn't a whole number, or `note` isn't text or is over 200 characters; `field` names it. |
+| 404 | `not_found` | No agent of this account's has that id. |
+| 409 | `revision_conflict` | Someone saved the workflow since you read it. |
+| 409 | `invalid_state` | There's no `note`, or something in the draft is `broken`. |
+| 404 | `module_off` | The account doesn't have AI agents on: they aren't in its plan, or are switched off for it. |
+| 403 | `scope_missing` | The key doesn't have the `agents:write` scope. |
+
+Any request can also be refused for its key, its account or its rate (`key_required`, `invalid_key`, `account_suspended`, `plan_excludes_api`, `address_not_allowed`, `rate_limited`); see [the overview](/api-reference/overview).

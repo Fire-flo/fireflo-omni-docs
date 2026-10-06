@@ -1,0 +1,94 @@
+---
+title: "POST /v1/crm/pipelines/{pipeline_id}/stages"
+description: "Add a stage at the end of a pipeline, optionally as its won or lost stage."
+---
+
+Adds a stage at the end of a pipeline. With `outcome`, it becomes the pipeline's closing stage for that outcome: moving a deal into it wins or loses the deal. A pipeline has at most one won and one lost stage, so a stage that held that outcome before becomes an ordinary stage.
+
+<Note>Needs the `crm.pipelines:write` scope.</Note>
+
+## Path parameters
+
+| Field | Type | Required | Notes |
+| :--- | :--- | :--- | :--- |
+| `pipeline_id` | integer | Yes | The pipeline's id. |
+
+## Body
+
+| Field | Type | Required | Notes |
+| :--- | :--- | :--- | :--- |
+| `name` | string | Yes | What the stage is called. Up to 100 characters, and not a name another stage of this pipeline has. |
+| `outcome` | string | No | `won` or `lost` to make it a closing stage. Left out or empty, it is an ordinary stage. |
+
+## Request
+
+<CodeGroup>
+
+```bash cURL
+curl -X POST "https://api.fireflo.au/v1/crm/pipelines/3/stages" \
+  -H "Authorization: Bearer $OMNI_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "Lost",
+  "outcome": "lost"
+}'
+```
+
+```python Python
+import os
+
+import requests
+
+response = requests.post(
+    "https://api.fireflo.au/v1/crm/pipelines/3/stages",
+    headers={"Authorization": f"Bearer {os.environ['OMNI_API_KEY']}"},
+    json={
+        "name": "Lost",
+        "outcome": "lost"
+    },
+)
+print(response.status_code, response.json())
+```
+
+```javascript Node
+const response = await fetch("https://api.fireflo.au/v1/crm/pipelines/3/stages", {
+  method: "POST",
+  headers: {
+    Authorization: `Bearer ${process.env.OMNI_API_KEY}`,
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({
+    "name": "Lost",
+    "outcome": "lost"
+  }),
+});
+console.log(response.status, await response.json());
+```
+
+</CodeGroup>
+
+## Response
+
+`201 Created` — the stage.
+
+```json
+{
+  "id": 15,
+  "name": "Lost",
+  "order": 4,
+  "outcome": "lost"
+}
+```
+
+## Errors
+
+Every refusal is `{"error": {"code", "message", "field"}}`; `field` is there when one input is at fault.
+
+| Status | Error code | When |
+| :--- | :--- | :--- |
+| 400 | `invalid_request` | `name` is missing, empty, too long or already a stage's in this pipeline, or `outcome` isn't `won`, `lost` or empty (`field` names it). |
+| 404 | `not_found` | No pipeline of this account's has that id. |
+| 404 | `module_off` | The account doesn't have Pipelines on. |
+| 403 | `scope_missing` | The key doesn't have the `crm.pipelines:write` scope. |
+
+Any request can also be refused for its key, its account or its rate (`key_required`, `invalid_key`, `account_suspended`, `plan_excludes_api`, `address_not_allowed`, `rate_limited`); see [the overview](/api-reference/overview).

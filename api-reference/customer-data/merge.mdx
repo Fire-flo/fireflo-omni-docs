@@ -1,0 +1,115 @@
+---
+title: "POST /v1/cdp/merge"
+description: "Merge one contact into another: messages, deals, tickets and the rest move to the one you keep."
+---
+
+Merges two contacts into one. Everything belonging to `lose` — messages, deals, tickets and the rest — moves to `keep`, and `lose` is deleted. It can't be undone.
+
+Where only `lose` has a value — a name, a field — `keep` takes it. Where both have one, `keep`'s stays unless `choices` picks `lose`'s. Tags and identifiers from both are kept, and the number not chosen stays on the contact as an older number. Where both said something about the same channel and purpose, a stop wins. The merge sends the `contacts.merged` [webhook event](/developers/customer-data#webhook-events).
+
+<Note>Needs the `cdp.contacts:write` scope.</Note>
+
+## Body
+
+| Field | Type | Required | Notes |
+| :--- | :--- | :--- | :--- |
+| `keep` | string | Yes | The id of the contact to keep. |
+| `lose` | string | Yes | The id of the contact to merge into it. |
+| `choices` | object | No | Where both have a value, whose wins: `keep` (the default) or `lose`, by `name`, `msisdn` (the main number), `segment`, or `attr:` and a contact field's key. |
+
+Send an `Idempotency-Key` header to merge once however often the request is retried.
+
+## Request
+
+<CodeGroup>
+
+```bash cURL
+curl -X POST "https://api.fireflo.au/v1/cdp/merge" \
+  -H "Authorization: Bearer $OMNI_API_KEY" \
+  -H "Content-Type: application/json" \
+  -H "Idempotency-Key: merge-asha-4821" \
+  -d '{
+    "keep": "3f6b2a1e-8c4d-4e2a-9b7f-5d1c0e8a9f42",
+    "lose": "c2e9f4a7-1d3b-4a6c-8f5e-9b0d7c3a2e16",
+    "choices": {
+      "msisdn": "lose",
+      "attr:city": "lose"
+    }
+  }'
+```
+
+```python Python
+import os
+
+import requests
+
+response = requests.post(
+    "https://api.fireflo.au/v1/cdp/merge",
+    headers={
+        "Authorization": f"Bearer {os.environ['OMNI_API_KEY']}",
+        "Idempotency-Key": "merge-asha-4821",
+    },
+    json={
+        "keep": "3f6b2a1e-8c4d-4e2a-9b7f-5d1c0e8a9f42",
+        "lose": "c2e9f4a7-1d3b-4a6c-8f5e-9b0d7c3a2e16",
+        "choices": {
+            "msisdn": "lose",
+            "attr:city": "lose",
+        },
+    },
+)
+print(response.status_code, response.json())
+```
+
+```javascript Node
+const response = await fetch("https://api.fireflo.au/v1/cdp/merge", {
+  method: "POST",
+  headers: {
+    Authorization: `Bearer ${process.env.OMNI_API_KEY}`,
+    "Content-Type": "application/json",
+    "Idempotency-Key": "merge-asha-4821",
+  },
+  body: JSON.stringify({
+    "keep": "3f6b2a1e-8c4d-4e2a-9b7f-5d1c0e8a9f42",
+    "lose": "c2e9f4a7-1d3b-4a6c-8f5e-9b0d7c3a2e16",
+    "choices": {
+      "msisdn": "lose",
+      "attr:city": "lose"
+    }
+  }),
+});
+console.log(response.status, await response.json());
+```
+
+</CodeGroup>
+
+## Response
+
+`200 OK` — the contact kept, and `moved`: how many of each kind of record moved to it.
+
+```json
+{
+  "contact": {
+    "id": "3f6b2a1e-8c4d-4e2a-9b7f-5d1c0e8a9f42",
+    "name": "Asha Rao",
+    "phone": "+919822001144"
+  },
+  "moved": {
+    "messages": 37
+  }
+}
+```
+
+## Errors
+
+Every refusal is `{"error": {"code", "message", "field"}}`; `field` is there when one input is at fault.
+
+| Status | Error code | When |
+| :--- | :--- | :--- |
+| 404 | `not_found` | `keep` or `lose` isn't a contact on this account. |
+| 400 | `invalid_request` | `choices` isn't an object (`field` names it). |
+| 409 | `invalid_state` | `keep` and `lose` are the same contact, or one was merged or deleted meanwhile. |
+| 403 | `scope_missing` | The key doesn't have the `cdp.contacts:write` scope. |
+| 404 | `module_off` | The account doesn't have Customer data on. |
+
+Any request can also be refused for its key, its account or its rate (`key_required`, `invalid_key`, `account_suspended`, `plan_excludes_api`, `address_not_allowed`, `rate_limited`); see [the overview](/api-reference/overview).

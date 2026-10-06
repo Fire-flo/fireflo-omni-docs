@@ -1,0 +1,121 @@
+---
+title: "POST /v1/agents/contacts/{contact_id}/agents/{agent_id}/pause"
+description: "Pause an AI agent on one contact, until it is resumed."
+---
+
+Pauses an agent for one contact. It steps back from them, as when someone on the team takes over, until it is [resumed](/api-reference/ai-agents/resume). The pause is noted as `Paused by API · <key name>`.
+
+<Note>Needs the `agents.contacts:write` scope.</Note>
+
+## Path parameters
+
+| Field | Type | Required | Notes |
+| :--- | :--- | :--- | :--- |
+| `contact_id` | string | Yes | The contact's id. |
+| `agent_id` | integer | Yes | The id of the agent working them. |
+
+## Request
+
+<CodeGroup>
+
+```bash cURL
+curl -X POST "https://api.fireflo.au/v1/agents/contacts/3f6b2a1e-8c4d-4e2a-9b7f-5d1c0e8a9f42/agents/12/pause" \
+  -H "Authorization: Bearer $OMNI_API_KEY"
+```
+
+```python Python
+import os
+
+import requests
+
+response = requests.post(
+    "https://api.fireflo.au/v1/agents/contacts/3f6b2a1e-8c4d-4e2a-9b7f-5d1c0e8a9f42/agents/12/pause",
+    headers={"Authorization": f"Bearer {os.environ['OMNI_API_KEY']}"},
+)
+print(response.status_code, response.json())
+```
+
+```javascript Node
+const response = await fetch("https://api.fireflo.au/v1/agents/contacts/3f6b2a1e-8c4d-4e2a-9b7f-5d1c0e8a9f42/agents/12/pause", {
+  method: "POST",
+  headers: { Authorization: `Bearer ${process.env.OMNI_API_KEY}` },
+});
+console.log(response.status, await response.json());
+```
+
+</CodeGroup>
+
+## Response
+
+`200 OK` — the agents working the contact, this one `paused`. `contact` is the contact, and `data` the agents working them that haven't been released. For each: the `agent`; `status` — `active` (working) or `paused`; `since` when; the `deal` it works (its title and `deal_id`), if any; `paused_reason` and `resume_at` while paused; `needs_attention` when it handed over to the team; the `channels` it can answer on; and `workflow` — where the conversation is in its workflow (the version, the block, and what it is waiting for), or null.
+
+```json
+{
+  "contact": {
+    "id": "3f6b2a1e-8c4d-4e2a-9b7f-5d1c0e8a9f42",
+    "name": "Ravi Kumar",
+    "phone": "+919876500101"
+  },
+  "data": [
+    {
+      "resume_at": null,
+      "paused_by": null,
+      "workflow": {
+        "version": 3,
+        "status": "waiting",
+        "block": "Wait for reply",
+        "waiting_for": "reply",
+        "wake_at": "2026-10-06T11:05:00+05:30"
+      },
+      "agent": {
+        "id": 12,
+        "name": "Priya",
+        "role": "support"
+      },
+      "status": "paused",
+      "since": "2026-10-06T10:35:48+05:30",
+      "deal": null,
+      "deal_id": null,
+      "needs_attention": false,
+      "paused_reason": "Paused by API · Order sync",
+      "channels": [
+        "whatsapp",
+        "sms"
+      ]
+    },
+    {
+      "resume_at": null,
+      "paused_by": null,
+      "workflow": null,
+      "agent": {
+        "id": 7,
+        "name": "Arjun",
+        "role": "sales"
+      },
+      "status": "active",
+      "since": "2026-09-30T16:02:11+05:30",
+      "deal": "Kumar Electricals — AMC renewal",
+      "deal_id": 3402,
+      "needs_attention": false,
+      "paused_reason": null,
+      "channels": [
+        "whatsapp",
+        "sms"
+      ]
+    }
+  ]
+}
+```
+
+## Errors
+
+Every refusal is `{"error": {"code", "message", "field"}}`; `field` is there when one input is at fault.
+
+| Status | Error code | When |
+| :--- | :--- | :--- |
+| 400 | `invalid_request` | No contact of this account's has that id (`field` is `contact`). |
+| 404 | `not_found` | That agent isn't working this contact. |
+| 404 | `module_off` | The account doesn't have AI agents on: they aren't in its plan, or are switched off for it. |
+| 403 | `scope_missing` | The key doesn't have the `agents.contacts:write` scope. |
+
+Any request can also be refused for its key, its account or its rate (`key_required`, `invalid_key`, `account_suspended`, `plan_excludes_api`, `address_not_allowed`, `rate_limited`); see [the overview](/api-reference/overview).

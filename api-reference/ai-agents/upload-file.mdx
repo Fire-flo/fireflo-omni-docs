@@ -1,0 +1,96 @@
+---
+title: "POST /v1/agents/knowledge/files"
+description: "Upload a PDF, Word, CSV, text or Markdown file for agents to answer from."
+---
+
+Uploads a file to Knowledge as a multipart form. Agents answer from the text inside it, and answers from a PDF cite the page they came from. Scanned images aren't read. It is `processing` at first, then `ready`.
+
+To change a file's text, upload the new version and [delete](/api-reference/ai-agents/delete-source) the old one — a file whose name is already in Knowledge is refused.
+
+<Note>Needs the `agents.knowledge:write` scope.</Note>
+
+## Form fields
+
+| Field | Type | Required | Notes |
+| :--- | :--- | :--- | :--- |
+| `file` | file | Yes | A PDF, Word (`.docx`), CSV, text (`.txt`) or Markdown (`.md`) file, up to 20 MB. Its name becomes the source's title. |
+| `collection` | integer | No | The [collection](/api-reference/ai-agents/list-collections) it goes in; **General** when left out. |
+
+## Request
+
+<CodeGroup>
+
+```bash cURL
+curl -X POST "https://api.fireflo.au/v1/agents/knowledge/files" \
+  -H "Authorization: Bearer $OMNI_API_KEY" \
+  -F "file=@warranty-terms.pdf" \
+  -F "collection=3"
+```
+
+```python Python
+import os
+
+import requests
+
+with open("warranty-terms.pdf", "rb") as handle:
+    response = requests.post(
+        "https://api.fireflo.au/v1/agents/knowledge/files",
+        headers={"Authorization": f"Bearer {os.environ['OMNI_API_KEY']}"},
+        files={"file": ("warranty-terms.pdf", handle)},
+        data={"collection": "3"},
+    )
+print(response.status_code, response.json())
+```
+
+```javascript Node
+import { openAsBlob } from "node:fs";
+
+const form = new FormData();
+form.append("file", await openAsBlob("warranty-terms.pdf"), "warranty-terms.pdf");
+form.append("collection", "3");
+
+const response = await fetch("https://api.fireflo.au/v1/agents/knowledge/files", {
+  method: "POST",
+  headers: { Authorization: `Bearer ${process.env.OMNI_API_KEY}` },
+  body: form,
+});
+console.log(response.status, await response.json());
+```
+
+</CodeGroup>
+
+## Response
+
+`201 Created` — the source, `processing`. A source has its `id`, `kind` (`article`, `faq`, `file` or `website`), `title` (an FAQ's question), its `collection`, whether agents use it (`active`) and when it last changed. `status` is `processing` while it is read, then `ready` — or `failed`, with the reason in `error`. An article or FAQ has its `body`; a website its `url`, how often it is checked for changes (`refresh`) and how many `pages` it reads; a file its `file` type and size in bytes.
+
+```json
+{
+  "id": "5d4c3b2a-1f0e-4d9c-8b7a-6f5e4d3c2b1a",
+  "kind": "file",
+  "title": "warranty-terms.pdf",
+  "collection": {
+    "id": 3,
+    "name": "Returns & warranty"
+  },
+  "status": "processing",
+  "error": "",
+  "active": true,
+  "updated_at": "2026-10-06T09:52:17+05:30",
+  "file": {
+    "type": "pdf",
+    "size": 482113
+  }
+}
+```
+
+## Errors
+
+Every refusal is `{"error": {"code", "message", "field"}}`; `field` is there when one input is at fault.
+
+| Status | Error code | When |
+| :--- | :--- | :--- |
+| 400 | `invalid_request` | No `file`, a file of another type, one over 20 MB, or one whose name is already in Knowledge (`field` is `file`). |
+| 404 | `module_off` | The account doesn't have AI agents on: they aren't in its plan, or are switched off for it. |
+| 403 | `scope_missing` | The key doesn't have the `agents.knowledge:write` scope. |
+
+Any request can also be refused for its key, its account or its rate (`key_required`, `invalid_key`, `account_suspended`, `plan_excludes_api`, `address_not_allowed`, `rate_limited`); see [the overview](/api-reference/overview).

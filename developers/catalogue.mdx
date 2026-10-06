@@ -1,0 +1,148 @@
+---
+title: "Catalogue"
+description: "Keep your products in step with your own systems, place orders from them, and follow every order — from a cart, an agent or the API — as it is confirmed and fulfilled."
+---
+
+With the [Catalogue](/batteries/catalogue) battery, OMNI holds the products you sell —
+prices, stock, pictures and sets — and the orders customers place. Through the API your
+own systems can keep those products up to date, place orders, and act on orders however
+they arrived: from a WhatsApp cart, drafted by an AI agent, or placed by hand in the
+panel. It is the same catalogue and the same orders the panel shows.
+
+- Catalogue's endpoints are under `/v1/catalogue/…`. They exist when your account has
+  Catalogue on; otherwise they answer `404 module_off`.
+- Money is always in minor units — paise for `INR`, so `249900` is ₹2,499.00 — except
+  in a CSV import, where prices are in rupees.
+- Changes made through the API are recorded under the key's name, as "API · Shopify
+  sync", in a product's history and an order's.
+
+## Scopes
+
+| Scope | Lets a key |
+| :--- | :--- |
+| `catalogue.products:read` | See products and sets |
+| `catalogue.products:write` | Add, change, import and take products off sale; manage sets |
+| `catalogue.orders:read` | See orders |
+| `catalogue.orders:write` | Place orders, and confirm, decline, fulfil or cancel them |
+
+See [Keys and scopes](/developers/keys-and-scopes).
+
+## Products
+
+| | |
+| :--- | :--- |
+| [`GET /v1/catalogue/products`](/api-reference/catalogue/list-products) | Your products, newest first; filter by `active`, `category`, `set` or `sku`, or search with `q` |
+| [`POST /v1/catalogue/products`](/api-reference/catalogue/add-product) | Add one: a SKU and a name at least |
+| [`GET …/products/{product_id}`](/api-reference/catalogue/get-product) | One product |
+| [`PATCH …/products/{product_id}`](/api-reference/catalogue/update-product) | Change it; only what you send changes |
+| [`DELETE …/products/{product_id}`](/api-reference/catalogue/remove-product) | Take it off sale |
+| [`POST …/products/{product_id}/image`](/api-reference/catalogue/upload-image) | Give it a picture: PNG, JPEG or WebP, 8 MB at most |
+| [`POST …/products/import`](/api-reference/catalogue/import-products) | Add or update many from a CSV, matched on the SKU |
+
+A product's **SKU** is your product code — up to 100 letters, digits, dots, dashes and
+underscores, unique in your account — and is what WhatsApp calls the retailer ID. It
+can't change once the product is on WhatsApp. **Availability** is `in_stock` or
+`out_of_stock`; set `stock` to count what's left (or `null` not to), and a stock of `0`
+makes the product out of stock.
+
+Every product on sale that is added or changed is queued for your WhatsApp catalogue, and its
+`whatsapp.state` follows it there: `pending`, then `synced` — or `error`, with the
+reason. Taking a product off sale hides it from customers and agents, but keeps it for
+the orders and conversations that name it.
+
+Pictures and imports are multipart form posts, not JSON: the picture in the field
+`image`, the CSV in the field `file`. An import checks every row before saving any, so
+a file with a bad row changes nothing.
+
+## Sets
+
+A set is a collection of products sent together — as one WhatsApp product list, or one
+link on SMS and RCS.
+
+| | |
+| :--- | :--- |
+| [`GET`, `POST /v1/catalogue/sets`](/api-reference/catalogue/list-sets) | Your sets, with how many products each holds; add one |
+| [`PATCH …/sets/{set_id}`](/api-reference/catalogue/update-set) | Rename one or change its description |
+| [`DELETE …/sets/{set_id}`](/api-reference/catalogue/delete-set) | Delete one; its products stay |
+
+Put products in sets through their `sets` — a list of set names, on
+[add](/api-reference/catalogue/add-product) or
+[change](/api-reference/catalogue/update-product), or the `sets` column of an import. A
+product is put in exactly the sets named, and a name that isn't a set yet makes one.
+
+## Orders
+
+| | |
+| :--- | :--- |
+| [`GET /v1/catalogue/orders`](/api-reference/catalogue/list-orders) | Your orders, newest first; filter by `status` or `contact` |
+| [`POST /v1/catalogue/orders`](/api-reference/catalogue/open-order) | Place an order for a contact |
+| [`GET …/orders/{order_id}`](/api-reference/catalogue/get-order) | One order, with its history |
+| [`POST …/orders/{order_id}/confirm`](/api-reference/catalogue/confirm-order) | Confirm it, and send the customer your confirmation |
+| [`POST …/orders/{order_id}/decline`](/api-reference/catalogue/decline-order) | Decline it, with a reason the customer is sent |
+| [`POST …/orders/{order_id}/fulfil`](/api-reference/catalogue/fulfil-order) | Mark it fulfilled |
+| [`POST …/orders/{order_id}/cancel`](/api-reference/catalogue/cancel-order) | Cancel it |
+
+### Placing one
+
+[POST /v1/catalogue/orders](/api-reference/catalogue/open-order) takes a contact and the
+lines ordered, each naming a product by id or a SKU:
+
+```json
+{
+  "contact": "5b2f9e1c-8a3d-4c7e-9f61-2d4b7a0e3c85",
+  "channel": "whatsapp",
+  "items": [
+    { "product": "3f8a2c1e-7b4d-4e6a-9c2f-1a5b8d7e6f40", "quantity": 2 },
+    { "sku": "DUP-PHUL-RED", "quantity": 1 }
+  ],
+  "note": "Gift wrap, please."
+}
+```
+
+A line's price is the product's own — its sale price while it has one — unless you send
+`unit_price_minor`. Each line keeps its own copy of the name and price, so a later
+change to the product never rewrites what someone ordered. The order's `source` is
+`api`, and its history begins "Placed through the API". When your account has set
+Catalogue to open a deal for each order, the order opens one in
+[Pipelines](/batteries/pipelines) too. Send an `Idempotency-Key` header so a retried
+request places it once.
+
+### What happens to an order
+
+An order starts `new`, and is then confirmed, declined, fulfilled or cancelled — by a
+person in the panel, an AI agent a person approved, or the API.
+
+| To | Call | What happens |
+| :--- | :--- | :--- |
+| Confirm | [POST …/confirm](/api-reference/catalogue/confirm-order) | `confirmed`. The customer is sent your confirmation reply, with their name, the order number and the total filled in, on the channel the order came in on. |
+| Decline | [POST …/decline](/api-reference/catalogue/decline-order) | `declined`. A `reason`, when you give one, is sent to the customer on the order's channel. |
+| Fulfil | [POST …/fulfil](/api-reference/catalogue/fulfil-order) | `fulfilled` — it has gone out. Nothing is sent. |
+| Cancel | [POST …/cancel](/api-reference/catalogue/cancel-order) | `cancelled`. Nothing is sent. |
+
+A declined or cancelled order can't be fulfilled: asking is refused with
+`invalid_state` (409), and the message says why. Asking for the status an order already
+has changes nothing and sends nothing again. If the channel can't send a reply, the
+decision still stands and the order's history says why the reply didn't go.
+
+## Webhook events
+
+Subscribe a [webhook endpoint](/developers/webhooks) to:
+
+| Event | When |
+| :--- | :--- |
+| `order.opened` | An order was placed — from a cart, an agent or the API. |
+| `order.confirmed` | An order was confirmed. |
+| `order.declined` | An order was declined. |
+| `order.fulfilled` | An order was fulfilled. |
+| `order.canceled` | An order was canceled. |
+| `product.changed` | A product was added or changed. |
+
+An order event carries the order, as `order`, and `product.changed` the product, as
+`product` — each in the shape its GET answers
+([order](/api-reference/catalogue/get-order), without its history;
+[product](/api-reference/catalogue/get-product)).
+
+<Note>
+A CSV import doesn't send `product.changed` for each row it saves. After an import, read
+the products you need with [GET /v1/catalogue/products](/api-reference/catalogue/list-products).
+</Note>

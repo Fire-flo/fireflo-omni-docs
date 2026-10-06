@@ -166,22 +166,28 @@ the last 50 sent in, with how each went.
 
 ### Keys
 
-Choose **New key** and say where it is used:
-
-| Key | Where it goes | What it can do |
-|---|---|---|
-| **Your server** | Your own backend | Send any event. It is secret and shown once — keep it on your server. |
-| **A website** | Your website's HTML | It is public, and works only from the websites you list. Listing a domain also covers its subdomains. |
+The keys on this screen are for **websites**. Choose **New key**, name it and list the
+websites it may be used from. A website key sits in your pages' HTML for anyone to read,
+so it works only from those websites — listing a domain also covers its subdomains — and
+it can only send events, never read anything.
 
 Revoke a key and anything using it stops at once.
+
+<Note>
+Your server sends events with an **OMNI API key**, not a key from this screen: make one in
+**Developer Tools → API keys** with the scope `cdp.events:write`. Server keys made here
+before (`sk_live_…`) were retired and no longer work; requests that still use one are
+refused. See [Customer data on the API](/developers/customer-data).
+</Note>
 
 ### Sending events
 
 - **From your website**: make a website key to get your snippet, and add it to your pages.
   Page views count on their own. Say who someone is when they log in or check out.
-- **From your server**: the screen shows a ready example with your key. You can identify
-  people (by phone, email or customer id, with traits), send single events, or send up to
-  100 at a time.
+- **From your server**: with an OMNI API key, identify people (by phone, email or
+  customer id, with traits), send single events, or send up to 100 at a time — see
+  [Customer data on the API](/developers/customer-data). This needs the OMNI API in your
+  plan.
 
 People without a phone number are kept as visitors, and join the contact once a phone is
 known.

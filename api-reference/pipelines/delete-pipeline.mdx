@@ -1,0 +1,64 @@
+---
+title: "DELETE /v1/crm/pipelines/{pipeline_id}"
+description: "Delete a pipeline with no open deals; its closed deals go with it."
+---
+
+Deletes a pipeline and its stages. It must have no open deals — win, lose or move them first. Its won and lost deals are deleted with it.
+
+<Note>Needs the `crm.pipelines:write` scope.</Note>
+
+## Path parameters
+
+| Field | Type | Required | Notes |
+| :--- | :--- | :--- | :--- |
+| `pipeline_id` | integer | Yes | The pipeline's id. |
+
+## Request
+
+<CodeGroup>
+
+```bash cURL
+curl -X DELETE "https://api.fireflo.au/v1/crm/pipelines/4" \
+  -H "Authorization: Bearer $OMNI_API_KEY"
+```
+
+```python Python
+import os
+
+import requests
+
+response = requests.delete(
+    "https://api.fireflo.au/v1/crm/pipelines/4",
+    headers={"Authorization": f"Bearer {os.environ['OMNI_API_KEY']}"},
+)
+print(response.status_code)
+```
+
+```javascript Node
+const response = await fetch("https://api.fireflo.au/v1/crm/pipelines/4", {
+  method: "DELETE",
+  headers: {
+    Authorization: `Bearer ${process.env.OMNI_API_KEY}`,
+  },
+});
+console.log(response.status);
+```
+
+</CodeGroup>
+
+## Response
+
+`204 No Content` — no body.
+
+## Errors
+
+Every refusal is `{"error": {"code", "message", "field"}}`; `field` is there when one input is at fault.
+
+| Status | Error code | When |
+| :--- | :--- | :--- |
+| 404 | `not_found` | No pipeline of this account's has that id. |
+| 409 | `invalid_state` | The pipeline still has open deals. |
+| 404 | `module_off` | The account doesn't have Pipelines on. |
+| 403 | `scope_missing` | The key doesn't have the `crm.pipelines:write` scope. |
+
+Any request can also be refused for its key, its account or its rate (`key_required`, `invalid_key`, `account_suspended`, `plan_excludes_api`, `address_not_allowed`, `rate_limited`); see [the overview](/api-reference/overview).

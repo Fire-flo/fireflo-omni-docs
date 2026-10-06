@@ -1,0 +1,112 @@
+---
+title: "GET /v1/calendar/booking-types"
+description: "What people can book: how long each booking type lasts, the prep before it, and who takes it."
+---
+
+The account's booking types — what people can book — in the order the panel shows them, switched-off ones included.
+
+<Note>Needs the `calendar:read` scope.</Note>
+
+## Request
+
+<CodeGroup>
+
+```bash cURL
+curl "https://api.fireflo.au/v1/calendar/booking-types" \
+  -H "Authorization: Bearer $OMNI_API_KEY"
+```
+
+```python Python
+import os
+
+import requests
+
+response = requests.get(
+    "https://api.fireflo.au/v1/calendar/booking-types",
+    headers={"Authorization": f"Bearer {os.environ['OMNI_API_KEY']}"},
+)
+print(response.status_code, response.json())
+```
+
+```javascript Node
+const response = await fetch("https://api.fireflo.au/v1/calendar/booking-types", {
+  headers: { Authorization: `Bearer ${process.env.OMNI_API_KEY}` },
+});
+console.log(response.status, await response.json());
+```
+
+</CodeGroup>
+
+## Response
+
+`200 OK` — every booking type, in `data`. The list isn't paged: an account has at most 50.
+
+| Field | Meaning |
+| :--- | :--- |
+| `id` | The booking type's id — what free times and bookings name it by. |
+| `name`, `description` | What it is called, and what it is for. |
+| `slot_minutes` | How long the appointment lasts. |
+| `prep_minutes` | Time blocked on the teammate's calendar just before it. |
+| `mode` | `online`, `physical` (in person) or `either` — chosen when booking. |
+| `location`, `meeting_link` | Where it happens, in person or online. Empty uses the teammate's own, or the account's default location. |
+| `default_staff` | The teammate who takes it first, as `{name, email}`, or `null`. |
+| `staff` | Others who can take it. |
+| `active` | Whether it can be booked. |
+| `online` | Whether it is offered on the account's online booking page. |
+
+```json
+{
+  "data": [
+    {
+      "id": 3,
+      "name": "Home loan consultation",
+      "description": "Eligibility, documents and EMI options, in 30 minutes.",
+      "slot_minutes": 30,
+      "prep_minutes": 10,
+      "mode": "either",
+      "location": "Kaveri Homes, 2nd floor, Kalpataru Plaza, Andheri East, Mumbai",
+      "meeting_link": "https://meet.google.com/kfr-ptqw-xya",
+      "default_staff": {
+        "name": "Priya Sharma",
+        "email": "priya@acme.in"
+      },
+      "staff": [
+        {
+          "name": "Rahul Verma",
+          "email": "rahul@acme.in"
+        }
+      ],
+      "active": true,
+      "online": true
+    },
+    {
+      "id": 4,
+      "name": "Site visit",
+      "description": "Walk through a sample flat with a teammate.",
+      "slot_minutes": 60,
+      "prep_minutes": 15,
+      "mode": "physical",
+      "location": "Kaveri Heights, Powai, Mumbai",
+      "meeting_link": "",
+      "default_staff": {
+        "name": "Rahul Verma",
+        "email": "rahul@acme.in"
+      },
+      "staff": [],
+      "active": true,
+      "online": false
+    }
+  ]
+}
+```
+
+## Errors
+
+Every refusal is `{"error": {"code", "message", "field"}}`; `field` is there when one input is at fault.
+
+| Status | Error code | When |
+| :--- | :--- | :--- |
+| 404 | `module_off` | The account's plan doesn't include Calendar. |
+| 403 | `scope_missing` | The key doesn't have the `calendar:read` scope. |
+
+Any request can also be refused for its key, its account or its rate (`key_required`, `invalid_key`, `account_suspended`, `plan_excludes_api`, `address_not_allowed`, `rate_limited`); see [the overview](/api-reference/overview).

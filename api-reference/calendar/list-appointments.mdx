@@ -1,0 +1,131 @@
+---
+title: "GET /v1/calendar/appointments"
+description: "The account's appointments, newest first, by day, status, teammate or contact."
+---
+
+The account's appointments, the most recently booked first — booked in the panel, the Inbox, by an AI agent, a workflow, online booking or the API.
+
+<Note>Needs the `calendar:read` scope.</Note>
+
+## Query parameters
+
+| Field | Type | Required | Notes |
+| :--- | :--- | :--- | :--- |
+| `from` | string | No | `YYYY-MM-DD`: only appointments ending on or after this day. |
+| `to` | string | No | `YYYY-MM-DD`: only appointments starting on or before this day. |
+| `status` | string | No | `requested`, `confirmed`, `completed`, `cancelled` or `no_show`. |
+| `staff` | string | No | A teammate's email: only theirs. |
+| `contact` | string | No | A contact's id: only theirs. |
+| `limit` | integer | No | 1 to 100; 50 by default. |
+| `starting_after` | string | No | The last id of the previous page — `next` from it. |
+
+## Request
+
+<CodeGroup>
+
+```bash cURL
+curl "https://api.fireflo.au/v1/calendar/appointments?from=2026-10-08&to=2026-10-14&limit=20" \
+  -H "Authorization: Bearer $OMNI_API_KEY"
+```
+
+```python Python
+import os
+
+import requests
+
+response = requests.get(
+    "https://api.fireflo.au/v1/calendar/appointments?from=2026-10-08&to=2026-10-14&limit=20",
+    headers={"Authorization": f"Bearer {os.environ['OMNI_API_KEY']}"},
+)
+print(response.status_code, response.json())
+```
+
+```javascript Node
+const response = await fetch("https://api.fireflo.au/v1/calendar/appointments?from=2026-10-08&to=2026-10-14&limit=20", {
+  headers: { Authorization: `Bearer ${process.env.OMNI_API_KEY}` },
+});
+console.log(response.status, await response.json());
+```
+
+</CodeGroup>
+
+## Response
+
+`200 OK` — `has_more` says whether there is another page, and `next` is the `starting_after` for it. Each appointment is as [GET /v1/calendar/appointments/\{appointment_id\}](/api-reference/calendar/get-appointment) shows it, without its history.
+
+```json
+{
+  "data": [
+    {
+      "id": "5b0e7d3c-9a2f-4c61-8e47-1f3a6c9d2b84",
+      "title": "Home loan consultation",
+      "status": "confirmed",
+      "booking_type": {
+        "id": 3,
+        "name": "Home loan consultation"
+      },
+      "contact": {
+        "id": "3f6b2a1e-8c4d-4e2a-9b7f-5d1c0e8a9f42",
+        "name": "Ravi Kumar",
+        "phone": "+919876500101"
+      },
+      "staff": {
+        "name": "Priya Sharma",
+        "email": "priya@acme.in"
+      },
+      "starts_at": "2026-10-08T10:30:00+05:30",
+      "ends_at": "2026-10-08T11:00:00+05:30",
+      "mode": "online",
+      "location": "",
+      "meeting_link": "https://meet.google.com/kfr-ptqw-xya",
+      "notes": "Salaried, looking at a ₹45 lakh loan. Bring Form 16.",
+      "source": "api",
+      "deal": null,
+      "created_at": "2026-10-06T04:12:04.512903+00:00",
+      "updated_at": "2026-10-06T04:12:04.512903+00:00"
+    },
+    {
+      "id": "a83f1c2d-6e4b-4f09-b7d5-2c8e1a9f3b60",
+      "title": "Site visit",
+      "status": "requested",
+      "booking_type": {
+        "id": 4,
+        "name": "Site visit"
+      },
+      "contact": {
+        "id": "8d2c4e6a-1b3f-4a5c-9e7d-0f2b4c6a8e13",
+        "name": "Asha Rao",
+        "phone": "+919876543210"
+      },
+      "staff": {
+        "name": "Rahul Verma",
+        "email": "rahul@acme.in"
+      },
+      "starts_at": "2026-10-10T16:00:00+05:30",
+      "ends_at": "2026-10-10T17:00:00+05:30",
+      "mode": "physical",
+      "location": "Kaveri Heights, Powai, Mumbai",
+      "meeting_link": "",
+      "notes": "",
+      "source": "link",
+      "deal": null,
+      "created_at": "2026-10-05T13:40:51.208114+00:00",
+      "updated_at": "2026-10-05T13:40:51.208114+00:00"
+    }
+  ],
+  "has_more": false,
+  "next": null
+}
+```
+
+## Errors
+
+Every refusal is `{"error": {"code", "message", "field"}}`; `field` is there when one input is at fault.
+
+| Status | Error code | When |
+| :--- | :--- | :--- |
+| 400 | `invalid_request` | `status`, `staff`, `contact` or `limit` isn't one (`field` names it), or `starting_after` isn't an id from this list. |
+| 404 | `module_off` | The account's plan doesn't include Calendar. |
+| 403 | `scope_missing` | The key doesn't have the `calendar:read` scope. |
+
+Any request can also be refused for its key, its account or its rate (`key_required`, `invalid_key`, `account_suspended`, `plan_excludes_api`, `address_not_allowed`, `rate_limited`); see [the overview](/api-reference/overview).

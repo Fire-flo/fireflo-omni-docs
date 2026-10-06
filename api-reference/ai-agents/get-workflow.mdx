@@ -1,0 +1,178 @@
+---
+title: "GET /v1/agents/{agent_id}/workflow"
+description: "An agent's workflow: the draft graph, its problems, its revision and the live version."
+---
+
+An agent's workflow — the diagram of blocks that decides what happens in a conversation, and when the AI is called. You edit a **draft**; publishing makes it a new live version.
+
+Keep the `revision` you read: [saving](/api-reference/ai-agents/save-workflow) and [publishing](/api-reference/ai-agents/publish-workflow) need it.
+
+<Note>Needs the `agents:read` scope.</Note>
+
+## Path parameters
+
+| Field | Type | Required | Notes |
+| :--- | :--- | :--- | :--- |
+| `agent_id` | integer | Yes | The agent's id. |
+
+## Request
+
+<CodeGroup>
+
+```bash cURL
+curl "https://api.fireflo.au/v1/agents/12/workflow" \
+  -H "Authorization: Bearer $OMNI_API_KEY"
+```
+
+```python Python
+import os
+
+import requests
+
+response = requests.get(
+    "https://api.fireflo.au/v1/agents/12/workflow",
+    headers={"Authorization": f"Bearer {os.environ['OMNI_API_KEY']}"},
+)
+print(response.status_code, response.json())
+```
+
+```javascript Node
+const response = await fetch("https://api.fireflo.au/v1/agents/12/workflow", {
+  headers: { Authorization: `Bearer ${process.env.OMNI_API_KEY}` },
+});
+console.log(response.status, await response.json());
+```
+
+</CodeGroup>
+
+## Response
+
+`200 OK`:
+
+| Field | What it is |
+| :--- | :--- |
+| `revision` | The draft's revision. It goes up by one with every save. |
+| `draft` | The draft graph: `nodes` and `wires`. |
+| `issues` | What the checks found: each has a `level` — `broken` stops a publish, `look` is allowed but probably unintended — the `node` it is about (null for the whole workflow) and `text`. |
+| `unpublished` | Whether the draft has changes that aren't live. |
+| `live` | The live version, or null when nothing is published yet. |
+
+Each node has its `id`, the `block` it is, its `label` and `summary`, its `outcomes`, its place on the canvas (`x`, `y`) and its `config`. OMNI adds the block's `category`, whether it calls the AI (`ai`), and, for a block that runs an action, the agent's `policy` for it. A wire joins one outcome of a node — by its position in `outcomes`, from 0 — to another node. A version has its `number`, the `note` it was published with, who published it (`by`; null when published through the API), when (`at`), how many `blocks` it has and how many call the AI (`ai_blocks`), and whether it is the `live` one.
+
+```json
+{
+  "agent": 12,
+  "revision": 18,
+  "draft": {
+    "nodes": [
+      {
+        "id": "start-1",
+        "block": "customer_writes",
+        "label": "Customer writes",
+        "summary": "WhatsApp · SMS",
+        "outcomes": [
+          "next"
+        ],
+        "x": 40,
+        "y": 40,
+        "config": {},
+        "category": "start",
+        "ai": false,
+        "policy": null
+      },
+      {
+        "id": "hours",
+        "block": "business_hours",
+        "label": "Business hours",
+        "summary": "the agent's working hours",
+        "outcomes": [
+          "open",
+          "closed"
+        ],
+        "x": 320,
+        "y": 40,
+        "config": {},
+        "category": "rule",
+        "ai": false,
+        "policy": null
+      },
+      {
+        "id": "answer",
+        "block": "ai_replies",
+        "label": "AI replies",
+        "summary": "from knowledge",
+        "outcomes": [
+          "answered",
+          "unsure"
+        ],
+        "x": 600,
+        "y": 40,
+        "config": {},
+        "category": "ai",
+        "ai": true,
+        "policy": null
+      },
+      {
+        "id": "team",
+        "block": "hand_to_person",
+        "label": "Hand to a person",
+        "summary": "needs attention · unread",
+        "outcomes": [],
+        "x": 600,
+        "y": 220,
+        "config": {},
+        "category": "handover",
+        "ai": false,
+        "policy": "auto"
+      }
+    ],
+    "wires": [
+      {
+        "from": "start-1",
+        "outcome": 0,
+        "to": "hours"
+      },
+      {
+        "from": "hours",
+        "outcome": 0,
+        "to": "answer"
+      },
+      {
+        "from": "hours",
+        "outcome": 1,
+        "to": "team"
+      },
+      {
+        "from": "answer",
+        "outcome": 1,
+        "to": "team"
+      }
+    ]
+  },
+  "issues": [],
+  "unpublished": false,
+  "live": {
+    "number": 3,
+    "note": "Out of hours goes straight to the team",
+    "by": "Meera Iyer",
+    "at": "2026-10-02T17:20:44+05:30",
+    "blocks": 4,
+    "ai_blocks": 1,
+    "live": true,
+    "running": 0
+  },
+  "updated_at": "2026-10-02T17:20:44+05:30"
+}
+```
+
+## Errors
+
+Every refusal is `{"error": {"code", "message", "field"}}`; `field` is there when one input is at fault.
+
+| Status | Error code | When |
+| :--- | :--- | :--- |
+| 404 | `not_found` | No agent of this account's has that id. |
+| 404 | `module_off` | The account doesn't have AI agents on: they aren't in its plan, or are switched off for it. |
+| 403 | `scope_missing` | The key doesn't have the `agents:read` scope. |
+
+Any request can also be refused for its key, its account or its rate (`key_required`, `invalid_key`, `account_suspended`, `plan_excludes_api`, `address_not_allowed`, `rate_limited`); see [the overview](/api-reference/overview).

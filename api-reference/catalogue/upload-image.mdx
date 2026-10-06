@@ -1,0 +1,104 @@
+---
+title: "POST /v1/catalogue/products/{product_id}/image"
+description: "Give a product its picture: a PNG, JPEG or WebP of 8 MB at most, sent as a form."
+---
+
+Gives a product its picture, replacing any it had. Send it as a multipart form with the file in the field `image`. A product on sale is queued for the WhatsApp catalogue again, where the picture shows in product cards; square, and at least 500 × 500 px, looks best.
+
+<Note>Needs the `catalogue.products:write` scope.</Note>
+
+## Path parameters
+
+| Field | Type | Required | Notes |
+| :--- | :--- | :--- | :--- |
+| `product_id` | string | Yes | The product's id. |
+
+## Form fields
+
+| Field | Type | Required | Notes |
+| :--- | :--- | :--- | :--- |
+| `image` | file | Yes | A PNG, JPEG or WebP picture, 8 MB or smaller. |
+
+## Request
+
+<CodeGroup>
+
+```bash cURL
+curl -X POST "https://api.fireflo.au/v1/catalogue/products/3f8a2c1e-7b4d-4e6a-9c2f-1a5b8d7e6f40/image" \
+  -H "Authorization: Bearer $OMNI_API_KEY" \
+  -F "image=@kurta-indigo.jpg;type=image/jpeg"
+```
+
+```python Python
+import os
+
+import requests
+
+with open("kurta-indigo.jpg", "rb") as upload:
+    response = requests.post(
+        "https://api.fireflo.au/v1/catalogue/products/3f8a2c1e-7b4d-4e6a-9c2f-1a5b8d7e6f40/image",
+        headers={"Authorization": f"Bearer {os.environ['OMNI_API_KEY']}"},
+        files={"image": ("kurta-indigo.jpg", upload, "image/jpeg")},
+    )
+print(response.status_code, response.json())
+```
+
+```javascript Node
+import { readFile } from "node:fs/promises";
+
+const form = new FormData();
+form.append("image", new Blob([await readFile("kurta-indigo.jpg")], { type: "image/jpeg" }), "kurta-indigo.jpg");
+
+const response = await fetch("https://api.fireflo.au/v1/catalogue/products/3f8a2c1e-7b4d-4e6a-9c2f-1a5b8d7e6f40/image", {
+  method: "POST",
+  headers: { Authorization: `Bearer ${process.env.OMNI_API_KEY}` },
+  body: form,
+});
+console.log(response.status, await response.json());
+```
+
+</CodeGroup>
+
+## Response
+
+`200 OK` — the product, with `has_image` true.
+
+```json
+{
+  "id": "3f8a2c1e-7b4d-4e6a-9c2f-1a5b8d7e6f40",
+  "sku": "KUR-COT-IND-M",
+  "name": "Cotton kurta — indigo, M",
+  "description": "Hand-block printed cotton from Jaipur. Machine wash cold.",
+  "price_minor": 249900,
+  "sale_price_minor": 199900,
+  "currency": "INR",
+  "availability": "in_stock",
+  "stock": 18,
+  "category": "Kurtas",
+  "brand": "Neel Weaves",
+  "url": "",
+  "has_image": true,
+  "sets": [
+    "Diwali edit"
+  ],
+  "active": true,
+  "whatsapp": {
+    "state": "pending",
+    "error": ""
+  },
+  "updated_at": "2026-10-06T10:31:18+05:30"
+}
+```
+
+## Errors
+
+Every refusal is `{"error": {"code", "message", "field"}}`; `field` is there when one input is at fault.
+
+| Status | Error code | When |
+| :--- | :--- | :--- |
+| 400 | `invalid_request` | No `image` field, a picture larger than 8 MB, or one that isn't PNG, JPEG or WebP (`field` is `image`). |
+| 404 | `not_found` | No product of this account's has that id. |
+| 404 | `module_off` | The account doesn't have Catalogue on. |
+| 403 | `scope_missing` | The key doesn't have the `catalogue.products:write` scope. |
+
+Any request can also be refused for its key, its account or its rate (`key_required`, `invalid_key`, `account_suspended`, `plan_excludes_api`, `address_not_allowed`, `rate_limited`); see [the overview](/api-reference/overview).

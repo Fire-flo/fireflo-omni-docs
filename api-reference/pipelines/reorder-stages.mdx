@@ -1,0 +1,140 @@
+---
+title: "POST /v1/crm/pipelines/{pipeline_id}/stages/reorder"
+description: "Put a pipeline's stages in a new order."
+---
+
+Puts a pipeline's stages in a new order — the order of the board's columns. List every stage of the pipeline exactly once. Deals stay in their stages.
+
+<Note>Needs the `crm.pipelines:write` scope.</Note>
+
+## Path parameters
+
+| Field | Type | Required | Notes |
+| :--- | :--- | :--- | :--- |
+| `pipeline_id` | integer | Yes | The pipeline's id. |
+
+## Body
+
+| Field | Type | Required | Notes |
+| :--- | :--- | :--- | :--- |
+| `order` | array of integers | Yes | Every stage id of this pipeline, once each, in the new order. |
+
+## Request
+
+<CodeGroup>
+
+```bash cURL
+curl -X POST "https://api.fireflo.au/v1/crm/pipelines/3/stages/reorder" \
+  -H "Authorization: Bearer $OMNI_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "order": [
+    11,
+    13,
+    12,
+    14,
+    15
+  ]
+}'
+```
+
+```python Python
+import os
+
+import requests
+
+response = requests.post(
+    "https://api.fireflo.au/v1/crm/pipelines/3/stages/reorder",
+    headers={"Authorization": f"Bearer {os.environ['OMNI_API_KEY']}"},
+    json={
+        "order": [
+            11,
+            13,
+            12,
+            14,
+            15
+        ]
+    },
+)
+print(response.status_code, response.json())
+```
+
+```javascript Node
+const response = await fetch("https://api.fireflo.au/v1/crm/pipelines/3/stages/reorder", {
+  method: "POST",
+  headers: {
+    Authorization: `Bearer ${process.env.OMNI_API_KEY}`,
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({
+    "order": [
+      11,
+      13,
+      12,
+      14,
+      15
+    ]
+  }),
+});
+console.log(response.status, await response.json());
+```
+
+</CodeGroup>
+
+## Response
+
+`200 OK` — the pipeline, with its stages in the new order.
+
+```json
+{
+  "id": 3,
+  "name": "Retail sales",
+  "order": 0,
+  "stages": [
+    {
+      "id": 11,
+      "name": "New",
+      "order": 0,
+      "outcome": ""
+    },
+    {
+      "id": 13,
+      "name": "Proposal",
+      "order": 1,
+      "outcome": ""
+    },
+    {
+      "id": 12,
+      "name": "Contacted",
+      "order": 2,
+      "outcome": ""
+    },
+    {
+      "id": 14,
+      "name": "Won",
+      "order": 3,
+      "outcome": "won"
+    },
+    {
+      "id": 15,
+      "name": "Lost",
+      "order": 4,
+      "outcome": "lost"
+    }
+  ],
+  "created_at": "2026-09-14T10:02:17+05:30"
+}
+```
+
+## Errors
+
+Every refusal is `{"error": {"code", "message", "field"}}`; `field` is there when one input is at fault.
+
+| Status | Error code | When |
+| :--- | :--- | :--- |
+| 400 | `invalid_request` | `order` isn't a list of stage ids, or doesn't list every stage of this pipeline exactly once (`field` is `order`). |
+| 404 | `not_found` | No pipeline of this account's has that id. |
+| 404 | `module_off` | The account doesn't have Pipelines on. |
+| 403 | `scope_missing` | The key doesn't have the `crm.pipelines:write` scope. |
+
+Any request can also be refused for its key, its account or its rate (`key_required`, `invalid_key`, `account_suspended`, `plan_excludes_api`, `address_not_allowed`, `rate_limited`); see [the overview](/api-reference/overview).

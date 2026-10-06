@@ -1,0 +1,161 @@
+---
+title: "Customer data"
+description: "Send events from your server with an OMNI API key, and manage audiences, traits, consent and duplicates on the API."
+---
+
+With the **Customer data** battery, the API takes events from your own systems — who
+someone is, and what they did — and lets you manage what the battery builds from them:
+audiences, traits, consent per channel, and duplicate contacts. They use the same keys,
+errors and conventions as the rest of the API.
+
+- The endpoints exist when your account has Customer data; otherwise they answer
+  `404 module_off`. Your plan must include the **OMNI API** too.
+- Their scopes start with `cdp.`: `cdp.events:write`, `cdp.audiences:read`,
+  `cdp.audiences:write`, `cdp.contacts:read`, `cdp.contacts:write`.
+
+What each feature does in the panel: [Customer data](/batteries/customer-data).
+
+## Sending events from your server
+
+Events from your server go to the same addresses as always, with an **OMNI API key**
+that has the `cdp.events:write` scope.
+
+| | |
+| :--- | :--- |
+| [`POST /v1/identify`](/api-reference/customer-data/identify) | Who someone is: your customer id, phone, email or the website visitor id, with traits |
+| [`POST /v1/track`](/api-reference/customer-data/track) | Something they did: an event name, its properties and when |
+| [`POST /v1/batch`](/api-reference/customer-data/batch) | Up to 100 of either at once |
+
+```bash
+curl -X POST "https://api.fireflo.au/v1/track" \
+  -H "Authorization: Bearer $OMNI_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "user_id": "CUST-10482",
+    "event": "cart_added",
+    "properties": { "sku": "KURTA-BLU-M", "price": 1499 }
+  }'
+```
+
+- Each answers `202 {"accepted": n}`: the events are taken, and applied in the
+  background. One that can't be applied is dropped without stopping the rest, and shows
+  with its reason under **Live events** on **Settings → Data sources**.
+- A request is at most 256 KB (`413 too_large`), and a batch at most 100 events.
+- An event never creates a contact on its own, and `identify` creates one only with a
+  `phone`. People without a phone are kept as visitors, and what they did joins the
+  contact once a phone is known.
+- Event names FireFlo writes itself — starting `message.`, `deal.`, `audience.`,
+  `consent.` and the like — are refused.
+
+## Moving from source keys
+
+<Warning>
+Server events used to take **Customer data source keys** (`sk_live_…`), made on the
+**Data sources** screen. They now take an **OMNI API key** (`ff_live_…`) with the
+`cdp.events:write` scope. A source key sent to the API is refused with
+`401 key_retired`.
+</Warning>
+
+The addresses, the bodies and the answers are unchanged — only the key is different.
+
+<Steps>
+  <Step title="Make an OMNI API key">
+    In **Developer Tools → API keys**, make a key with the scope **`cdp.events:write`** ("Send events: identify, track and
+    batch"). Copy it: it is shown once. See
+    [Keys and scopes](/developers/keys-and-scopes).
+  </Step>
+  <Step title="Swap the key">
+    On your server, change the `Authorization` header from `Bearer sk_live_…` to
+    `Bearer ff_live_…`. Nothing else changes.
+  </Step>
+  <Step title="Check it arrives">
+    Send an event, and look for it under **Live events** on **Settings → Data sources**.
+  </Step>
+</Steps>
+
+- An OMNI API key works only with the **OMNI API** in your plan.
+- An OMNI API key can be limited to the addresses your server sends from, like any
+  other key.
+- **Website keys** (`pk_live_…`) and the website snippet are unchanged: keep them as
+  they are.
+
+## Audiences
+
+An audience is a group of people described by rules; people join and leave as they
+match. Rules are `{"match": "all" | "any", "conditions": [...]}` — the condition types are
+in [POST /v1/cdp/audiences](/api-reference/customer-data/create-audience#rules).
+
+| | |
+| :--- | :--- |
+| [`GET /v1/cdp/audiences`](/api-reference/customer-data/list-audiences) | Your audiences, with how many are in each |
+| [`POST /v1/cdp/audiences`](/api-reference/customer-data/create-audience) | Save one from rules; its members are worked out in the background |
+| [`GET /v1/cdp/audiences/{audience_id}`](/api-reference/customer-data/get-audience) | One audience and its rules |
+| [`PATCH …/audiences/{audience_id}`](/api-reference/customer-data/update-audience) | Rename it or change its rules |
+| [`DELETE …/audiences/{audience_id}`](/api-reference/customer-data/delete-audience) | Delete one no AI agent or other audience uses |
+| [`GET …/audiences/{audience_id}/members`](/api-reference/customer-data/audience-members) | Who is in it, latest to join first |
+| [`POST …/audiences/{audience_id}/refresh`](/api-reference/customer-data/refresh-audience) | Work out who is in it again, now |
+
+An audience can be the recipients of a [broadcast](/developers/broadcasts).
+
+## Traits
+
+Traits are facts worked out for every contact — built-in ones from messages, visits and
+deals, and your own from an event: how many times, when last, or a total, over a window
+of days. Use a trait's key in audience rules and its `{{trait.key}}` merge tag in messages.
+
+| | |
+| :--- | :--- |
+| [`GET /v1/cdp/traits`](/api-reference/customer-data/list-traits) | The built-in traits and your own |
+| [`POST /v1/cdp/traits`](/api-reference/customer-data/add-trait) | Add one, worked out from an event |
+| [`DELETE /v1/cdp/traits/{key}`](/api-reference/customer-data/remove-trait) | Remove one of your own |
+
+## Consent
+
+Consent is kept per channel and per purpose: **marketing** (campaigns, offers) and
+**transactional** (replies, order and appointment updates). Every change is recorded with
+its proof.
+
+| | |
+| :--- | :--- |
+| [`GET /v1/cdp/contacts/{contact_id}/consent`](/api-reference/customer-data/get-consent) | Where a contact stands on each channel, and the history |
+| [`POST …/contacts/{contact_id}/consent`](/api-reference/customer-data/set-consent) | Record `granted`, `revoked` or `cleared` for a channel (or `all`) and purpose |
+
+## Duplicates and merging
+
+| | |
+| :--- | :--- |
+| [`GET /v1/cdp/duplicates`](/api-reference/customer-data/list-duplicates) | Pairs that look like one person: same customer id, email, number, or name and email domain |
+| [`POST …/duplicates/{duplicate_id}/dismiss`](/api-reference/customer-data/dismiss-duplicate) | They aren't the same person; don't suggest them again |
+| [`POST /v1/cdp/merge`](/api-reference/customer-data/merge) | Merge one contact into another; its history moves to the one you keep |
+
+## Webhook events
+
+Add these to a [webhook endpoint](/developers/webhooks) to hear about them as they happen.
+
+| Event | `data` carries | When |
+| :--- | :--- | :--- |
+| `audience.entered` | `audience`, `contacts` | Contacts joined an audience. Up to 500 contacts an event; more arrive as further events. |
+| `audience.left` | `audience`, `contacts` | Contacts left an audience, up to 500 an event. |
+| `consent.changed` | `contact`, `consent` | A contact's consent changed, on a channel or all |
+| `contacts.merged` | `contact`, `merged` | Two contacts were merged: `contact` is the one kept, `merged` the id, name and phone of the one merged into it |
+
+```json
+{
+  "id": "evt_2a9c4e7b1d3f5a8c6e0b4d2f7a9c1e3b",
+  "event": "audience.entered",
+  "created": "2026-10-06T05:17:12.408Z",
+  "data": {
+    "audience": {
+      "id": "5b2e8d14-7c3a-4f9e-a1d6-3e8b0c4f2a71",
+      "name": "Carts left this week",
+      "members": 313
+    },
+    "contacts": [
+      { "id": "3f6b2a1e-8c4d-4e2a-9b7f-5d1c0e8a9f42", "name": "Asha Rao", "phone": "+919876543210" }
+    ]
+  }
+}
+```
+
+The `audience` in these events is shortened here; it is the audience as
+[GET /v1/cdp/audiences](/api-reference/customer-data/list-audiences) lists it.

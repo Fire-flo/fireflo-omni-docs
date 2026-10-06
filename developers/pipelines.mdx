@@ -1,0 +1,156 @@
+---
+title: "Pipelines"
+description: "Keep deals in step with your own systems: create and move deals, win or lose them, add notes, shape pipelines and their stages, and hear about every change."
+---
+
+With the [Pipelines](/batteries/pipelines) battery, the API reaches the same pipelines and
+deals your team works on the board. Create a deal when a lead arrives on your website, move
+it as your own systems learn more, mark it won when the order is paid, and add notes your
+team will see on the deal's page. A deal changed through the API obeys the rules a deal
+dragged on the board does, and its history names the key that changed it —
+`API · <key name>`.
+
+- The endpoints are under `/v1/crm/…`. They exist when the account's plan includes
+  Pipelines; otherwise every one answers `404 module_off`.
+- Pipelines and stages have whole-number ids; deals have string ids.
+- Values are whole numbers in the currency's minor unit: `value_minor` `12500000` with
+  `currency` `INR` is ₹1,25,000.
+
+## Scopes
+
+| Scope | Lets a key |
+| :--- | :--- |
+| `crm.pipelines:read` | See pipelines and their stages |
+| `crm.pipelines:write` | Add, rename, reorder and remove pipelines and stages |
+| `crm.deals:read` | See deals, their notes and their history |
+| `crm.deals:write` | Create, move, change and delete deals, and add notes |
+
+See [Keys and scopes](/developers/keys-and-scopes) for giving a key its scopes.
+
+## Pipelines and stages
+
+| | |
+| :--- | :--- |
+| [`GET /v1/crm/pipelines`](/api-reference/pipelines/list-pipelines) | Every pipeline, in board order, with its stages |
+| [`POST /v1/crm/pipelines`](/api-reference/pipelines/create-pipeline) | Add a pipeline; it starts with New, Contacted, Proposal and Won |
+| [`GET …/pipelines/{pipeline_id}`](/api-reference/pipelines/get-pipeline) | One pipeline and its stages |
+| [`PATCH …/pipelines/{pipeline_id}`](/api-reference/pipelines/rename-pipeline) | Rename it |
+| [`DELETE …/pipelines/{pipeline_id}`](/api-reference/pipelines/delete-pipeline) | Delete it, once it has no open deals |
+| [`POST …/pipelines/{pipeline_id}/stages`](/api-reference/pipelines/add-stage) | Add a stage at the end |
+| [`POST …/stages/reorder`](/api-reference/pipelines/reorder-stages) | Put the stages in a new order |
+| [`PATCH …/stages/{stage_id}`](/api-reference/pipelines/change-stage) | Rename a stage, or make it a won or lost stage |
+| [`DELETE …/stages/{stage_id}`](/api-reference/pipelines/delete-stage) | Delete a stage, moving its deals with `move_to` |
+
+## Deals
+
+| | |
+| :--- | :--- |
+| [`GET /v1/crm/deals`](/api-reference/pipelines/list-deals) | Deals, newest first; filter by pipeline, stage, status or contact |
+| [`POST /v1/crm/deals`](/api-reference/pipelines/create-deal) | Create a deal — in the pipeline's first stage unless you name one |
+| [`GET …/deals/{deal_id}`](/api-reference/pipelines/get-deal) | One deal |
+| [`PATCH …/deals/{deal_id}`](/api-reference/pipelines/update-deal) | Move it, win, lose or reopen it, or change its title, value, contact or notes |
+| [`DELETE …/deals/{deal_id}`](/api-reference/pipelines/delete-deal) | Delete it |
+| [`GET …/deals/{deal_id}/notes`](/api-reference/pipelines/list-notes) | Its notes, newest first |
+| [`POST …/deals/{deal_id}/notes`](/api-reference/pipelines/add-note) | Add a note, signed `API · <key name>` |
+| [`GET …/deals/{deal_id}/timeline`](/api-reference/pipelines/deal-timeline) | Its story: changes, notes, and what happened with its contact |
+
+A new deal from your website might be:
+
+```json
+{
+  "pipeline": 3,
+  "title": "Ravi Traders — 50 POS terminals",
+  "contact": "9d4f2a61-3c8e-4b7a-a5d2-6e1f0b8c7a34",
+  "value_minor": 12500000
+}
+```
+
+Give it a `contact` and the contact's messages, on any channel, show on the deal and in its
+timeline.
+
+## Winning, losing and reopening
+
+A deal's `status` is `open`, `won` or `lost`. A pipeline can have one **won** stage and one
+**lost** stage — its closing stages, marked by their `outcome`. A new pipeline has a won
+stage (Won) and no lost stage; [add one](/api-reference/pipelines/add-stage) with
+`"outcome": "lost"` if you want lost deals in a column of their own.
+
+- **Moving a deal into a closing stage closes it**: into the won stage wins it, into the lost
+  stage loses it, and `closed_at` is set.
+- **Marking a deal won or lost moves it** to the pipeline's won or lost stage, when it has
+  one.
+- **Reopening**: moving a closed deal out of its closing stage opens it again. Setting
+  `status` to `open` on a deal in a closing stage moves it back to the last ordinary stage.
+- Sending `stage` and `status` together moves the deal and sets that status, as given.
+- A deal created in a closing stage starts closed.
+
+Making a stage the won (or lost) stage turns the stage that held that outcome into an
+ordinary one. Deals already in it keep their status; the rule applies to moves from then on.
+
+## Removing stages and pipelines
+
+- **A stage that holds deals** is deleted only with `move_to`, another stage of the same
+  pipeline. Each deal moves there first, by the rules above — into a closing stage closes it
+  — and each move sends its own webhook event. A pipeline keeps at least one stage.
+- **A pipeline with open deals** can't be deleted: the request is refused with
+  `409 invalid_state`. Win, lose or move its open deals first. Its won and lost deals are
+  deleted with it, without a `deal.deleted` event for each.
+
+## Hearing about changes
+
+Rather than asking, subscribe a [webhook endpoint](/developers/webhooks) to the `deal.*`
+events. They fire for every change, wherever it was made — the board, an AI agent or the
+API.
+
+| Event | When |
+| :--- | :--- |
+| `deal.created` | A deal was created. |
+| `deal.updated` | A deal's title, value, contact or notes changed. |
+| `deal.stage_changed` | A deal moved to another stage. |
+| `deal.won` | A deal was won. |
+| `deal.lost` | A deal was lost. |
+| `deal.reopened` | A won or lost deal was opened again. |
+| `deal.deleted` | A deal was deleted. |
+
+Each change sends **one** event: a change of status (`deal.won`, `deal.lost`,
+`deal.reopened`) outranks a move (`deal.stage_changed`), which outranks the rest
+(`deal.updated`). Dragging a deal into the won stage sends `deal.won`, not
+`deal.stage_changed` as well.
+
+Each event carries the deal, as `deal`, in the shape
+[GET …/deals/\{deal_id\}](/api-reference/pipelines/get-deal) answers, and `changed` — the
+names of the fields that changed:
+
+```json
+{
+  "id": "evt_2b7d9e4f1a0c4c8e9f3b6a5d4c3e2f1a",
+  "event": "deal.won",
+  "created": "2026-10-06T07:00:05.412Z",
+  "data": {
+    "deal": {
+      "id": "5b2e8c1d-7a4f-4e3b-9c6d-1f0a2b3c4d5e",
+      "title": "Ravi Traders — 50 POS terminals",
+      "pipeline": { "id": 3, "name": "Retail sales" },
+      "stage": { "id": 14, "name": "Won" },
+      "status": "won",
+      "value_minor": 11800000,
+      "currency": "INR",
+      "contact": { "id": "9d4f2a61-3c8e-4b7a-a5d2-6e1f0b8c7a34", "name": "Ravi Kumar", "phone": "+919876500101" },
+      "notes": "Wants delivery before Diwali.",
+      "stage_entered_at": "2026-10-06T12:30:05+05:30",
+      "closed_at": "2026-10-06T12:30:05+05:30",
+      "created_at": "2026-10-01T11:08:12+05:30",
+      "updated_at": "2026-10-06T12:30:05+05:30"
+    },
+    "changed": ["stage", "status", "value_minor"]
+  }
+}
+```
+
+`deal.deleted` carries only the deal's `id` and `title`, as `deal`.
+
+<Note>
+Notes don't send events. Read a deal's notes with
+[GET …/notes](/api-reference/pipelines/list-notes), or its whole story with
+[GET …/timeline](/api-reference/pipelines/deal-timeline).
+</Note>

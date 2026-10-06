@@ -1,0 +1,63 @@
+---
+title: "DELETE /v1/cdp/traits/{key}"
+description: "Remove one of the account's own traits, and its value from every contact."
+---
+
+Removes one of the account's own traits, and its value from every contact. Built-in traits can't be removed.
+
+<Note>Needs the `cdp.contacts:write` scope.</Note>
+
+## Path parameters
+
+| Field | Type | Required | Notes |
+| :--- | :--- | :--- | :--- |
+| `key` | string | Yes | The trait's key, like `cart_adds_30_days`. |
+
+## Request
+
+<CodeGroup>
+
+```bash cURL
+curl -X DELETE "https://api.fireflo.au/v1/cdp/traits/cart_adds_30_days" \
+  -H "Authorization: Bearer $OMNI_API_KEY"
+```
+
+```python Python
+import os
+
+import requests
+
+response = requests.delete(
+    "https://api.fireflo.au/v1/cdp/traits/cart_adds_30_days",
+    headers={"Authorization": f"Bearer {os.environ['OMNI_API_KEY']}"},
+)
+print(response.status_code)
+```
+
+```javascript Node
+const response = await fetch("https://api.fireflo.au/v1/cdp/traits/cart_adds_30_days", {
+  method: "DELETE",
+  headers: {
+    Authorization: `Bearer ${process.env.OMNI_API_KEY}`,
+  },
+});
+console.log(response.status);
+```
+
+</CodeGroup>
+
+## Response
+
+`204 No Content` — no body.
+
+## Errors
+
+Every refusal is `{"error": {"code", "message", "field"}}`; `field` is there when one input is at fault.
+
+| Status | Error code | When |
+| :--- | :--- | :--- |
+| 404 | `not_found` | The account has no trait with that key. |
+| 403 | `scope_missing` | The key doesn't have the `cdp.contacts:write` scope. |
+| 404 | `module_off` | The account doesn't have Customer data on. |
+
+Any request can also be refused for its key, its account or its rate (`key_required`, `invalid_key`, `account_suspended`, `plan_excludes_api`, `address_not_allowed`, `rate_limited`); see [the overview](/api-reference/overview).

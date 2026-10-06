@@ -1,0 +1,61 @@
+---
+title: "DELETE /v1/catalogue/products/{product_id}"
+description: "Take a product off sale — it stays for the orders and conversations that name it."
+---
+
+Takes a product off sale, as `PATCH` with `"active": false` would. It isn't deleted: orders and conversations that name it still do, and it can be put on sale again with [PATCH /v1/catalogue/products/\{product_id\}](/api-reference/catalogue/update-product).
+
+<Note>Needs the `catalogue.products:write` scope.</Note>
+
+## Path parameters
+
+| Field | Type | Required | Notes |
+| :--- | :--- | :--- | :--- |
+| `product_id` | string | Yes | The product's id. |
+
+## Request
+
+<CodeGroup>
+
+```bash cURL
+curl -X DELETE "https://api.fireflo.au/v1/catalogue/products/3f8a2c1e-7b4d-4e6a-9c2f-1a5b8d7e6f40" \
+  -H "Authorization: Bearer $OMNI_API_KEY"
+```
+
+```python Python
+import os
+
+import requests
+
+response = requests.delete(
+    "https://api.fireflo.au/v1/catalogue/products/3f8a2c1e-7b4d-4e6a-9c2f-1a5b8d7e6f40",
+    headers={"Authorization": f"Bearer {os.environ['OMNI_API_KEY']}"},
+)
+print(response.status_code)
+```
+
+```javascript Node
+const response = await fetch("https://api.fireflo.au/v1/catalogue/products/3f8a2c1e-7b4d-4e6a-9c2f-1a5b8d7e6f40", {
+  method: "DELETE",
+  headers: { Authorization: `Bearer ${process.env.OMNI_API_KEY}` },
+});
+console.log(response.status);
+```
+
+</CodeGroup>
+
+## Response
+
+`204 No Content` — no body.
+
+## Errors
+
+Every refusal is `{"error": {"code", "message", "field"}}`; `field` is there when one input is at fault.
+
+| Status | Error code | When |
+| :--- | :--- | :--- |
+| 404 | `not_found` | No product of this account's has that id. |
+| 404 | `module_off` | The account doesn't have Catalogue on. |
+| 403 | `scope_missing` | The key doesn't have the `catalogue.products:write` scope. |
+
+Any request can also be refused for its key, its account or its rate (`key_required`, `invalid_key`, `account_suspended`, `plan_excludes_api`, `address_not_allowed`, `rate_limited`); see [the overview](/api-reference/overview).

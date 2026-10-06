@@ -1,0 +1,157 @@
+---
+title: "GET /v1/tickets/{ticket_id}"
+description: "One ticket, with its history."
+---
+
+One ticket, with its history: every change made to it, by whom and when — in the panel, by an AI agent or through the API.
+
+<Note>Needs the `tickets:read` scope.</Note>
+
+## Path parameters
+
+| Field | Type | Required | Notes |
+| :--- | :--- | :--- | :--- |
+| ticket_id | string | Yes | The ticket's id. |
+
+## Request
+
+<CodeGroup>
+
+```bash cURL
+curl "https://api.fireflo.au/v1/tickets/b84f2c10-5e7a-4c3d-9a61-0f2d7e9c4a18" \
+  -H "Authorization: Bearer $OMNI_API_KEY"
+```
+
+```python Python
+import os
+
+import requests
+
+response = requests.get(
+    "https://api.fireflo.au/v1/tickets/b84f2c10-5e7a-4c3d-9a61-0f2d7e9c4a18",
+    headers={"Authorization": f"Bearer {os.environ['OMNI_API_KEY']}"},
+)
+print(response.status_code, response.json())
+```
+
+```javascript Node
+const response = await fetch("https://api.fireflo.au/v1/tickets/b84f2c10-5e7a-4c3d-9a61-0f2d7e9c4a18", {
+  headers: { Authorization: `Bearer ${process.env.OMNI_API_KEY}` },
+});
+console.log(response.status, await response.json());
+```
+
+</CodeGroup>
+
+## Response
+
+`200 OK`
+
+```json
+{
+  "id": "b84f2c10-5e7a-4c3d-9a61-0f2d7e9c4a18",
+  "number": 1042,
+  "subject": "Order A-1042 not delivered",
+  "status": "open",
+  "priority": "high",
+  "assignee": {
+    "name": "Priya Nair",
+    "email": "priya@acme.in"
+  },
+  "category": {
+    "id": 4,
+    "name": "Delivery",
+    "colour": "info"
+  },
+  "contact": {
+    "id": "3f6b2a1e-8c4d-4e2a-9b7f-5d1c0e8a9f42",
+    "name": "Asha Rao",
+    "phone": "+919876543210"
+  },
+  "conversation": "3f6b2a1e-8c4d-4e2a-9b7f-5d1c0e8a9f42",
+  "source": "inbound",
+  "handled_by": "human",
+  "resolution": "",
+  "summary": "",
+  "opened_at": "2026-10-06T09:02:17+05:30",
+  "first_response_at": "2026-10-06T09:08:40+05:30",
+  "last_activity_at": "2026-10-06T10:15:03+05:30",
+  "solved_at": null,
+  "closed_at": null,
+  "history": [
+    {
+      "kind": "opened",
+      "detail": "",
+      "by": "",
+      "at": "2026-10-06T09:02:17+05:30"
+    },
+    {
+      "kind": "assigned",
+      "detail": "Priya Nair",
+      "by": "Rahul Mehta",
+      "at": "2026-10-06T09:05:52+05:30"
+    },
+    {
+      "kind": "category",
+      "detail": "Delivery",
+      "by": "Priya Nair",
+      "at": "2026-10-06T09:08:12+05:30"
+    },
+    {
+      "kind": "priority",
+      "detail": "high",
+      "by": "API · Order sync",
+      "at": "2026-10-06T10:15:03+05:30"
+    }
+  ]
+}
+```
+
+### The ticket
+
+| Field | Notes |
+| :--- | :--- |
+| `id` | The ticket's id. |
+| `number` | Its number, counting up across the account — `#1042` in the panel. |
+| `subject` | What it is about. |
+| `status` | `open`, `pending`, `solved` or `closed`. |
+| `priority` | `normal`, `high` or `urgent`. |
+| `assignee` | `{name, email}` of the team member it is assigned to, or null. |
+| `category` | `{id, name, colour}`, or null. |
+| `contact` | `{id, name, phone}` — who it is with. |
+| `conversation` | The conversation it lives in, by the id [/v1/conversations](/api-reference/conversations/get) uses: the contact's id. |
+| `source` | How it started: `inbound` (the customer wrote), `broadcast_reply`, `staff` (started by the team or through the API), `agent` (started by an AI agent) or `backfill` (an earlier conversation). |
+| `handled_by` | Who has answered so far: `ai`, `human`, `both`, or empty for nobody yet. |
+| `resolution` | How it was solved: `ai`, `human`, `no_reply` (the customer didn't answer), or empty while unsolved. |
+| `summary` | A summary an AI agent wrote when it handed over or solved it; empty otherwise. |
+| `opened_at`, `first_response_at` | When it opened, and when the team or an AI agent first answered. |
+| `last_activity_at` | The latest message, note or status change. |
+| `solved_at`, `closed_at` | When it was solved and closed, or null. |
+
+### Its history
+
+`history` lists its changes, oldest first, each `{kind, detail, by, at}`:
+
+| `kind` | Means |
+| :--- | :--- |
+| `opened` | It opened. |
+| `status` | Its status changed; `detail` is the new one. |
+| `reopened` | A solved ticket opened again. |
+| `assigned` | Its assignee changed; `detail` is their name, or `nobody`. |
+| `priority` | Its priority changed; `detail` is the new one. |
+| `category` | Its category changed; `detail` is its name, or `none`. |
+| `subject` | Its subject changed. |
+
+`by` names who made the change — a team member, an AI agent, `API · ` and the key's name, or why OMNI made it ("No reply in 3 days").
+
+## Errors
+
+Every refusal is `{"error": {"code", "message", "field"}}`; `field` is there when one input is at fault.
+
+| Status | Error code | When |
+| :--- | :--- | :--- |
+| 404 | `not_found` | No ticket has that id on this account. |
+| 404 | `module_off` | The account's plan doesn't include Tickets. |
+| 403 | `scope_missing` | The key doesn't have the `tickets:read` scope. |
+
+Any request can also be refused for its key, its account or its rate (`key_required`, `invalid_key`, `account_suspended`, `plan_excludes_api`, `address_not_allowed`, `rate_limited`); see [the overview](/api-reference/overview).

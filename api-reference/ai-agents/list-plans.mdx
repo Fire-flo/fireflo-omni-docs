@@ -1,0 +1,176 @@
+---
+title: "GET /v1/agents/plans"
+description: "Agents' plans, newest first — the ones waiting for a decision, open ones, or all."
+---
+
+Plans the account's agents made, newest first. Use `status=awaiting` for the panel's **Approvals** queue: the plans a person needs to look at.
+
+<Note>Needs the `agents:read` scope.</Note>
+
+## Query parameters
+
+| Field | Type | Required | Notes |
+| :--- | :--- | :--- | :--- |
+| `status` | string | No | `awaiting` — waiting for approval, whole or a step; or `open` — still has work ahead. All plans when left out. |
+| `agent` | integer | No | Only this agent's. |
+| `contact` | string | No | Only plans for this contact (their id). |
+| `limit` | integer | No | 1 to 100; 50 by default. |
+| `starting_after` | string | No | The last id of the previous page — `next` from it. |
+
+## Request
+
+<CodeGroup>
+
+```bash cURL
+curl "https://api.fireflo.au/v1/agents/plans?status=awaiting&limit=20" \
+  -H "Authorization: Bearer $OMNI_API_KEY"
+```
+
+```python Python
+import os
+
+import requests
+
+response = requests.get(
+    "https://api.fireflo.au/v1/agents/plans?status=awaiting&limit=20",
+    headers={"Authorization": f"Bearer {os.environ['OMNI_API_KEY']}"},
+)
+print(response.status_code, response.json())
+```
+
+```javascript Node
+const response = await fetch("https://api.fireflo.au/v1/agents/plans?status=awaiting&limit=20", {
+  headers: { Authorization: `Bearer ${process.env.OMNI_API_KEY}` },
+});
+console.log(response.status, await response.json());
+```
+
+</CodeGroup>
+
+## Response
+
+`200 OK` — `has_more` says whether there is another page, and `next` is the `starting_after` for it. Each plan is in the shape [GET /v1/agents/plans/\{plan_id\}](/api-reference/ai-agents/get-plan) answers.
+
+```json
+{
+  "data": [
+    {
+      "id": 4812,
+      "agent": {
+        "id": 7,
+        "name": "Arjun",
+        "role": "sales"
+      },
+      "scope": "contact",
+      "campaign_id": null,
+      "contact": {
+        "id": 90417,
+        "uuid": "3f6b2a1e-8c4d-4e2a-9b7f-5d1c0e8a9f42",
+        "name": "Neha Arora",
+        "msisdn": "+919876500102"
+      },
+      "deal": {
+        "id": 3318,
+        "title": "Arora Traders — 40 inverters",
+        "stage": "Quoted"
+      },
+      "pipeline": {
+        "id": 2,
+        "name": "B2B sales"
+      },
+      "trigger": "inbound_message",
+      "trigger_excerpt": "Can you do ₹6,200 per unit if we take 40?",
+      "goal": "Answer Neha's price question and keep the quote moving",
+      "rationale": "She asked for a lower unit price on a large order. The playbook allows up to 5% off above 25 units, so offer ₹6,350 and note it on the deal.",
+      "status": "awaiting_approval",
+      "approval_mode": "plan",
+      "approval_reasons": [
+        "Send a message needs approval"
+      ],
+      "created": "2026-10-06T10:14:22+05:30",
+      "expires_at": "2026-10-07T10:14:31+05:30",
+      "next_run_at": null,
+      "tokens": 2310,
+      "model": "gpt-4o-mini",
+      "decided_by": null,
+      "decision_note": null,
+      "last_error": null,
+      "steps": [
+        {
+          "id": 20931,
+          "order": 1,
+          "action": "send_message",
+          "title": "Send WhatsApp message",
+          "body": "Hi Neha, for 40 units we can do ₹6,350 each, delivered to Ludhiana within 10 days. Shall I update the quote?",
+          "detail": "WhatsApp",
+          "reason": "Answer the price question while she is online.",
+          "run_at": "2026-10-06T10:14:31+05:30",
+          "requires_approval": true,
+          "status": "pending",
+          "result": null,
+          "editable": [
+            "body"
+          ],
+          "params": {
+            "channel": "whatsapp",
+            "body": "Hi Neha, for 40 units we can do ₹6,350 each, delivered to Ludhiana within 10 days. Shall I update the quote?",
+            "channel_locked": true
+          }
+        },
+        {
+          "id": 20932,
+          "order": 2,
+          "action": "add_note",
+          "title": "Add note",
+          "body": "Offered ₹6,350/unit for 40 units (5% off list).",
+          "detail": null,
+          "reason": "Keep the team aware of the offer.",
+          "run_at": "2026-10-06T10:14:31+05:30",
+          "requires_approval": false,
+          "status": "pending",
+          "result": null,
+          "editable": [
+            "body"
+          ],
+          "params": {
+            "body": "Offered ₹6,350/unit for 40 units (5% off list)."
+          }
+        },
+        {
+          "id": 20933,
+          "order": 3,
+          "action": "follow_up",
+          "title": "Follow up",
+          "body": null,
+          "detail": "Check whether Neha accepts the revised price",
+          "reason": "No reply by tomorrow means the quote needs a nudge.",
+          "run_at": "2026-10-07T11:00:00+05:30",
+          "requires_approval": false,
+          "status": "pending",
+          "result": null,
+          "editable": [],
+          "params": {
+            "goal": "Check whether Neha accepts the revised price"
+          }
+        }
+      ],
+      "audience": null,
+      "story_id": null
+    }
+  ],
+  "has_more": false,
+  "next": null
+}
+```
+
+## Errors
+
+Every refusal is `{"error": {"code", "message", "field"}}`; `field` is there when one input is at fault.
+
+| Status | Error code | When |
+| :--- | :--- | :--- |
+| 400 | `invalid_request` | No contact with that id (`field` is `contact`), `limit` out of range, or `starting_after` isn't an id from this list. |
+| 404 | `module_off` | The account doesn't have AI agents on: they aren't in its plan, or are switched off for it. |
+| 403 | `scope_missing` | The key doesn't have the `agents:read` scope. |
+
+Any request can also be refused for its key, its account or its rate (`key_required`, `invalid_key`, `account_suspended`, `plan_excludes_api`, `address_not_allowed`, `rate_limited`); see [the overview](/api-reference/overview).

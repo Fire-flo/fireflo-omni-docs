@@ -1,0 +1,138 @@
+---
+title: "POST /v1/calendar/appointments"
+description: "Book a contact into a free time of a booking type."
+---
+
+Books a contact into a free time of a booking type — one from [GET /v1/calendar/free-times](/api-reference/calendar/free-times). The time must still be free: a teammate has one appointment at a time, prep time included. The appointment is booked with `source` `api`, and the contact is sent the account's confirmation and reminders, as when the team books.
+
+<Note>Needs the `calendar:write` scope.</Note>
+
+## Body
+
+| Field | Type | Required | Notes |
+| :--- | :--- | :--- | :--- |
+| `contact` | string | Yes | The contact's id. |
+| `booking_type` | integer | Yes | The booking type's id. It must be switched on. |
+| `starts_at` | string | Yes | When it starts, with its offset: `2026-10-08T10:30:00+05:30`. A free start for the booking type. |
+| `staff` | string | No | The email of the teammate to book. Left out, the first one free then — the booking type's default teammate first. |
+| `status` | string | No | `confirmed` (the default) or `requested`. |
+| `mode` | string | No | `online` or `physical`, for a booking type whose mode is `either` — the account's default when left out. Other booking types keep their own mode. |
+| `location` | string | No | Where, for an in-person appointment. Up to 255 characters. Left out, the booking type's place, the teammate's, or the account's default. |
+| `meeting_link` | string | No | The link, for an online appointment. Up to 500 characters. Left out, the booking type's link or the teammate's. |
+| `notes` | string | No | The team's notes. Up to 5,000 characters. |
+| `deal` | string | No | The id of a deal it belongs to, with Pipelines. |
+
+Send an `Idempotency-Key` header to make a retry safe: the same key with the same body is answered once, and the first answer repeated (with `Idempotent-Replayed: true`).
+
+## Request
+
+<CodeGroup>
+
+```bash cURL
+curl -X POST "https://api.fireflo.au/v1/calendar/appointments" \
+  -H "Authorization: Bearer $OMNI_API_KEY" \
+  -H "Content-Type: application/json" \
+  -H "Idempotency-Key: book-ravi-8oct-1030" \
+  -d '{
+  "contact": "3f6b2a1e-8c4d-4e2a-9b7f-5d1c0e8a9f42",
+  "booking_type": 3,
+  "starts_at": "2026-10-08T10:30:00+05:30",
+  "staff": "priya@acme.in",
+  "mode": "online",
+  "notes": "Salaried, looking at a ₹45 lakh loan. Bring Form 16."
+}'
+```
+
+```python Python
+import os
+
+import requests
+
+response = requests.post(
+    "https://api.fireflo.au/v1/calendar/appointments",
+    headers={
+        "Authorization": f"Bearer {os.environ['OMNI_API_KEY']}",
+        "Idempotency-Key": "book-ravi-8oct-1030",
+    },
+    json={
+        "contact": "3f6b2a1e-8c4d-4e2a-9b7f-5d1c0e8a9f42",
+        "booking_type": 3,
+        "starts_at": "2026-10-08T10:30:00+05:30",
+        "staff": "priya@acme.in",
+        "mode": "online",
+        "notes": "Salaried, looking at a ₹45 lakh loan. Bring Form 16."
+    },
+)
+print(response.status_code, response.json())
+```
+
+```javascript Node
+const response = await fetch("https://api.fireflo.au/v1/calendar/appointments", {
+  method: "POST",
+  headers: {
+    Authorization: `Bearer ${process.env.OMNI_API_KEY}`,
+    "Content-Type": "application/json",
+    "Idempotency-Key": "book-ravi-8oct-1030",
+  },
+  body: JSON.stringify({
+    "contact": "3f6b2a1e-8c4d-4e2a-9b7f-5d1c0e8a9f42",
+    "booking_type": 3,
+    "starts_at": "2026-10-08T10:30:00+05:30",
+    "staff": "priya@acme.in",
+    "mode": "online",
+    "notes": "Salaried, looking at a ₹45 lakh loan. Bring Form 16."
+  }),
+});
+console.log(response.status, await response.json());
+```
+
+</CodeGroup>
+
+## Response
+
+`201 Created` — the appointment, as [GET /v1/calendar/appointments/\{appointment_id\}](/api-reference/calendar/get-appointment) shows it, without its history. It also sends `appointment.booked` to your [webhook endpoints](/developers/webhooks).
+
+```json
+{
+  "id": "5b0e7d3c-9a2f-4c61-8e47-1f3a6c9d2b84",
+  "title": "Home loan consultation",
+  "status": "confirmed",
+  "booking_type": {
+    "id": 3,
+    "name": "Home loan consultation"
+  },
+  "contact": {
+    "id": "3f6b2a1e-8c4d-4e2a-9b7f-5d1c0e8a9f42",
+    "name": "Ravi Kumar",
+    "phone": "+919876500101"
+  },
+  "staff": {
+    "name": "Priya Sharma",
+    "email": "priya@acme.in"
+  },
+  "starts_at": "2026-10-08T10:30:00+05:30",
+  "ends_at": "2026-10-08T11:00:00+05:30",
+  "mode": "online",
+  "location": "",
+  "meeting_link": "https://meet.google.com/kfr-ptqw-xya",
+  "notes": "Salaried, looking at a ₹45 lakh loan. Bring Form 16.",
+  "source": "api",
+  "deal": null,
+  "created_at": "2026-10-06T04:12:04.512903+00:00",
+  "updated_at": "2026-10-06T04:12:04.512903+00:00"
+}
+```
+
+## Errors
+
+Every refusal is `{"error": {"code", "message", "field"}}`; `field` is there when one input is at fault.
+
+| Status | Error code | When |
+| :--- | :--- | :--- |
+| 400 | `invalid_request` | A field is wrong — `field` names it: no `contact`, an unknown or switched-off `booking_type`, a `starts_at` without its offset, a `staff` who isn't in your team or doesn't take this booking type, a `status` other than `confirmed` or `requested`, an unknown `deal`, or text that is too long. |
+| 409 | `slot_taken` | That time isn't free (any more) — pick another from the free times. |
+| 409 | `invalid_state` | Appointments are switched off in the account's Calendar settings. |
+| 404 | `module_off` | The account's plan doesn't include Calendar. |
+| 403 | `scope_missing` | The key doesn't have the `calendar:write` scope. |
+
+Any request can also be refused for its key, its account or its rate (`key_required`, `invalid_key`, `account_suspended`, `plan_excludes_api`, `address_not_allowed`, `rate_limited`); see [the overview](/api-reference/overview).

@@ -1,0 +1,72 @@
+---
+title: "GET /v1/catalogue/sets"
+description: "The account's product sets, by name, with how many products each holds."
+---
+
+The account's product sets, in order of name. A set is a collection of products sent together — as one WhatsApp product list, or one link on SMS and RCS.
+
+<Note>Needs the `catalogue.products:read` scope.</Note>
+
+## Request
+
+<CodeGroup>
+
+```bash cURL
+curl "https://api.fireflo.au/v1/catalogue/sets" \
+  -H "Authorization: Bearer $OMNI_API_KEY"
+```
+
+```python Python
+import os
+
+import requests
+
+response = requests.get(
+    "https://api.fireflo.au/v1/catalogue/sets",
+    headers={"Authorization": f"Bearer {os.environ['OMNI_API_KEY']}"},
+)
+print(response.status_code, response.json())
+```
+
+```javascript Node
+const response = await fetch("https://api.fireflo.au/v1/catalogue/sets", {
+  headers: { Authorization: `Bearer ${process.env.OMNI_API_KEY}` },
+});
+console.log(response.status, await response.json());
+```
+
+</CodeGroup>
+
+## Response
+
+`200 OK` — every set at once, with no pages. `products` is how many products are in it.
+
+```json
+{
+  "data": [
+    {
+      "id": "e2a9d4b6-5c1f-4e83-a7d0-9b6f3c8e2a14",
+      "name": "Bestsellers",
+      "description": "",
+      "products": 9
+    },
+    {
+      "id": "c4e81f2a-6b7d-4a39-8e15-0d3f9b2a7c61",
+      "name": "Diwali edit",
+      "description": "Festive picks, sent as one product list.",
+      "products": 24
+    }
+  ]
+}
+```
+
+## Errors
+
+Every refusal is `{"error": {"code", "message", "field"}}`; `field` is there when one input is at fault.
+
+| Status | Error code | When |
+| :--- | :--- | :--- |
+| 404 | `module_off` | The account doesn't have Catalogue on. |
+| 403 | `scope_missing` | The key doesn't have the `catalogue.products:read` scope. |
+
+Any request can also be refused for its key, its account or its rate (`key_required`, `invalid_key`, `account_suspended`, `plan_excludes_api`, `address_not_allowed`, `rate_limited`); see [the overview](/api-reference/overview).

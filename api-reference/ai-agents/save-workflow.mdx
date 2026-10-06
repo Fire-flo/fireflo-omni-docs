@@ -1,0 +1,423 @@
+---
+title: "PUT /v1/agents/{agent_id}/workflow"
+description: "Replace an agent's draft workflow, with the revision you read."
+---
+
+Replaces the draft with the graph you send. What is live doesn't change until you [publish](/api-reference/ai-agents/publish-workflow).
+
+Send the `revision` you read. If someone saved the workflow since — on the panel or through the API — the save is refused with `revision_conflict`: read it again, apply your change to theirs, and save with the new revision.
+
+<Note>Needs the `agents:write` scope.</Note>
+
+## Path parameters
+
+| Field | Type | Required | Notes |
+| :--- | :--- | :--- | :--- |
+| `agent_id` | integer | Yes | The agent's id. |
+
+## Body
+
+| Field | Type | Required | Notes |
+| :--- | :--- | :--- | :--- |
+| `revision` | integer | Yes | The `revision` from your last read or save. |
+| `graph` | object | Yes | `nodes` and `wires`, as [GET …/workflow](/api-reference/ai-agents/get-workflow) gives them. `category`, `ai` and `policy` on a node are ignored. |
+
+A graph is refused when:
+
+- it has more than 300 blocks;
+- a node's `id` is missing, used twice, or isn't 1 to 40 letters, digits, `-` or `_`;
+- a `block` isn't one this agent can use;
+- a node's `config` isn't a small object of plain values (up to 30 settings);
+- a wire joins nodes or outcomes that aren't there, goes to a Start block or back to its own node, or an outcome has two wires.
+
+Only blocks whose outcomes you choose — **AI decides** and **Send buttons** — keep the `outcomes` you send (up to 12); others always have their block's own. A teammate or knowledge article a block names that isn't in the account is dropped, and the block then shows an issue. A graph can be saved with issues; only publishing needs nothing `broken`.
+
+## Request
+
+<CodeGroup>
+
+```bash cURL
+curl -X PUT "https://api.fireflo.au/v1/agents/12/workflow" \
+  -H "Authorization: Bearer $OMNI_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "revision": 18,
+    "graph": {
+      "nodes": [
+        {
+          "id": "start-1",
+          "block": "customer_writes",
+          "label": "Customer writes",
+          "summary": "WhatsApp · SMS",
+          "outcomes": [
+            "next"
+          ],
+          "x": 40,
+          "y": 40,
+          "config": {}
+        },
+        {
+          "id": "hours",
+          "block": "business_hours",
+          "label": "Business hours",
+          "summary": "the agent'\''s working hours",
+          "outcomes": [
+            "open",
+            "closed"
+          ],
+          "x": 320,
+          "y": 40,
+          "config": {}
+        },
+        {
+          "id": "answer",
+          "block": "ai_replies",
+          "label": "AI replies",
+          "summary": "from knowledge",
+          "outcomes": [
+            "answered",
+            "unsure"
+          ],
+          "x": 600,
+          "y": 40,
+          "config": {}
+        },
+        {
+          "id": "team",
+          "block": "hand_to_person",
+          "label": "Hand to a person",
+          "summary": "needs attention · unread",
+          "outcomes": [],
+          "x": 600,
+          "y": 220,
+          "config": {}
+        }
+      ],
+      "wires": [
+        {
+          "from": "start-1",
+          "outcome": 0,
+          "to": "hours"
+        },
+        {
+          "from": "hours",
+          "outcome": 0,
+          "to": "answer"
+        },
+        {
+          "from": "hours",
+          "outcome": 1,
+          "to": "team"
+        },
+        {
+          "from": "answer",
+          "outcome": 1,
+          "to": "team"
+        }
+      ]
+    }
+  }'
+```
+
+```python Python
+import os
+
+import requests
+
+response = requests.put(
+    "https://api.fireflo.au/v1/agents/12/workflow",
+    headers={"Authorization": f"Bearer {os.environ['OMNI_API_KEY']}"},
+    json={
+        "revision": 18,
+        "graph": {
+            "nodes": [
+                {
+                    "id": "start-1",
+                    "block": "customer_writes",
+                    "label": "Customer writes",
+                    "summary": "WhatsApp · SMS",
+                    "outcomes": [
+                        "next"
+                    ],
+                    "x": 40,
+                    "y": 40,
+                    "config": {}
+                },
+                {
+                    "id": "hours",
+                    "block": "business_hours",
+                    "label": "Business hours",
+                    "summary": "the agent's working hours",
+                    "outcomes": [
+                        "open",
+                        "closed"
+                    ],
+                    "x": 320,
+                    "y": 40,
+                    "config": {}
+                },
+                {
+                    "id": "answer",
+                    "block": "ai_replies",
+                    "label": "AI replies",
+                    "summary": "from knowledge",
+                    "outcomes": [
+                        "answered",
+                        "unsure"
+                    ],
+                    "x": 600,
+                    "y": 40,
+                    "config": {}
+                },
+                {
+                    "id": "team",
+                    "block": "hand_to_person",
+                    "label": "Hand to a person",
+                    "summary": "needs attention · unread",
+                    "outcomes": [],
+                    "x": 600,
+                    "y": 220,
+                    "config": {}
+                }
+            ],
+            "wires": [
+                {
+                    "from": "start-1",
+                    "outcome": 0,
+                    "to": "hours"
+                },
+                {
+                    "from": "hours",
+                    "outcome": 0,
+                    "to": "answer"
+                },
+                {
+                    "from": "hours",
+                    "outcome": 1,
+                    "to": "team"
+                },
+                {
+                    "from": "answer",
+                    "outcome": 1,
+                    "to": "team"
+                }
+            ]
+        }
+    },
+)
+print(response.status_code, response.json())
+```
+
+```javascript Node
+const response = await fetch("https://api.fireflo.au/v1/agents/12/workflow", {
+  method: "PUT",
+  headers: {
+    Authorization: `Bearer ${process.env.OMNI_API_KEY}`,
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({
+    "revision": 18,
+    "graph": {
+      "nodes": [
+        {
+          "id": "start-1",
+          "block": "customer_writes",
+          "label": "Customer writes",
+          "summary": "WhatsApp · SMS",
+          "outcomes": [
+            "next"
+          ],
+          "x": 40,
+          "y": 40,
+          "config": {}
+        },
+        {
+          "id": "hours",
+          "block": "business_hours",
+          "label": "Business hours",
+          "summary": "the agent's working hours",
+          "outcomes": [
+            "open",
+            "closed"
+          ],
+          "x": 320,
+          "y": 40,
+          "config": {}
+        },
+        {
+          "id": "answer",
+          "block": "ai_replies",
+          "label": "AI replies",
+          "summary": "from knowledge",
+          "outcomes": [
+            "answered",
+            "unsure"
+          ],
+          "x": 600,
+          "y": 40,
+          "config": {}
+        },
+        {
+          "id": "team",
+          "block": "hand_to_person",
+          "label": "Hand to a person",
+          "summary": "needs attention · unread",
+          "outcomes": [],
+          "x": 600,
+          "y": 220,
+          "config": {}
+        }
+      ],
+      "wires": [
+        {
+          "from": "start-1",
+          "outcome": 0,
+          "to": "hours"
+        },
+        {
+          "from": "hours",
+          "outcome": 0,
+          "to": "answer"
+        },
+        {
+          "from": "hours",
+          "outcome": 1,
+          "to": "team"
+        },
+        {
+          "from": "answer",
+          "outcome": 1,
+          "to": "team"
+        }
+      ]
+    }
+  }),
+});
+console.log(response.status, await response.json());
+```
+
+</CodeGroup>
+
+## Response
+
+`200 OK` — the workflow, in the shape [GET …/workflow](/api-reference/ai-agents/get-workflow) answers, with the new `revision`, the checks run on your draft, and `unpublished` true.
+
+```json
+{
+  "agent": 12,
+  "revision": 19,
+  "draft": {
+    "nodes": [
+      {
+        "id": "start-1",
+        "block": "customer_writes",
+        "label": "Customer writes",
+        "summary": "WhatsApp · SMS",
+        "outcomes": [
+          "next"
+        ],
+        "x": 40,
+        "y": 40,
+        "config": {},
+        "category": "start",
+        "ai": false,
+        "policy": null
+      },
+      {
+        "id": "hours",
+        "block": "business_hours",
+        "label": "Business hours",
+        "summary": "the agent's working hours",
+        "outcomes": [
+          "open",
+          "closed"
+        ],
+        "x": 320,
+        "y": 40,
+        "config": {},
+        "category": "rule",
+        "ai": false,
+        "policy": null
+      },
+      {
+        "id": "answer",
+        "block": "ai_replies",
+        "label": "AI replies",
+        "summary": "from knowledge",
+        "outcomes": [
+          "answered",
+          "unsure"
+        ],
+        "x": 600,
+        "y": 40,
+        "config": {},
+        "category": "ai",
+        "ai": true,
+        "policy": null
+      },
+      {
+        "id": "team",
+        "block": "hand_to_person",
+        "label": "Hand to a person",
+        "summary": "needs attention · unread",
+        "outcomes": [],
+        "x": 600,
+        "y": 220,
+        "config": {},
+        "category": "handover",
+        "ai": false,
+        "policy": "auto"
+      }
+    ],
+    "wires": [
+      {
+        "from": "start-1",
+        "outcome": 0,
+        "to": "hours"
+      },
+      {
+        "from": "hours",
+        "outcome": 0,
+        "to": "answer"
+      },
+      {
+        "from": "hours",
+        "outcome": 1,
+        "to": "team"
+      },
+      {
+        "from": "answer",
+        "outcome": 1,
+        "to": "team"
+      }
+    ]
+  },
+  "issues": [],
+  "unpublished": true,
+  "live": {
+    "number": 3,
+    "note": "Out of hours goes straight to the team",
+    "by": "Meera Iyer",
+    "at": "2026-10-02T17:20:44+05:30",
+    "blocks": 4,
+    "ai_blocks": 1,
+    "live": true,
+    "running": 0
+  },
+  "updated_at": "2026-10-06T10:02:51+05:30"
+}
+```
+
+## Errors
+
+Every refusal is `{"error": {"code", "message", "field"}}`; `field` is there when one input is at fault.
+
+| Status | Error code | When |
+| :--- | :--- | :--- |
+| 400 | `invalid_request` | `revision` isn't a whole number (`field` is `revision`), or the graph can't be saved (`field` is `graph`; the message says why). |
+| 404 | `not_found` | No agent of this account's has that id. |
+| 409 | `revision_conflict` | Someone saved the workflow since you read it. |
+| 404 | `module_off` | The account doesn't have AI agents on: they aren't in its plan, or are switched off for it. |
+| 403 | `scope_missing` | The key doesn't have the `agents:write` scope. |
+
+Any request can also be refused for its key, its account or its rate (`key_required`, `invalid_key`, `account_suspended`, `plan_excludes_api`, `address_not_allowed`, `rate_limited`); see [the overview](/api-reference/overview).

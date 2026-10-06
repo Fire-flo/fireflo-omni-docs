@@ -1,0 +1,119 @@
+---
+title: "POST /v1/crm/deals"
+description: "Create a deal in a pipeline — in its first stage unless you say which."
+---
+
+Creates a deal in a pipeline, in its first stage unless `stage` names another. A deal created in a won or lost stage starts closed. It shows on the board straight away, and its history says it was made by the API key.
+
+<Note>Needs the `crm.deals:write` scope.</Note>
+
+## Body
+
+| Field | Type | Required | Notes |
+| :--- | :--- | :--- | :--- |
+| `pipeline` | integer | Yes | The pipeline's id. |
+| `title` | string | Yes | What the deal is. Up to 200 characters. |
+| `stage` | integer | No | A stage of that pipeline. Its first stage when left out. |
+| `contact` | string | No | The id of one of the account's contacts, whose messages then show on the deal. |
+| `value_minor` | integer | No | Its value in the currency's minor unit (paise for `INR`): 0 or more. 0 when left out. |
+| `notes` | string | No | The deal's own free text. Up to 4,000 characters. |
+
+## Request
+
+<CodeGroup>
+
+```bash cURL
+curl -X POST "https://api.fireflo.au/v1/crm/deals" \
+  -H "Authorization: Bearer $OMNI_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "pipeline": 3,
+  "title": "Ravi Traders — 50 POS terminals",
+  "contact": "9d4f2a61-3c8e-4b7a-a5d2-6e1f0b8c7a34",
+  "value_minor": 12500000,
+  "notes": "Wants delivery before Diwali."
+}'
+```
+
+```python Python
+import os
+
+import requests
+
+response = requests.post(
+    "https://api.fireflo.au/v1/crm/deals",
+    headers={"Authorization": f"Bearer {os.environ['OMNI_API_KEY']}"},
+    json={
+        "pipeline": 3,
+        "title": "Ravi Traders — 50 POS terminals",
+        "contact": "9d4f2a61-3c8e-4b7a-a5d2-6e1f0b8c7a34",
+        "value_minor": 12500000,
+        "notes": "Wants delivery before Diwali."
+    },
+)
+print(response.status_code, response.json())
+```
+
+```javascript Node
+const response = await fetch("https://api.fireflo.au/v1/crm/deals", {
+  method: "POST",
+  headers: {
+    Authorization: `Bearer ${process.env.OMNI_API_KEY}`,
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({
+    "pipeline": 3,
+    "title": "Ravi Traders — 50 POS terminals",
+    "contact": "9d4f2a61-3c8e-4b7a-a5d2-6e1f0b8c7a34",
+    "value_minor": 12500000,
+    "notes": "Wants delivery before Diwali."
+  }),
+});
+console.log(response.status, await response.json());
+```
+
+</CodeGroup>
+
+## Response
+
+`201 Created` — the deal. It also sends `deal.created` to your [webhook endpoints](/developers/webhooks).
+
+```json
+{
+  "id": "5b2e8c1d-7a4f-4e3b-9c6d-1f0a2b3c4d5e",
+  "title": "Ravi Traders — 50 POS terminals",
+  "pipeline": {
+    "id": 3,
+    "name": "Retail sales"
+  },
+  "stage": {
+    "id": 11,
+    "name": "New"
+  },
+  "status": "open",
+  "value_minor": 12500000,
+  "currency": "INR",
+  "contact": {
+    "id": "9d4f2a61-3c8e-4b7a-a5d2-6e1f0b8c7a34",
+    "name": "Ravi Kumar",
+    "phone": "+919876500101"
+  },
+  "notes": "Wants delivery before Diwali.",
+  "stage_entered_at": "2026-10-06T11:08:12+05:30",
+  "closed_at": null,
+  "created_at": "2026-10-06T11:08:12+05:30",
+  "updated_at": "2026-10-06T11:08:12+05:30"
+}
+```
+
+## Errors
+
+Every refusal is `{"error": {"code", "message", "field"}}`; `field` is there when one input is at fault.
+
+| Status | Error code | When |
+| :--- | :--- | :--- |
+| 400 | `invalid_request` | `pipeline` is missing or isn't one of the account's; `stage` isn't a stage of it; `title` is missing, empty or too long; `contact` isn't one of the account's contacts; `value_minor` isn't a whole number of 0 or more; or `notes` is too long. `field` names it. |
+| 404 | `module_off` | The account doesn't have Pipelines on. |
+| 403 | `scope_missing` | The key doesn't have the `crm.deals:write` scope. |
+
+Any request can also be refused for its key, its account or its rate (`key_required`, `invalid_key`, `account_suspended`, `plan_excludes_api`, `address_not_allowed`, `rate_limited`); see [the overview](/api-reference/overview).

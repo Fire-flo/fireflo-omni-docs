@@ -1,0 +1,63 @@
+---
+title: "DELETE /v1/crm/deals/{deal_id}"
+description: "Delete a deal."
+---
+
+Deletes a deal, with its notes. The pipeline's history records it, and `deal.deleted` goes to your [webhook endpoints](/developers/webhooks) with the deal's id and title.
+
+<Note>Needs the `crm.deals:write` scope.</Note>
+
+## Path parameters
+
+| Field | Type | Required | Notes |
+| :--- | :--- | :--- | :--- |
+| `deal_id` | string | Yes | The deal's id. |
+
+## Request
+
+<CodeGroup>
+
+```bash cURL
+curl -X DELETE "https://api.fireflo.au/v1/crm/deals/5b2e8c1d-7a4f-4e3b-9c6d-1f0a2b3c4d5e" \
+  -H "Authorization: Bearer $OMNI_API_KEY"
+```
+
+```python Python
+import os
+
+import requests
+
+response = requests.delete(
+    "https://api.fireflo.au/v1/crm/deals/5b2e8c1d-7a4f-4e3b-9c6d-1f0a2b3c4d5e",
+    headers={"Authorization": f"Bearer {os.environ['OMNI_API_KEY']}"},
+)
+print(response.status_code)
+```
+
+```javascript Node
+const response = await fetch("https://api.fireflo.au/v1/crm/deals/5b2e8c1d-7a4f-4e3b-9c6d-1f0a2b3c4d5e", {
+  method: "DELETE",
+  headers: {
+    Authorization: `Bearer ${process.env.OMNI_API_KEY}`,
+  },
+});
+console.log(response.status);
+```
+
+</CodeGroup>
+
+## Response
+
+`204 No Content` — no body.
+
+## Errors
+
+Every refusal is `{"error": {"code", "message", "field"}}`; `field` is there when one input is at fault.
+
+| Status | Error code | When |
+| :--- | :--- | :--- |
+| 404 | `not_found` | No deal of this account's has that id. |
+| 404 | `module_off` | The account doesn't have Pipelines on. |
+| 403 | `scope_missing` | The key doesn't have the `crm.deals:write` scope. |
+
+Any request can also be refused for its key, its account or its rate (`key_required`, `invalid_key`, `account_suspended`, `plan_excludes_api`, `address_not_allowed`, `rate_limited`); see [the overview](/api-reference/overview).

@@ -1,0 +1,106 @@
+---
+title: "GET /v1/tickets"
+description: "The account's tickets, newest first, filtered by status, priority, assignee, category or contact."
+---
+
+The account's tickets, newest first — opened by customers writing in, by the team, by AI agents or through the API.
+
+<Note>Needs the `tickets:read` scope.</Note>
+
+## Query parameters
+
+| Field | Type | Required | Notes |
+| :--- | :--- | :--- | :--- |
+| `status` | string | No | `open`, `pending`, `solved` or `closed`. |
+| `priority` | string | No | `normal`, `high` or `urgent`. |
+| `assignee` | string | No | A team member's email: only theirs. Empty for tickets nobody is assigned. |
+| `category` | integer | No | A category's id: only its tickets. |
+| `contact` | string | No | A contact's id: only their tickets. |
+| `limit` | integer | No | 1 to 100; 50 by default. |
+| `starting_after` | string | No | The last id of the previous page — `next` from it. |
+
+## Request
+
+<CodeGroup>
+
+```bash cURL
+curl "https://api.fireflo.au/v1/tickets?status=open&assignee=priya@acme.in&limit=20" \
+  -H "Authorization: Bearer $OMNI_API_KEY"
+```
+
+```python Python
+import os
+
+import requests
+
+response = requests.get(
+    "https://api.fireflo.au/v1/tickets?status=open&assignee=priya@acme.in&limit=20",
+    headers={"Authorization": f"Bearer {os.environ['OMNI_API_KEY']}"},
+)
+print(response.status_code, response.json())
+```
+
+```javascript Node
+const response = await fetch("https://api.fireflo.au/v1/tickets?status=open&assignee=priya@acme.in&limit=20", {
+  headers: { Authorization: `Bearer ${process.env.OMNI_API_KEY}` },
+});
+console.log(response.status, await response.json());
+```
+
+</CodeGroup>
+
+## Response
+
+`200 OK` — `has_more` says whether there is another page, and `next` is the `starting_after` for it. Each ticket is in the shape [GET /v1/tickets/\{ticket_id\}](/api-reference/tickets/get) answers, without its history.
+
+```json
+{
+  "data": [
+    {
+      "id": "b84f2c10-5e7a-4c3d-9a61-0f2d7e9c4a18",
+      "number": 1042,
+      "subject": "Order A-1042 not delivered",
+      "status": "open",
+      "priority": "high",
+      "assignee": {
+        "name": "Priya Nair",
+        "email": "priya@acme.in"
+      },
+      "category": {
+        "id": 4,
+        "name": "Delivery",
+        "colour": "info"
+      },
+      "contact": {
+        "id": "3f6b2a1e-8c4d-4e2a-9b7f-5d1c0e8a9f42",
+        "name": "Asha Rao",
+        "phone": "+919876543210"
+      },
+      "conversation": "3f6b2a1e-8c4d-4e2a-9b7f-5d1c0e8a9f42",
+      "source": "inbound",
+      "handled_by": "human",
+      "resolution": "",
+      "summary": "",
+      "opened_at": "2026-10-06T09:02:17+05:30",
+      "first_response_at": "2026-10-06T09:08:40+05:30",
+      "last_activity_at": "2026-10-06T10:15:03+05:30",
+      "solved_at": null,
+      "closed_at": null
+    }
+  ],
+  "has_more": false,
+  "next": null
+}
+```
+
+## Errors
+
+Every refusal is `{"error": {"code", "message", "field"}}`; `field` is there when one input is at fault.
+
+| Status | Error code | When |
+| :--- | :--- | :--- |
+| 400 | `invalid_request` | `status` or `limit` isn't one, no one in your team has the `assignee` email, no contact has the `contact` id, or `starting_after` isn't an id from this list (`field` names it). |
+| 404 | `module_off` | The account's plan doesn't include Tickets. |
+| 403 | `scope_missing` | The key doesn't have the `tickets:read` scope. |
+
+Any request can also be refused for its key, its account or its rate (`key_required`, `invalid_key`, `account_suspended`, `plan_excludes_api`, `address_not_allowed`, `rate_limited`); see [the overview](/api-reference/overview).

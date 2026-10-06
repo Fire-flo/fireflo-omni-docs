@@ -1,0 +1,93 @@
+---
+title: "PATCH /v1/catalogue/sets/{set_id}"
+description: "Rename a product set or change its description."
+---
+
+Renames a set or changes its description; only what you send changes. Its products stay in it.
+
+<Note>Needs the `catalogue.products:write` scope.</Note>
+
+## Path parameters
+
+| Field | Type | Required | Notes |
+| :--- | :--- | :--- | :--- |
+| `set_id` | string | Yes | The set's id. |
+
+## Body
+
+| Field | Type | Required | Notes |
+| :--- | :--- | :--- | :--- |
+| `name` | string | No | A new name: up to 80 characters, not used by another of the account's sets. |
+| `description` | string | No | Up to 200 characters. |
+
+## Request
+
+<CodeGroup>
+
+```bash cURL
+curl -X PATCH "https://api.fireflo.au/v1/catalogue/sets/c4e81f2a-6b7d-4a39-8e15-0d3f9b2a7c61" \
+  -H "Authorization: Bearer $OMNI_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "Diwali & Bhai Dooj edit"
+}'
+```
+
+```python Python
+import os
+
+import requests
+
+response = requests.patch(
+    "https://api.fireflo.au/v1/catalogue/sets/c4e81f2a-6b7d-4a39-8e15-0d3f9b2a7c61",
+    headers={
+        "Authorization": f"Bearer {os.environ['OMNI_API_KEY']}",
+    },
+    json={
+        "name": "Diwali & Bhai Dooj edit",
+    },
+)
+print(response.status_code, response.json())
+```
+
+```javascript Node
+const response = await fetch("https://api.fireflo.au/v1/catalogue/sets/c4e81f2a-6b7d-4a39-8e15-0d3f9b2a7c61", {
+  method: "PATCH",
+  headers: {
+    Authorization: `Bearer ${process.env.OMNI_API_KEY}`,
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({
+    "name": "Diwali & Bhai Dooj edit"
+  }),
+});
+console.log(response.status, await response.json());
+```
+
+</CodeGroup>
+
+## Response
+
+`200 OK` — the set.
+
+```json
+{
+  "id": "c4e81f2a-6b7d-4a39-8e15-0d3f9b2a7c61",
+  "name": "Diwali & Bhai Dooj edit",
+  "description": "Festive picks, sent as one product list.",
+  "products": 24
+}
+```
+
+## Errors
+
+Every refusal is `{"error": {"code", "message", "field"}}`; `field` is there when one input is at fault.
+
+| Status | Error code | When |
+| :--- | :--- | :--- |
+| 400 | `invalid_request` | `name` is empty, too long or already a set's, or `description` is too long (`field` names it). |
+| 404 | `not_found` | No set of this account's has that id. |
+| 404 | `module_off` | The account doesn't have Catalogue on. |
+| 403 | `scope_missing` | The key doesn't have the `catalogue.products:write` scope. |
+
+Any request can also be refused for its key, its account or its rate (`key_required`, `invalid_key`, `account_suspended`, `plan_excludes_api`, `address_not_allowed`, `rate_limited`); see [the overview](/api-reference/overview).

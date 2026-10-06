@@ -1,0 +1,180 @@
+---
+title: "AI agents"
+description: "Set up AI agents from your own systems, edit and publish their workflows, keep their knowledge current, put them on contacts, decide their plans, and follow what they do."
+---
+
+Everything an [AI agent](/batteries/ai-agents) does on the panel can be driven from your
+own systems too: setting agents up, their workflows, the [knowledge](/batteries/knowledge)
+they answer from, which contacts they work, and the plans waiting for a person. It is the
+same agent either way — a plan approved through the API runs exactly as one approved on
+the panel, and shows there too.
+
+The endpoints are under `/v1/agents/…`, with the same keys, errors and conventions as the
+rest of the API.
+
+- They exist when the account's plan includes **AI agents** and they are switched on for
+  it; otherwise every one answers `404 module_off`.
+- What a key does is recorded as `API · <key name>` — in an agent's activity when
+  its setup changes, and as the reason when it pauses an agent or stops a plan.
+- Agents, plans and workflow versions have numbers for ids. Contacts and deals are named
+  by the ids they have everywhere else in the API.
+
+## Scopes
+
+| Scope | Lets a key |
+| :--- | :--- |
+| `agents:read` | See agents, their workflows, who they work, plans, activity and usage |
+| `agents:write` | Create, set up, publish, switch on and off, and delete agents |
+| `agents.knowledge:read` | See what agents know |
+| `agents.knowledge:write` | Add, change, re-read and remove knowledge |
+| `agents.contacts:write` | Put agents on contacts, pause, resume, run and release them |
+| `agents.plans:write` | Approve, reject and cancel agents' plans |
+
+A key that only approves plans from your own approval tool, say, needs `agents:read` and
+`agents.plans:write`. See [Keys and scopes](/developers/keys-and-scopes).
+
+## What stays on the panel
+
+- **AI provider keys.** The keys your agents use are added, tested and chosen only on the
+  panel, under **AI agents → AI providers** and in each agent's **Model & key** step. They
+  are never sent or set over the API: a `PATCH` with `credential` is refused. An agent's
+  `provider` says which key it uses, never the key itself.
+- **Engaging pipelines.** An agent needs at least one pipeline before it can go live;
+  choose them in its **Engage** step.
+- **The workflow designer's helpers** — laying out the canvas, **Design with AI**, the
+  ready-made workflows, test runs, export and import. The API reads, saves and publishes
+  the graph itself.
+
+## Setting an agent up
+
+| | |
+| :--- | :--- |
+| [`GET /v1/agents`](/api-reference/ai-agents/list) | Every agent, with its setup, status and today's figures |
+| [`POST /v1/agents`](/api-reference/ai-agents/create) | Start one — a name, a role and what it should achieve. It starts as a `draft` |
+| [`GET`, `PATCH`, `DELETE /v1/agents/{agent_id}`](/api-reference/ai-agents/get) | Read, [change](/api-reference/ai-agents/update) or [delete](/api-reference/ai-agents/delete) one |
+| [`POST …/verify`](/api-reference/ai-agents/verify) | Check its AI key and model answer in the format agents need |
+| [`POST …/activate`](/api-reference/ai-agents/activate) | Put it live |
+| [`POST …/disable`](/api-reference/ai-agents/disable) | Switch it off; its open plans stop |
+
+The path to live is the panel's: create the agent, choose its key and model and engage a
+pipeline on the panel, **verify**, set it up with `PATCH`, then **activate**. `PATCH` takes
+the agent's instructions, channels, knowledge collections, actions and approvals, when to
+plan again, working hours, limits and how it shares conversations with your team.
+
+Changing an agent's `model` sends it back to be verified: a live agent becomes a `draft`
+until it passes. When it can't go live, `activate` answers `409 invalid_state` and lists
+what is missing.
+
+## Workflows
+
+| | |
+| :--- | :--- |
+| [`GET /v1/agents/{agent_id}/workflow`](/api-reference/ai-agents/get-workflow) | The draft graph, its checks, its `revision` and the live version |
+| [`PUT …/workflow`](/api-reference/ai-agents/save-workflow) | Replace the draft |
+| [`POST …/workflow/publish`](/api-reference/ai-agents/publish-workflow) | Make the draft live as a new version, with a note |
+| [`GET …/workflow/versions`](/api-reference/ai-agents/list-versions) | Published versions, newest first |
+| [`POST …/workflow/versions/{number}/rollback`](/api-reference/ai-agents/roll-back) | Make an earlier version live again, under a new number |
+
+Saving and publishing need the `revision` you read. Someone may be editing the same
+workflow on the panel: if they saved since you read it, your save is refused with
+`409 revision_conflict` instead of overwriting their work. Read it again, apply your change
+to theirs, and save with the new revision.
+
+```json
+{ "revision": 18, "graph": { "nodes": [ … ], "wires": [ … ] } }
+```
+
+A draft can be saved with problems; its `issues` list them. Publishing needs nothing
+`broken` — anything left is refused with `409 invalid_state`.
+
+## Knowledge
+
+| | |
+| :--- | :--- |
+| [`GET /v1/agents/knowledge/sources`](/api-reference/ai-agents/list-sources) | Articles, FAQs, files and websites, by kind or collection |
+| [`POST …/sources`](/api-reference/ai-agents/add-source) | Add an article, an FAQ or a website |
+| [`POST /v1/agents/knowledge/files`](/api-reference/ai-agents/upload-file) | Upload a PDF, Word, CSV, text or Markdown file, up to 20 MB |
+| [`PATCH`, `DELETE …/sources/{source_id}`](/api-reference/ai-agents/update-source) | Change a source, switch it off, or [remove it](/api-reference/ai-agents/delete-source) |
+| [`POST …/sources/{source_id}/reindex`](/api-reference/ai-agents/reindex-source) | Read it again now |
+| [`GET`, `POST /v1/agents/knowledge/collections`](/api-reference/ai-agents/list-collections) | Collections, and [add one](/api-reference/ai-agents/add-collection) |
+
+A good fit for keeping FAQs in step with your own help centre or product catalogue: when
+an answer changes there, `PATCH` the FAQ. A source is `processing` until it has been read,
+then `ready` — usually a few seconds later.
+
+## Putting agents on contacts
+
+| | |
+| :--- | :--- |
+| [`GET /v1/agents/contacts/{contact_id}/agents`](/api-reference/ai-agents/contact-agents) | The agents working a contact, and where each one is |
+| [`POST …/agents`](/api-reference/ai-agents/assign) | Put a live agent on them, and on one of their deals |
+| [`POST …/agents/{agent_id}/pause`](/api-reference/ai-agents/pause) | Pause it for them |
+| [`POST …/agents/{agent_id}/resume`](/api-reference/ai-agents/resume) | Hand them back to it |
+| [`POST …/agents/{agent_id}/run`](/api-reference/ai-agents/run) | Ask it to plan now, with a note |
+| [`POST …/agents/{agent_id}/release`](/api-reference/ai-agents/release) | Take it off them; its open plans stop |
+
+A contact has at most one agent in each role — one sales agent and one support agent, say.
+Putting an agent on starts it at once. `run` is how your systems tell an agent something
+happened — "order A-1042 was delivered today" — and let it decide what to do.
+
+## Deciding plans
+
+| | |
+| :--- | :--- |
+| [`GET /v1/agents/plans`](/api-reference/ai-agents/list-plans) | Plans, newest first; `status=awaiting` for the ones waiting on a person |
+| [`GET /v1/agents/plans/{plan_id}`](/api-reference/ai-agents/get-plan) | One plan and its steps |
+| [`POST …/approve`](/api-reference/ai-agents/approve-plan) | Approve it, with edits to its steps |
+| [`POST …/reject`](/api-reference/ai-agents/reject-plan) | Reject it, telling the agent why |
+| [`POST …/cancel`](/api-reference/ai-agents/cancel-plan) | Stop a plan that still has work ahead |
+
+What you approve is exactly what runs. Before approving you may change a step in the
+fields its `editable` lists — a message's wording, a note, an amount — and the edit is
+checked again as if the agent had planned it. A rejection's note is read by the agent the
+next time it plans for that contact. A plan nobody decides is dropped after the account's
+approval time, 24 hours by default, rather than run late.
+
+## Activity and usage
+
+| | |
+| :--- | :--- |
+| [`GET /v1/agents/events`](/api-reference/ai-agents/list-events) | The activity log, newest first; by agent or kind |
+| [`GET /v1/agents/usage`](/api-reference/ai-agents/usage) | AI tokens per day, agent, pipeline and model, over 7, 14 or 30 days |
+
+The tokens are used on your own AI keys and billed by your AI provider; OMNI doesn't
+charge for AI.
+
+## Webhook events
+
+Rather than asking, subscribe a [webhook endpoint](/developers/webhooks) to:
+
+| Event | When | `data` |
+| :--- | :--- | :--- |
+| `agent.plan_proposed` | A plan is waiting for someone to approve it | `kind`, `summary`, `agent`, `contact`, and the `plan` in the shape [GET /v1/agents/plans/\{plan_id\}](/api-reference/ai-agents/get-plan) answers |
+| `agent.assignment_changed` | An agent started, paused, resumed or stopped working a contact | `kind` — `assigned`, `paused`, `resumed` or `unassigned` — `summary`, `agent`, `contact` |
+| `agent.handed_over` | An agent handed a contact to your team | `agent`, `contact`, and the `reason` |
+
+They are sent however it happened — on the panel, through the API, or by the agent
+itself. `contact` is `{ "id", "name", "phone" }`, with the contact's id; `agent` is
+`{ "id", "name" }`.
+
+```json
+{
+  "id": "evt_2b7d9e1f4a6c4b3d8e0f1a2b3c4d5e6f",
+  "event": "agent.plan_proposed",
+  "created": "2026-10-06T04:44:31.208Z",
+  "data": {
+    "kind": "approval_requested",
+    "summary": "Plan #4812 is waiting for approval",
+    "agent": { "id": 7, "name": "Arjun" },
+    "contact": {
+      "id": "3f6b2a1e-8c4d-4e2a-9b7f-5d1c0e8a9f42",
+      "name": "Neha Arora",
+      "phone": "+919876500102"
+    },
+    "plan": { "id": 4812, "status": "awaiting_approval", "goal": "Answer Neha's price question and keep the quote moving", "steps": [ … ], … }
+  }
+}
+```
+
+With `agent.plan_proposed` and the plans endpoints you can put approvals where your team
+already works — a chat tool or your own back office — and approve or reject from there.

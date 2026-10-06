@@ -1,0 +1,219 @@
+---
+title: "POST /v1/cdp/audiences"
+description: "Save an audience from rules; who is in it is worked out in the background."
+---
+
+Saves an audience: a group of people described by rules — "added to cart in the last 7 days and didn't order". Who is in it is worked out in the background, and from then on people join and leave as they match. It is the same audience the panel builds, and shows under **Audiences** there.
+
+<Note>Needs the `cdp.audiences:write` scope.</Note>
+
+## Body
+
+| Field | Type | Required | Notes |
+| :--- | :--- | :--- | :--- |
+| `name` | string | Yes | What it's called. Up to 120 characters, and not the name of another audience on the account. |
+| `description` | string | No | Up to 300 characters. |
+| `rules` | object | Yes | Who is in it — below. |
+
+Send an `Idempotency-Key` header to save it once however often the request is retried.
+
+## Rules
+
+```json
+{
+  "match": "all",
+  "conditions": [ ... ],
+  "groups": [ { "match": "any", "conditions": [ ... ] } ]
+}
+```
+
+`match` is `all` (every condition) or `any` (at least one); `all` when left out. `groups` are
+optional: each is its own `match` and `conditions`, and counts as one condition beside the
+others. Up to 5 groups and 20 conditions in all, and at least one.
+
+Each condition has a `type`:
+
+| `type` | Fields | Matches people who… |
+| :--- | :--- | :--- |
+| `event` | `op` `did` or `did_not`; `name`; `days` (1 to 365, default 30); `count` (default 1); optional `property` and `value` | did, or didn't, do the event at least `count` times in the last `days` — where `property` equals `value`, when given |
+| `field` | `field` (a contact field's key); `op`; `value` | have the field: `equals`, `contains`, `is_empty`, `not_empty`; or `at_least`, `at_most` for numbers and dates (`YYYY-MM-DD`) |
+| `tag` | `tag` (the tag's id, a number); `op` `has` or `has_not` | have, or don't have, the tag |
+| `segment` | `segment` (its name); `op` `is` or `is_not` | are, or aren't, in the segment |
+| `identifier` | `kind` `email` or `external_id`; `op` `has` or `has_not` | have, or have no, email or customer id |
+| `consent` | `channel` (a channel key, like `whatsapp`); `purpose` `marketing` (default) or `transactional` | may get that kind of message on that channel |
+| `trait` | `trait` (a trait's key); `op`; `value` | have the trait `at_least`, `at_most` or `equals` `value`; for a time trait, `within_days` or `not_within_days` (`value` is the days, 1 to 365); or `is_empty` |
+| `created` | `days` (1 to 365) | became a contact in the last `days` |
+| `audience` | `audience` (another audience's id); `op` `in` or `not_in` | are, or aren't, in that audience. Not itself, and not one that is built on this one. |
+
+Trait keys are the built-in ones and your own, from [GET /v1/cdp/traits](/api-reference/customer-data/list-traits).
+`lifetime_value` and `open_deals_value` are compared in rupees.
+
+## Request
+
+<CodeGroup>
+
+```bash cURL
+curl -X POST "https://api.fireflo.au/v1/cdp/audiences" \
+  -H "Authorization: Bearer $OMNI_API_KEY" \
+  -H "Content-Type: application/json" \
+  -H "Idempotency-Key: audience-carts-left-week" \
+  -d '{
+    "name": "Carts left this week",
+    "description": "Added to cart in the last 7 days and didn't order",
+    "rules": {
+      "match": "all",
+      "conditions": [
+        {
+          "type": "event",
+          "op": "did",
+          "name": "cart_added",
+          "days": 7
+        },
+        {
+          "type": "event",
+          "op": "did_not",
+          "name": "order_placed",
+          "days": 7
+        },
+        {
+          "type": "consent",
+          "channel": "whatsapp",
+          "purpose": "marketing"
+        }
+      ]
+    }
+  }'
+```
+
+```python Python
+import os
+
+import requests
+
+response = requests.post(
+    "https://api.fireflo.au/v1/cdp/audiences",
+    headers={
+        "Authorization": f"Bearer {os.environ['OMNI_API_KEY']}",
+        "Idempotency-Key": "audience-carts-left-week",
+    },
+    json={
+        "name": "Carts left this week",
+        "description": "Added to cart in the last 7 days and didn't order",
+        "rules": {
+            "match": "all",
+            "conditions": [
+                {
+                    "type": "event",
+                    "op": "did",
+                    "name": "cart_added",
+                    "days": 7,
+                },
+                {
+                    "type": "event",
+                    "op": "did_not",
+                    "name": "order_placed",
+                    "days": 7,
+                },
+                {
+                    "type": "consent",
+                    "channel": "whatsapp",
+                    "purpose": "marketing",
+                },
+            ],
+        },
+    },
+)
+print(response.status_code, response.json())
+```
+
+```javascript Node
+const response = await fetch("https://api.fireflo.au/v1/cdp/audiences", {
+  method: "POST",
+  headers: {
+    Authorization: `Bearer ${process.env.OMNI_API_KEY}`,
+    "Content-Type": "application/json",
+    "Idempotency-Key": "audience-carts-left-week",
+  },
+  body: JSON.stringify({
+    "name": "Carts left this week",
+    "description": "Added to cart in the last 7 days and didn't order",
+    "rules": {
+      "match": "all",
+      "conditions": [
+        {
+          "type": "event",
+          "op": "did",
+          "name": "cart_added",
+          "days": 7
+        },
+        {
+          "type": "event",
+          "op": "did_not",
+          "name": "order_placed",
+          "days": 7
+        },
+        {
+          "type": "consent",
+          "channel": "whatsapp",
+          "purpose": "marketing"
+        }
+      ]
+    }
+  }),
+});
+console.log(response.status, await response.json());
+```
+
+</CodeGroup>
+
+## Response
+
+`201 Created` — the audience, `building` while its members are worked out. Follow it with [GET /v1/cdp/audiences/\{audience_id\}](/api-reference/customer-data/get-audience), or the `audience.entered` [webhook event](/developers/customer-data#webhook-events).
+
+```json
+{
+  "id": "5b2e8d14-7c3a-4f9e-a1d6-3e8b0c4f2a71",
+  "name": "Carts left this week",
+  "description": "Added to cart in the last 7 days and didn't order",
+  "status": "building",
+  "error": "",
+  "members": 0,
+  "refreshed_at": null,
+  "created_at": "2026-10-06T11:02:19+05:30",
+  "updated_at": "2026-10-06T11:02:19+05:30",
+  "rules": {
+    "match": "all",
+    "conditions": [
+      {
+        "type": "event",
+        "op": "did",
+        "name": "cart_added",
+        "days": 7
+      },
+      {
+        "type": "event",
+        "op": "did_not",
+        "name": "order_placed",
+        "days": 7
+      },
+      {
+        "type": "consent",
+        "channel": "whatsapp",
+        "purpose": "marketing"
+      }
+    ]
+  }
+}
+```
+
+## Errors
+
+Every refusal is `{"error": {"code", "message", "field"}}`; `field` is there when one input is at fault.
+
+| Status | Error code | When |
+| :--- | :--- | :--- |
+| 400 | `invalid_request` | `field` names `name` (missing, or another audience has it) or `rules` (the message says what's wrong — an unknown condition, a trait or field that doesn't exist, too many conditions). |
+| 403 | `scope_missing` | The key doesn't have the `cdp.audiences:write` scope. |
+| 404 | `module_off` | The account doesn't have Customer data on. |
+
+Any request can also be refused for its key, its account or its rate (`key_required`, `invalid_key`, `account_suspended`, `plan_excludes_api`, `address_not_allowed`, `rate_limited`); see [the overview](/api-reference/overview).

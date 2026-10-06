@@ -1,0 +1,77 @@
+---
+title: "POST /v1/cdp/audiences/{audience_id}/refresh"
+description: "Work out who is in an audience again, now."
+---
+
+Works out who is in an audience again, now, rather than waiting for what people do to change it. It is `building` until done.
+
+<Note>Needs the `cdp.audiences:write` scope.</Note>
+
+## Path parameters
+
+| Field | Type | Required | Notes |
+| :--- | :--- | :--- | :--- |
+| `audience_id` | string | Yes | The audience's id. |
+
+## Request
+
+<CodeGroup>
+
+```bash cURL
+curl -X POST "https://api.fireflo.au/v1/cdp/audiences/5b2e8d14-7c3a-4f9e-a1d6-3e8b0c4f2a71/refresh" \
+  -H "Authorization: Bearer $OMNI_API_KEY"
+```
+
+```python Python
+import os
+
+import requests
+
+response = requests.post(
+    "https://api.fireflo.au/v1/cdp/audiences/5b2e8d14-7c3a-4f9e-a1d6-3e8b0c4f2a71/refresh",
+    headers={"Authorization": f"Bearer {os.environ['OMNI_API_KEY']}"},
+)
+print(response.status_code, response.json())
+```
+
+```javascript Node
+const response = await fetch("https://api.fireflo.au/v1/cdp/audiences/5b2e8d14-7c3a-4f9e-a1d6-3e8b0c4f2a71/refresh", {
+  method: "POST",
+  headers: {
+    Authorization: `Bearer ${process.env.OMNI_API_KEY}`,
+  },
+});
+console.log(response.status, await response.json());
+```
+
+</CodeGroup>
+
+## Response
+
+`202 Accepted` — the audience, `building`, without its rules. `members` is the count from before until it is done.
+
+```json
+{
+  "id": "5b2e8d14-7c3a-4f9e-a1d6-3e8b0c4f2a71",
+  "name": "Carts left this week",
+  "description": "Added to cart in the last 7 days and didn't order",
+  "status": "building",
+  "error": "",
+  "members": 312,
+  "refreshed_at": "2026-10-06T10:15:02+05:30",
+  "created_at": "2026-09-22T11:04:37+05:30",
+  "updated_at": "2026-10-01T16:20:45+05:30"
+}
+```
+
+## Errors
+
+Every refusal is `{"error": {"code", "message", "field"}}`; `field` is there when one input is at fault.
+
+| Status | Error code | When |
+| :--- | :--- | :--- |
+| 404 | `not_found` | No audience of this account's has that id. |
+| 403 | `scope_missing` | The key doesn't have the `cdp.audiences:write` scope. |
+| 404 | `module_off` | The account doesn't have Customer data on. |
+
+Any request can also be refused for its key, its account or its rate (`key_required`, `invalid_key`, `account_suspended`, `plan_excludes_api`, `address_not_allowed`, `rate_limited`); see [the overview](/api-reference/overview).

@@ -1,0 +1,104 @@
+---
+title: "GET /v1/cdp/audiences/{audience_id}"
+description: "One audience, with its rules and how many people are in it."
+---
+
+One audience, with its rules and how many people are in it.
+
+<Note>Needs the `cdp.audiences:read` scope.</Note>
+
+## Path parameters
+
+| Field | Type | Required | Notes |
+| :--- | :--- | :--- | :--- |
+| `audience_id` | string | Yes | The audience's id. |
+
+## Request
+
+<CodeGroup>
+
+```bash cURL
+curl "https://api.fireflo.au/v1/cdp/audiences/5b2e8d14-7c3a-4f9e-a1d6-3e8b0c4f2a71" \
+  -H "Authorization: Bearer $OMNI_API_KEY"
+```
+
+```python Python
+import os
+
+import requests
+
+response = requests.get(
+    "https://api.fireflo.au/v1/cdp/audiences/5b2e8d14-7c3a-4f9e-a1d6-3e8b0c4f2a71",
+    headers={"Authorization": f"Bearer {os.environ['OMNI_API_KEY']}"},
+)
+print(response.status_code, response.json())
+```
+
+```javascript Node
+const response = await fetch("https://api.fireflo.au/v1/cdp/audiences/5b2e8d14-7c3a-4f9e-a1d6-3e8b0c4f2a71", {
+  headers: {
+    Authorization: `Bearer ${process.env.OMNI_API_KEY}`,
+  },
+});
+console.log(response.status, await response.json());
+```
+
+</CodeGroup>
+
+## Response
+
+`200 OK` — the audience. `members` is how many are in it; `refreshed_at` is when that was last worked out. The rules are as [POST /v1/cdp/audiences](/api-reference/customer-data/create-audience#rules) describes.
+
+| `status` | Meaning |
+| :--- | :--- |
+| `building` | Who's in is being worked out. `members` is what it was before. |
+| `ready` | Worked out; people join and leave as they match. |
+| `failed` | It couldn't be worked out: `error` says why. |
+
+```json
+{
+  "id": "5b2e8d14-7c3a-4f9e-a1d6-3e8b0c4f2a71",
+  "name": "Carts left this week",
+  "description": "Added to cart in the last 7 days and didn't order",
+  "status": "ready",
+  "error": "",
+  "members": 312,
+  "refreshed_at": "2026-10-06T10:15:02+05:30",
+  "created_at": "2026-09-22T11:04:37+05:30",
+  "updated_at": "2026-10-01T16:20:45+05:30",
+  "rules": {
+    "match": "all",
+    "conditions": [
+      {
+        "type": "event",
+        "op": "did",
+        "name": "cart_added",
+        "days": 7
+      },
+      {
+        "type": "event",
+        "op": "did_not",
+        "name": "order_placed",
+        "days": 7
+      },
+      {
+        "type": "consent",
+        "channel": "whatsapp",
+        "purpose": "marketing"
+      }
+    ]
+  }
+}
+```
+
+## Errors
+
+Every refusal is `{"error": {"code", "message", "field"}}`; `field` is there when one input is at fault.
+
+| Status | Error code | When |
+| :--- | :--- | :--- |
+| 404 | `not_found` | No audience of this account's has that id. |
+| 403 | `scope_missing` | The key doesn't have the `cdp.audiences:read` scope. |
+| 404 | `module_off` | The account doesn't have Customer data on. |
+
+Any request can also be refused for its key, its account or its rate (`key_required`, `invalid_key`, `account_suspended`, `plan_excludes_api`, `address_not_allowed`, `rate_limited`); see [the overview](/api-reference/overview).

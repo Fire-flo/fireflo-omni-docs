@@ -1,0 +1,88 @@
+---
+title: "POST /v1/agents/knowledge/collections"
+description: "Add a knowledge collection to group sources by topic."
+---
+
+Adds a collection. An account can have up to 100.
+
+<Note>Needs the `agents.knowledge:write` scope.</Note>
+
+## Body
+
+| Field | Type | Required | Notes |
+| :--- | :--- | :--- | :--- |
+| `name` | string | Yes | Up to 60 characters; unique in the account. |
+| `description` | string | No | What belongs in it. Up to 200 characters. |
+
+## Request
+
+<CodeGroup>
+
+```bash cURL
+curl -X POST "https://api.fireflo.au/v1/agents/knowledge/collections" \
+  -H "Authorization: Bearer $OMNI_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Installation",
+    "description": "Inverter and battery installation, site checks"
+  }'
+```
+
+```python Python
+import os
+
+import requests
+
+response = requests.post(
+    "https://api.fireflo.au/v1/agents/knowledge/collections",
+    headers={"Authorization": f"Bearer {os.environ['OMNI_API_KEY']}"},
+    json={
+        "name": "Installation",
+        "description": "Inverter and battery installation, site checks"
+    },
+)
+print(response.status_code, response.json())
+```
+
+```javascript Node
+const response = await fetch("https://api.fireflo.au/v1/agents/knowledge/collections", {
+  method: "POST",
+  headers: {
+    Authorization: `Bearer ${process.env.OMNI_API_KEY}`,
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({
+    "name": "Installation",
+    "description": "Inverter and battery installation, site checks"
+  }),
+});
+console.log(response.status, await response.json());
+```
+
+</CodeGroup>
+
+## Response
+
+`201 Created` — the collection, with no sources yet.
+
+```json
+{
+  "id": 6,
+  "name": "Installation",
+  "description": "Inverter and battery installation, site checks",
+  "sources": 0
+}
+```
+
+## Errors
+
+Every refusal is `{"error": {"code", "message", "field"}}`; `field` is there when one input is at fault.
+
+| Status | Error code | When |
+| :--- | :--- | :--- |
+| 400 | `invalid_request` | `name` is empty, too long, or already a collection's (`field` is `name`). |
+| 409 | `invalid_state` | The account already has 100 collections. |
+| 404 | `module_off` | The account doesn't have AI agents on: they aren't in its plan, or are switched off for it. |
+| 403 | `scope_missing` | The key doesn't have the `agents.knowledge:write` scope. |
+
+Any request can also be refused for its key, its account or its rate (`key_required`, `invalid_key`, `account_suspended`, `plan_excludes_api`, `address_not_allowed`, `rate_limited`); see [the overview](/api-reference/overview).

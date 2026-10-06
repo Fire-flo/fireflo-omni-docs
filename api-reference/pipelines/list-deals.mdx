@@ -1,0 +1,102 @@
+---
+title: "GET /v1/crm/deals"
+description: "The account's deals, newest first, filtered by pipeline, stage, status or contact."
+---
+
+The account's deals, newest first, across every pipeline. Filter by pipeline, stage, status or contact; filters combine.
+
+<Note>Needs the `crm.deals:read` scope.</Note>
+
+## Query parameters
+
+| Field | Type | Required | Notes |
+| :--- | :--- | :--- | :--- |
+| `pipeline` | integer | No | Only this pipeline's deals. |
+| `stage` | integer | No | Only the deals in this stage. |
+| `status` | string | No | `open`, `won` or `lost`. |
+| `contact` | string | No | Only this contact's deals: the contact's id. |
+| `limit` | integer | No | 1 to 100; 50 by default. |
+| `starting_after` | string | No | The last id of the previous page — `next` from it. |
+
+A deal has `id`; `title`; its `pipeline` and `stage` (each an `id` and `name`); `status` — `open`, `won` or `lost`; `value_minor` — its value in the currency's minor unit (paise for `INR`); `currency`; `contact` (`id`, `name`, `phone`, or `null`); `notes` — the deal's own free text; `stage_entered_at` — when it reached its stage; `closed_at` — when it was won or lost, or `null` while open; and `created_at` and `updated_at`.
+
+## Request
+
+<CodeGroup>
+
+```bash cURL
+curl "https://api.fireflo.au/v1/crm/deals?pipeline=3&status=open&limit=20" \
+  -H "Authorization: Bearer $OMNI_API_KEY"
+```
+
+```python Python
+import os
+
+import requests
+
+response = requests.get(
+    "https://api.fireflo.au/v1/crm/deals?pipeline=3&status=open&limit=20",
+    headers={"Authorization": f"Bearer {os.environ['OMNI_API_KEY']}"},
+)
+print(response.status_code, response.json())
+```
+
+```javascript Node
+const response = await fetch("https://api.fireflo.au/v1/crm/deals?pipeline=3&status=open&limit=20", {
+  headers: { Authorization: `Bearer ${process.env.OMNI_API_KEY}` },
+});
+console.log(response.status, await response.json());
+```
+
+</CodeGroup>
+
+## Response
+
+`200 OK` — `has_more` says whether there is another page, and `next` is the `starting_after` for it.
+
+```json
+{
+  "data": [
+    {
+      "id": "5b2e8c1d-7a4f-4e3b-9c6d-1f0a2b3c4d5e",
+      "title": "Ravi Traders — 50 POS terminals",
+      "pipeline": {
+        "id": 3,
+        "name": "Retail sales"
+      },
+      "stage": {
+        "id": 13,
+        "name": "Proposal"
+      },
+      "status": "open",
+      "value_minor": 12500000,
+      "currency": "INR",
+      "contact": {
+        "id": "9d4f2a61-3c8e-4b7a-a5d2-6e1f0b8c7a34",
+        "name": "Ravi Kumar",
+        "phone": "+919876500101"
+      },
+      "notes": "Wants delivery before Diwali.",
+      "stage_entered_at": "2026-10-04T16:20:45+05:30",
+      "closed_at": null,
+      "created_at": "2026-10-01T11:08:12+05:30",
+      "updated_at": "2026-10-04T16:20:45+05:30"
+    }
+  ],
+  "has_more": false,
+  "next": null
+}
+```
+
+## Errors
+
+Every refusal is `{"error": {"code", "message", "field"}}`; `field` is there when one input is at fault.
+
+| Status | Error code | When |
+| :--- | :--- | :--- |
+| 400 | `invalid_request` | `status` isn't `open`, `won` or `lost`, `contact` isn't one of the account's contacts, `limit` is out of range (`field` names it), or `starting_after` isn't an id from this list. |
+| 404 | `not_found` | `pipeline` isn't one of the account's pipelines. |
+| 404 | `module_off` | The account doesn't have Pipelines on. |
+| 403 | `scope_missing` | The key doesn't have the `crm.deals:read` scope. |
+
+Any request can also be refused for its key, its account or its rate (`key_required`, `invalid_key`, `account_suspended`, `plan_excludes_api`, `address_not_allowed`, `rate_limited`); see [the overview](/api-reference/overview).

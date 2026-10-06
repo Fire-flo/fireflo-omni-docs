@@ -52,6 +52,39 @@ Present when the account has the channel.
 | `sms.templates:write` | Request and withdraw SMS DLT templates |
 | `sms.balance:read` | See the SMS gateway's balance |
 
+### A battery's own
+
+Present when the account has the battery. Each battery's guide says what its endpoints do:
+[Pipelines](/developers/pipelines), [Tickets](/developers/tickets),
+[Calendar](/developers/calendar), [Catalogue](/developers/catalogue),
+[Customer data](/developers/customer-data) and [AI agents](/developers/ai-agents).
+
+| Scope | Lets a key |
+| :--- | :--- |
+| `crm.pipelines:read` | See pipelines and their stages |
+| `crm.pipelines:write` | Add, rename, reorder and remove pipelines and stages |
+| `crm.deals:read` | See deals, their notes and their history |
+| `crm.deals:write` | Create, move, change and delete deals, and add notes |
+| `tickets:read` | See tickets, their notes and history, and categories |
+| `tickets:write` | Open, change, solve and close tickets, add notes, manage categories |
+| `calendar:read` | See booking types, the team, free times and appointments |
+| `calendar:write` | Book, move, confirm and cancel appointments, and set up booking types |
+| `catalogue.products:read` | See products and sets |
+| `catalogue.products:write` | Add, change, import and take products off sale; manage sets |
+| `catalogue.orders:read` | See orders |
+| `catalogue.orders:write` | Place orders, and confirm, decline, fulfil or cancel them |
+| `cdp.events:write` | Send events: identify, track and batch |
+| `cdp.audiences:read` | See audiences and who is in them |
+| `cdp.audiences:write` | Create, change, refresh and delete audiences |
+| `cdp.contacts:read` | See traits, consent and suggested duplicates |
+| `cdp.contacts:write` | Add and remove traits, record consent, merge contacts |
+| `agents:read` | See agents, their workflows, who they work, plans, activity and usage |
+| `agents:write` | Create, set up, publish, switch on and off, and delete agents |
+| `agents.knowledge:read` | See what agents know |
+| `agents.knowledge:write` | Add, change, re-read and remove knowledge |
+| `agents.contacts:write` | Put agents on contacts, pause, resume, run and release them |
+| `agents.plans:write` | Approve, reject and cancel agents' plans |
+
 ## Webhook events
 
 How they are delivered, signed and retried: [Webhooks](/developers/webhooks).
@@ -83,4 +116,36 @@ How they are delivered, signed and retried: [Webhooks](/developers/webhooks).
 | `broadcast.failed` | `broadcast` | A broadcast couldn't be sent |
 | `broadcast.canceled` | `broadcast` | A broadcast was canceled |
 | `report.delivered` | `report`, `schedule`, `period`, `columns`, `totals`, `rows`, `file` | A [scheduled report](/developers/reports#scheduled-reports-to-your-webhooks) was sent — with Analytics |
+| `deal.created` | `deal`, `changed` | A deal was created — with Pipelines |
+| `deal.updated` | `deal`, `changed` | A deal's title, value, contact or notes changed |
+| `deal.stage_changed` | `deal`, `changed` | A deal moved to another stage |
+| `deal.won` | `deal`, `changed` | A deal was won |
+| `deal.lost` | `deal`, `changed` | A deal was lost |
+| `deal.reopened` | `deal`, `changed` | A won or lost deal was opened again |
+| `deal.deleted` | `deal` (its id and title) | A deal was deleted |
+| `ticket.opened` | `ticket`, `change` | A ticket was opened — with Tickets |
+| `ticket.updated` | `ticket`, `change` | A ticket's status, assignee, priority, category or subject changed |
+| `ticket.solved` | `ticket`, `change` | A ticket was solved |
+| `ticket.closed` | `ticket`, `change` | A ticket was closed — `change` is left out when it closed on its own, after the account's window |
+| `ticket.reopened` | `ticket`, `change` | A solved ticket was opened again |
+| `appointment.booked` | `appointment`, `change` | An appointment was booked — with Calendar |
+| `appointment.rescheduled` | `appointment`, `change` | An appointment moved to another time |
+| `appointment.updated` | `appointment`, `change` | An appointment's place, link or mode changed |
+| `appointment.confirmed` | `appointment`, `change` | A requested appointment was confirmed |
+| `appointment.completed` | `appointment`, `change` | An appointment was marked done |
+| `appointment.canceled` | `appointment`, `change` | An appointment was canceled |
+| `appointment.no_show` | `appointment`, `change` | The contact didn't come |
+| `order.opened` | `order` | An order was placed — from a cart, an agent or the API — with Catalogue |
+| `order.confirmed` | `order` | An order was confirmed |
+| `order.declined` | `order` | An order was declined |
+| `order.fulfilled` | `order` | An order was fulfilled |
+| `order.canceled` | `order` | An order was canceled |
+| `product.changed` | `product` | A product was added or changed (not by a CSV import) |
+| `audience.entered` | `audience`, `contacts` | Contacts joined an audience — with Customer data; up to 500 contacts an event |
+| `audience.left` | `audience`, `contacts` | Contacts left an audience |
+| `consent.changed` | `contact`, `consent` | A contact's consent changed, on a channel or all |
+| `contacts.merged` | `contact`, `merged` | Two contacts were merged into one |
+| `agent.plan_proposed` | `agent`, `contact`, `plan`, `summary` | An agent's plan is waiting for someone to approve — with AI agents |
+| `agent.assignment_changed` | `agent`, `contact`, `kind`, `summary` | An agent started, paused, resumed or stopped working a contact |
+| `agent.handed_over` | `agent`, `contact`, `reason` | An agent handed a contact to the team |
 | `webhook.test` | `endpoint` | A test, sent from the endpoint's screen or the API |

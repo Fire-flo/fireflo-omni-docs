@@ -1,0 +1,90 @@
+---
+title: "POST /v1/crm/deals/{deal_id}/notes"
+description: "Add a note to a deal, signed as from the API."
+---
+
+Adds a note to a deal. It shows on the deal's page beside your team's notes, signed `API · <key name>`.
+
+<Note>Needs the `crm.deals:write` scope.</Note>
+
+## Path parameters
+
+| Field | Type | Required | Notes |
+| :--- | :--- | :--- | :--- |
+| `deal_id` | string | Yes | The deal's id. |
+
+## Body
+
+| Field | Type | Required | Notes |
+| :--- | :--- | :--- | :--- |
+| `body` | string | Yes | The note. Up to 4,000 characters; not empty. |
+
+## Request
+
+<CodeGroup>
+
+```bash cURL
+curl -X POST "https://api.fireflo.au/v1/crm/deals/5b2e8c1d-7a4f-4e3b-9c6d-1f0a2b3c4d5e/notes" \
+  -H "Authorization: Bearer $OMNI_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "body": "Quote sent: ₹1,18,000 incl. installation."
+}'
+```
+
+```python Python
+import os
+
+import requests
+
+response = requests.post(
+    "https://api.fireflo.au/v1/crm/deals/5b2e8c1d-7a4f-4e3b-9c6d-1f0a2b3c4d5e/notes",
+    headers={"Authorization": f"Bearer {os.environ['OMNI_API_KEY']}"},
+    json={
+        "body": "Quote sent: ₹1,18,000 incl. installation."
+    },
+)
+print(response.status_code, response.json())
+```
+
+```javascript Node
+const response = await fetch("https://api.fireflo.au/v1/crm/deals/5b2e8c1d-7a4f-4e3b-9c6d-1f0a2b3c4d5e/notes", {
+  method: "POST",
+  headers: {
+    Authorization: `Bearer ${process.env.OMNI_API_KEY}`,
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({
+    "body": "Quote sent: ₹1,18,000 incl. installation."
+  }),
+});
+console.log(response.status, await response.json());
+```
+
+</CodeGroup>
+
+## Response
+
+`201 Created` — the note.
+
+```json
+{
+  "id": 213,
+  "body": "Quote sent: ₹1,18,000 incl. installation.",
+  "author": "API · Billing sync",
+  "created_at": "2026-10-06T09:30:41+05:30"
+}
+```
+
+## Errors
+
+Every refusal is `{"error": {"code", "message", "field"}}`; `field` is there when one input is at fault.
+
+| Status | Error code | When |
+| :--- | :--- | :--- |
+| 400 | `invalid_request` | `body` is missing, empty or longer than 4,000 characters (`field` is `body`). |
+| 404 | `not_found` | No deal of this account's has that id. |
+| 404 | `module_off` | The account doesn't have Pipelines on. |
+| 403 | `scope_missing` | The key doesn't have the `crm.deals:write` scope. |
+
+Any request can also be refused for its key, its account or its rate (`key_required`, `invalid_key`, `account_suspended`, `plan_excludes_api`, `address_not_allowed`, `rate_limited`); see [the overview](/api-reference/overview).

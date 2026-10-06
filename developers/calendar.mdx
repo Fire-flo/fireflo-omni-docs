@@ -1,0 +1,180 @@
+---
+title: "Calendar"
+description: "Find free times, book contacts in, and move, confirm or cancel appointments from your own systems — and hear about every change by webhook."
+---
+
+The [Calendar](/batteries/calendar) battery is OMNI's shared appointment calendar. Its
+endpoints, under `/v1/calendar/…`, let your own systems do what the team does there: read
+the booking types and the team, ask which times are free, book a contact in, and move,
+confirm, complete or cancel what was booked.
+
+An appointment booked through the API is the same appointment the panel shows. The same
+rules decide when someone is free, and the contact gets the account's confirmation and
+reminders, as when the team books.
+
+- The endpoints exist when the account's plan includes Calendar; otherwise they answer
+  `404 module_off`.
+- You need a key with **`calendar:read`** to read booking types, the team, free times and
+  appointments, and **`calendar:write`** to book, move, confirm and cancel appointments
+  and to set up booking types (see [Keys and scopes](/developers/keys-and-scopes)).
+- Teammates are named by their **email**, everywhere.
+- Times are answered in the account's timezone, with its offset —
+  `2026-10-08T10:30:00+05:30`. A time you send must carry its offset too.
+
+## Find a free time, then book it
+
+<Steps>
+  <Step title="Pick the booking type">
+    [GET /v1/calendar/booking-types](/api-reference/calendar/list-booking-types) lists what
+    people can book: how long each lasts, the prep time before it, and who takes it. Note
+    the `id` of the one you want.
+  </Step>
+  <Step title="Ask for its free times">
+    [GET /v1/calendar/free-times](/api-reference/calendar/free-times) with
+    `booking_type`, and the days to look at:
+
+    ```bash
+    curl "https://api.fireflo.au/v1/calendar/free-times?booking_type=3&from=2026-10-08&to=2026-10-10" \
+      -H "Authorization: Bearer $OMNI_API_KEY"
+    ```
+
+    Each free start comes with the teammate free then:
+
+    ```json
+    {
+      "booking_type": 3,
+      "data": [
+        {
+          "staff": { "name": "Priya Sharma", "email": "priya@acme.in" },
+          "starts_at": "2026-10-08T10:30:00+05:30",
+          "ends_at": "2026-10-08T11:00:00+05:30"
+        }
+      ]
+    }
+    ```
+
+    Without `to`, a week is answered; ask for at most 31 days at a time. Add `staff` (an
+    email) for one teammate's times only.
+  </Step>
+  <Step title="Book it">
+    [POST /v1/calendar/appointments](/api-reference/calendar/book) with the contact, the
+    booking type, and a `starts_at` from the free times, unchanged:
+
+    ```json
+    {
+      "contact": "3f6b2a1e-8c4d-4e2a-9b7f-5d1c0e8a9f42",
+      "booking_type": 3,
+      "starts_at": "2026-10-08T10:30:00+05:30",
+      "staff": "priya@acme.in"
+    }
+    ```
+
+    The answer is the appointment, `confirmed` — or `requested`, if you send that as
+    `status`. Send an `Idempotency-Key` header so a retried request books only once.
+  </Step>
+  <Step title="If the time has gone">
+    Someone may book the same time between your two calls. Then booking is refused with
+    `409 slot_taken`: ask for the free times again and offer another.
+  </Step>
+</Steps>
+
+### What decides a free time
+
+A time is free for a teammate when the appointment **and its prep time** both fit in
+their working hours, clear of time off, busy times on a calendar they connected, and
+their other upcoming appointments (with those appointments' prep). A teammate has one
+appointment at a time. Teammates marked as not taking bookings are left out.
+
+The account's own settings apply too: the **minimum notice** — how soon from now a
+booking can start — and **how far ahead** it can be booked. Days past that are simply not
+answered.
+
+When appointments are switched off in the account's Calendar settings, free times are
+refused with `409 calendar_off`, and booking with `409 invalid_state`.
+
+## Endpoints
+
+### Booking types and the team
+
+| | |
+| :--- | :--- |
+| [`GET /v1/calendar/booking-types`](/api-reference/calendar/list-booking-types) | What people can book |
+| [`POST /v1/calendar/booking-types`](/api-reference/calendar/add-booking-type) | Add a booking type — at most 50 |
+| [`PATCH …/booking-types/{type_id}`](/api-reference/calendar/change-booking-type) | Change one |
+| [`DELETE …/booking-types/{type_id}`](/api-reference/calendar/delete-booking-type) | Delete one — or switch it off, when appointments were booked as it |
+| [`GET /v1/calendar/staff`](/api-reference/calendar/list-staff) | The team, and whether each can be booked |
+| [`GET /v1/calendar/free-times`](/api-reference/calendar/free-times) | Free starts for a booking type, per teammate |
+
+A booking type lasts 5 to 480 minutes (`slot_minutes`), with 0 to 240 minutes of prep
+before it (`prep_minutes`). Its `mode` is `online`, `physical` (in person) or `either`,
+chosen when booking.
+
+### Appointments
+
+| | |
+| :--- | :--- |
+| [`GET /v1/calendar/appointments`](/api-reference/calendar/list-appointments) | Appointments, newest first; by day, status, teammate or contact |
+| [`POST /v1/calendar/appointments`](/api-reference/calendar/book) | Book a contact into a free time |
+| [`GET …/appointments/{appointment_id}`](/api-reference/calendar/get-appointment) | One appointment, with its history |
+| [`PATCH …/appointments/{appointment_id}`](/api-reference/calendar/update-appointment) | Change its notes, place, meeting link or mode |
+| [`POST …/reschedule`](/api-reference/calendar/reschedule) | Move it to another free time, or teammate |
+| [`POST …/confirm`](/api-reference/calendar/confirm) | Confirm a requested appointment |
+| [`POST …/complete`](/api-reference/calendar/complete) | Mark it done |
+| [`POST …/no-show`](/api-reference/calendar/no-show) | Mark that the contact didn't come |
+| [`POST …/cancel`](/api-reference/calendar/cancel) | Cancel it, with an optional note |
+
+Every appointment says where it was booked in `source`: `panel`, `inbox`, `agent`,
+`workflow`, `link` (online booking) or `api` for yours.
+
+## Status
+
+An appointment is `requested` or `confirmed` while it is upcoming, and ends `completed`,
+`cancelled` or `no_show`.
+
+| To | Call | When it can |
+| :--- | :--- | :--- |
+| Confirm | [POST …/confirm](/api-reference/calendar/confirm) | When `requested`. |
+| Move | [POST …/reschedule](/api-reference/calendar/reschedule) | When `requested` or `confirmed`, to a free time. |
+| Mark done | [POST …/complete](/api-reference/calendar/complete) | When `requested` or `confirmed`. |
+| Mark a no-show | [POST …/no-show](/api-reference/calendar/no-show) | When `requested` or `confirmed`. |
+| Cancel | [POST …/cancel](/api-reference/calendar/cancel) | When `requested` or `confirmed`. |
+
+Asking at the wrong moment — moving a completed appointment, say — is refused with
+`invalid_state` (409), and the message says why. Once an appointment is done, canceled or
+a no-show, reminders not yet sent are dropped. Moving or canceling tells the contact, as
+when the team does it.
+
+## Webhook events
+
+Rather than asking, subscribe a [webhook endpoint](/developers/webhooks) to:
+
+| Event | When |
+| :--- | :--- |
+| `appointment.booked` | An appointment was booked |
+| `appointment.rescheduled` | It moved to another time, or teammate |
+| `appointment.updated` | Its place, meeting link or mode changed |
+| `appointment.confirmed` | A requested appointment was confirmed |
+| `appointment.completed` | It was marked done |
+| `appointment.canceled` | It was canceled |
+| `appointment.no_show` | The contact didn't come |
+
+They are sent whoever made the change — the team in the panel, the contact, an AI agent,
+online booking or the API. Each carries `data.appointment`, in the shape
+[GET …/appointments/\{appointment_id\}](/api-reference/calendar/get-appointment) answers
+(without its history), and `data.change`: what happened, as a line of that history.
+
+```json
+{
+  "appointment": { "id": "5b0e7d3c-9a2f-4c61-8e47-1f3a6c9d2b84", "status": "confirmed", … },
+  "change": {
+    "kind": "rescheduled",
+    "summary": "Moved from Thu 8 Oct 10:30 to Fri 9 Oct 11:00",
+    "at": "2026-10-06T07:45:19.104552+00:00"
+  }
+}
+```
+
+<Note>
+An appointment's status is spelled `cancelled`; its event is `appointment.canceled`, like
+OMNI's other events.
+</Note>

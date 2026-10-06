@@ -1,0 +1,169 @@
+---
+title: "POST /v1/agents/{agent_id}/verify"
+description: "Check that an agent's AI key and model answer in the format agents need."
+---
+
+Sends one small test request to the agent's AI provider and model and checks it can plan in the format agents use. Nothing about your customers is sent; the request uses a few hundred tokens on your key. An agent must pass before it can go live, and again whenever its key or model changes.
+
+<Note>Needs the `agents:write` scope.</Note>
+
+## Path parameters
+
+| Field | Type | Required | Notes |
+| :--- | :--- | :--- | :--- |
+| `agent_id` | integer | Yes | The agent's id. |
+
+## Request
+
+<CodeGroup>
+
+```bash cURL
+curl -X POST "https://api.fireflo.au/v1/agents/15/verify" \
+  -H "Authorization: Bearer $OMNI_API_KEY"
+```
+
+```python Python
+import os
+
+import requests
+
+response = requests.post(
+    "https://api.fireflo.au/v1/agents/15/verify",
+    headers={"Authorization": f"Bearer {os.environ['OMNI_API_KEY']}"},
+)
+print(response.status_code, response.json())
+```
+
+```javascript Node
+const response = await fetch("https://api.fireflo.au/v1/agents/15/verify", {
+  method: "POST",
+  headers: { Authorization: `Bearer ${process.env.OMNI_API_KEY}` },
+});
+console.log(response.status, await response.json());
+```
+
+</CodeGroup>
+
+## Response
+
+`200 OK` — `ok` says whether it passed, and `checks` what was checked. When it didn't pass, `error` says why. `agent` is the agent as it is now; `verified_at` is set when it passed.
+
+```json
+{
+  "ok": true,
+  "checks": [
+    {
+      "label": "Key accepted by the provider",
+      "ok": true
+    },
+    {
+      "label": "Model “gpt-4o-mini” answers",
+      "ok": true
+    },
+    {
+      "label": "Returns a valid plan in our format",
+      "ok": true
+    },
+    {
+      "label": "Response time 1.8 s · 412 tokens",
+      "ok": true
+    }
+  ],
+  "agent": {
+    "id": 15,
+    "name": "Kavya",
+    "role": "support",
+    "workflow": null,
+    "status": "draft",
+    "objective": "Answer warranty and service-centre questions, and book pick-ups with the team.",
+    "provider": {
+      "id": 4,
+      "label": "OpenAI — main",
+      "provider": "openai"
+    },
+    "model": "gpt-4o-mini",
+    "instructions": "",
+    "channels": [
+      "whatsapp",
+      "sms"
+    ],
+    "booking_types": [],
+    "knowledge_collections": [],
+    "answer_threshold": 80,
+    "handoff_assignees": [],
+    "channels_available": [
+      "whatsapp",
+      "sms"
+    ],
+    "channels_missing": [],
+    "action_policy": {
+      "send_message": "auto",
+      "send_whatsapp_template": "approval",
+      "send_broadcast": "approval",
+      "request_template": "approval",
+      "create_deal": "off",
+      "move_deal_stage": "auto",
+      "mark_deal_won": "off",
+      "mark_deal_lost": "off",
+      "update_deal_value": "off",
+      "add_note": "auto",
+      "update_contact": "auto",
+      "follow_up": "auto",
+      "close_conversation": "auto",
+      "handoff_to_human": "auto"
+    },
+    "approval_mode": "plan",
+    "replan": {
+      "triggers": [
+        "on_inbound"
+      ],
+      "every_n_hours": null,
+      "max_replans_per_contact_per_day": 6
+    },
+    "working_hours": {
+      "days": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "start": "09:00",
+      "end": "19:00"
+    },
+    "limits": {
+      "daily_token_limit": 100000,
+      "max_steps_per_plan": 6,
+      "max_messages_per_contact_per_day": 3,
+      "max_broadcast_audience": 500
+    },
+    "auto_assign_inbound": false,
+    "pause_on_human_reply": true,
+    "pause_minutes": 30,
+    "after_pause": "resume",
+    "pipelines": [],
+    "stats": {
+      "tokens_today": 0,
+      "active_contacts": 0,
+      "awaiting_approval": 0,
+      "plans_today": 0
+    },
+    "verified_at": "2026-10-06T09:41:26+05:30",
+    "created_at": "2026-10-06T09:30:12+05:30"
+  }
+}
+```
+
+## Errors
+
+Every refusal is `{"error": {"code", "message", "field"}}`; `field` is there when one input is at fault.
+
+| Status | Error code | When |
+| :--- | :--- | :--- |
+| 404 | `not_found` | No agent of this account's has that id. |
+| 409 | `invalid_state` | The agent has no AI key or model yet. Choose them on the panel first. |
+| 404 | `module_off` | The account doesn't have AI agents on: they aren't in its plan, or are switched off for it. |
+| 403 | `scope_missing` | The key doesn't have the `agents:write` scope. |
+
+Any request can also be refused for its key, its account or its rate (`key_required`, `invalid_key`, `account_suspended`, `plan_excludes_api`, `address_not_allowed`, `rate_limited`); see [the overview](/api-reference/overview).

@@ -1,0 +1,99 @@
+---
+title: "GET /v1/catalogue/products"
+description: "The account's products, newest first — filtered, or searched the way a customer would ask."
+---
+
+The account's products, newest first, on sale or not. Filter them, or search with `q`: it matches words in the name, description, category, brand and SKU, best matches first, and ignores words that say nothing about a product — so "do you have a cotton kurta" finds cotton kurtas.
+
+<Note>Needs the `catalogue.products:read` scope.</Note>
+
+## Query parameters
+
+| Field | Type | Required | Notes |
+| :--- | :--- | :--- | :--- |
+| `q` | string | No | Words to search for. A search answers one list of best matches, up to `limit`, with no further pages; it leaves out products off sale unless `active` is `false`, and ignores the other filters. |
+| `active` | string | No | `true` for products on sale, `false` for those taken off sale. Both when left out. |
+| `category` | string | No | Only this category (any case). |
+| `set` | string | No | Only products in the set with this name. |
+| `sku` | string | No | Only the product with this SKU. |
+| `limit` | integer | No | 1 to 100; 50 by default. |
+| `starting_after` | string | No | The last id of the previous page — `next` from it. |
+
+## Request
+
+<CodeGroup>
+
+```bash cURL
+curl "https://api.fireflo.au/v1/catalogue/products?category=Kurtas&active=true&limit=20" \
+  -H "Authorization: Bearer $OMNI_API_KEY"
+```
+
+```python Python
+import os
+
+import requests
+
+response = requests.get(
+    "https://api.fireflo.au/v1/catalogue/products?category=Kurtas&active=true&limit=20",
+    headers={"Authorization": f"Bearer {os.environ['OMNI_API_KEY']}"},
+)
+print(response.status_code, response.json())
+```
+
+```javascript Node
+const response = await fetch("https://api.fireflo.au/v1/catalogue/products?category=Kurtas&active=true&limit=20", {
+  headers: { Authorization: `Bearer ${process.env.OMNI_API_KEY}` },
+});
+console.log(response.status, await response.json());
+```
+
+</CodeGroup>
+
+## Response
+
+`200 OK` — `has_more` says whether there is another page, and `next` is the `starting_after` for it. Each product is in the shape [GET /v1/catalogue/products/\{product_id\}](/api-reference/catalogue/get-product) answers.
+
+```json
+{
+  "data": [
+    {
+      "id": "3f8a2c1e-7b4d-4e6a-9c2f-1a5b8d7e6f40",
+      "sku": "KUR-COT-IND-M",
+      "name": "Cotton kurta — indigo, M",
+      "description": "Hand-block printed cotton from Jaipur. Machine wash cold.",
+      "price_minor": 249900,
+      "sale_price_minor": 199900,
+      "currency": "INR",
+      "availability": "in_stock",
+      "stock": 18,
+      "category": "Kurtas",
+      "brand": "Neel Weaves",
+      "url": "",
+      "has_image": true,
+      "sets": [
+        "Diwali edit"
+      ],
+      "active": true,
+      "whatsapp": {
+        "state": "synced",
+        "error": ""
+      },
+      "updated_at": "2026-10-06T10:24:51+05:30"
+    }
+  ],
+  "has_more": false,
+  "next": null
+}
+```
+
+## Errors
+
+Every refusal is `{"error": {"code", "message", "field"}}`; `field` is there when one input is at fault.
+
+| Status | Error code | When |
+| :--- | :--- | :--- |
+| 400 | `invalid_request` | `limit` isn't a number from 1 to 100, or `starting_after` isn't an id from this list (`field` names it). |
+| 404 | `module_off` | The account doesn't have Catalogue on. |
+| 403 | `scope_missing` | The key doesn't have the `catalogue.products:read` scope. |
+
+Any request can also be refused for its key, its account or its rate (`key_required`, `invalid_key`, `account_suspended`, `plan_excludes_api`, `address_not_allowed`, `rate_limited`); see [the overview](/api-reference/overview).

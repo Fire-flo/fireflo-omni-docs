@@ -1,0 +1,83 @@
+---
+title: "DELETE /v1/calendar/booking-types/{type_id}"
+description: "Delete a booking type — or switch it off, when appointments were booked as it."
+---
+
+Deletes a booking type. One that appointments were booked as is switched off instead, so those appointments keep what they were booked as; it can no longer be booked.
+
+<Note>Needs the `calendar:write` scope.</Note>
+
+## Path parameters
+
+| Field | Type | Required | Notes |
+| :--- | :--- | :--- | :--- |
+| `type_id` | integer | Yes | The booking type's id. |
+
+## Request
+
+<CodeGroup>
+
+```bash cURL
+curl -X DELETE "https://api.fireflo.au/v1/calendar/booking-types/4" \
+  -H "Authorization: Bearer $OMNI_API_KEY"
+```
+
+```python Python
+import os
+
+import requests
+
+response = requests.delete(
+    "https://api.fireflo.au/v1/calendar/booking-types/4",
+    headers={"Authorization": f"Bearer {os.environ['OMNI_API_KEY']}"},
+)
+print(response.status_code, response.text)
+```
+
+```javascript Node
+const response = await fetch("https://api.fireflo.au/v1/calendar/booking-types/4", {
+  method: "DELETE",
+  headers: { Authorization: `Bearer ${process.env.OMNI_API_KEY}` },
+});
+console.log(response.status, await response.text());
+```
+
+</CodeGroup>
+
+## Response
+
+`204 No Content` — it was deleted; no body.
+
+`200 OK` — appointments were booked as it, so it was switched off instead: the booking type, with `active` `false`.
+
+```json
+{
+  "id": 4,
+  "name": "Site visit",
+  "description": "Walk through a sample flat with a teammate.",
+  "slot_minutes": 60,
+  "prep_minutes": 15,
+  "mode": "physical",
+  "location": "Kaveri Heights, Powai, Mumbai",
+  "meeting_link": "",
+  "default_staff": {
+    "name": "Rahul Verma",
+    "email": "rahul@acme.in"
+  },
+  "staff": [],
+  "active": false,
+  "online": false
+}
+```
+
+## Errors
+
+Every refusal is `{"error": {"code", "message", "field"}}`; `field` is there when one input is at fault.
+
+| Status | Error code | When |
+| :--- | :--- | :--- |
+| 404 | `not_found` | No booking type of this account's has that id. |
+| 404 | `module_off` | The account's plan doesn't include Calendar. |
+| 403 | `scope_missing` | The key doesn't have the `calendar:write` scope. |
+
+Any request can also be refused for its key, its account or its rate (`key_required`, `invalid_key`, `account_suspended`, `plan_excludes_api`, `address_not_allowed`, `rate_limited`); see [the overview](/api-reference/overview).

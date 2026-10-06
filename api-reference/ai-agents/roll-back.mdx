@@ -1,0 +1,76 @@
+---
+title: "POST /v1/agents/{agent_id}/workflow/versions/{number}/rollback"
+description: "Make an earlier workflow version live again, published under a new number."
+---
+
+Publishes an earlier version again, as a new version with the next number — history is never rewritten. The draft is left as it is.
+
+<Note>Needs the `agents:write` scope.</Note>
+
+## Path parameters
+
+| Field | Type | Required | Notes |
+| :--- | :--- | :--- | :--- |
+| `agent_id` | integer | Yes | The agent's id. |
+| `number` | integer | Yes | The version to go back to. |
+
+## Request
+
+<CodeGroup>
+
+```bash cURL
+curl -X POST "https://api.fireflo.au/v1/agents/12/workflow/versions/2/rollback" \
+  -H "Authorization: Bearer $OMNI_API_KEY"
+```
+
+```python Python
+import os
+
+import requests
+
+response = requests.post(
+    "https://api.fireflo.au/v1/agents/12/workflow/versions/2/rollback",
+    headers={"Authorization": f"Bearer {os.environ['OMNI_API_KEY']}"},
+)
+print(response.status_code, response.json())
+```
+
+```javascript Node
+const response = await fetch("https://api.fireflo.au/v1/agents/12/workflow/versions/2/rollback", {
+  method: "POST",
+  headers: { Authorization: `Bearer ${process.env.OMNI_API_KEY}` },
+});
+console.log(response.status, await response.json());
+```
+
+</CodeGroup>
+
+## Response
+
+`201 Created` — the new version, now live, with the note "Rolled back to version 2".
+
+```json
+{
+  "number": 5,
+  "note": "Rolled back to version 2",
+  "by": null,
+  "at": "2026-10-06T10:31:40+05:30",
+  "blocks": 6,
+  "ai_blocks": 1,
+  "live": true,
+  "running": 0
+}
+```
+
+## Errors
+
+Every refusal is `{"error": {"code", "message", "field"}}`; `field` is there when one input is at fault.
+
+| Status | Error code | When |
+| :--- | :--- | :--- |
+| 404 | `not_found` | No agent of this account's has that id. |
+| 409 | `invalid_state` | There is no such version, it is already live, or something in it is broken for this agent now — an action switched off, a person who left. Restore it as the draft on the panel and fix it. |
+| 404 | `module_off` | The account doesn't have AI agents on: they aren't in its plan, or are switched off for it. |
+| 403 | `scope_missing` | The key doesn't have the `agents:write` scope. |
+
+Any request can also be refused for its key, its account or its rate (`key_required`, `invalid_key`, `account_suspended`, `plan_excludes_api`, `address_not_allowed`, `rate_limited`); see [the overview](/api-reference/overview).

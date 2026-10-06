@@ -1,0 +1,144 @@
+---
+title: "POST /v1/calendar/booking-types"
+description: "Add a booking type: what it is called, how long it lasts, and which teammates take it."
+---
+
+Adds a booking type — something people can book. Teammates are named by their email. Only teammates who take bookings are offered in its free times.
+
+<Note>Needs the `calendar:write` scope.</Note>
+
+## Body
+
+| Field | Type | Required | Notes |
+| :--- | :--- | :--- | :--- |
+| `name` | string | Yes | What it is called. Up to 100 characters, and unlike the account's other booking types. |
+| `description` | string | No | What it is for. Up to 255 characters. |
+| `slot_minutes` | integer | No | How long it lasts: 5 to 480 minutes. 30 when left out. |
+| `prep_minutes` | integer | No | Time blocked before it, for the teammate to get ready: 0 to 240 minutes. 0 when left out. |
+| `mode` | string | No | `online`, `physical` (in person) or `either` — chosen when booking. `online` when left out. |
+| `location` | string | No | Where in-person appointments happen. Up to 255 characters. Empty uses the teammate's own place, or the account's default. |
+| `meeting_link` | string | No | The link for online appointments, starting `https://`. Empty uses the teammate's own link. |
+| `default_staff` | string | No | The email of the teammate who takes it first; `null` for none. |
+| `staff` | array | No | Emails of the others who can take it. |
+| `colour` | string | No | How the panel's calendar shows it: `brand`, `info`, `ai`, `warning` or `rose`. |
+| `active` | boolean | No | Whether it can be booked. `true` when left out. |
+| `online` | boolean | No | Whether it is offered on the account's online booking page. `false` when left out. |
+
+## Request
+
+<CodeGroup>
+
+```bash cURL
+curl -X POST "https://api.fireflo.au/v1/calendar/booking-types" \
+  -H "Authorization: Bearer $OMNI_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "Home loan consultation",
+  "description": "Eligibility, documents and EMI options, in 30 minutes.",
+  "slot_minutes": 30,
+  "prep_minutes": 10,
+  "mode": "either",
+  "location": "Kaveri Homes, 2nd floor, Kalpataru Plaza, Andheri East, Mumbai",
+  "meeting_link": "https://meet.google.com/kfr-ptqw-xya",
+  "default_staff": "priya@acme.in",
+  "staff": [
+    "rahul@acme.in"
+  ],
+  "online": true
+}'
+```
+
+```python Python
+import os
+
+import requests
+
+response = requests.post(
+    "https://api.fireflo.au/v1/calendar/booking-types",
+    headers={"Authorization": f"Bearer {os.environ['OMNI_API_KEY']}"},
+    json={
+        "name": "Home loan consultation",
+        "description": "Eligibility, documents and EMI options, in 30 minutes.",
+        "slot_minutes": 30,
+        "prep_minutes": 10,
+        "mode": "either",
+        "location": "Kaveri Homes, 2nd floor, Kalpataru Plaza, Andheri East, Mumbai",
+        "meeting_link": "https://meet.google.com/kfr-ptqw-xya",
+        "default_staff": "priya@acme.in",
+        "staff": [
+            "rahul@acme.in"
+        ],
+        "online": True
+    },
+)
+print(response.status_code, response.json())
+```
+
+```javascript Node
+const response = await fetch("https://api.fireflo.au/v1/calendar/booking-types", {
+  method: "POST",
+  headers: {
+    Authorization: `Bearer ${process.env.OMNI_API_KEY}`,
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({
+    "name": "Home loan consultation",
+    "description": "Eligibility, documents and EMI options, in 30 minutes.",
+    "slot_minutes": 30,
+    "prep_minutes": 10,
+    "mode": "either",
+    "location": "Kaveri Homes, 2nd floor, Kalpataru Plaza, Andheri East, Mumbai",
+    "meeting_link": "https://meet.google.com/kfr-ptqw-xya",
+    "default_staff": "priya@acme.in",
+    "staff": [
+      "rahul@acme.in"
+    ],
+    "online": true
+  }),
+});
+console.log(response.status, await response.json());
+```
+
+</CodeGroup>
+
+## Response
+
+`201 Created` — the booking type, as [GET /v1/calendar/booking-types](/api-reference/calendar/list-booking-types) shows it.
+
+```json
+{
+  "id": 3,
+  "name": "Home loan consultation",
+  "description": "Eligibility, documents and EMI options, in 30 minutes.",
+  "slot_minutes": 30,
+  "prep_minutes": 10,
+  "mode": "either",
+  "location": "Kaveri Homes, 2nd floor, Kalpataru Plaza, Andheri East, Mumbai",
+  "meeting_link": "https://meet.google.com/kfr-ptqw-xya",
+  "default_staff": {
+    "name": "Priya Sharma",
+    "email": "priya@acme.in"
+  },
+  "staff": [
+    {
+      "name": "Rahul Verma",
+      "email": "rahul@acme.in"
+    }
+  ],
+  "active": true,
+  "online": true
+}
+```
+
+## Errors
+
+Every refusal is `{"error": {"code", "message", "field"}}`; `field` is there when one input is at fault.
+
+| Status | Error code | When |
+| :--- | :--- | :--- |
+| 400 | `invalid_request` | A field is wrong — `field` names it: no `name`, a name another booking type has, minutes out of range, an unknown `mode` or `colour`, a link that doesn't start `https://`, or an email nobody active in your team has. |
+| 409 | `limit_reached` | The account has 50 booking types already, the most it can have. |
+| 404 | `module_off` | The account's plan doesn't include Calendar. |
+| 403 | `scope_missing` | The key doesn't have the `calendar:write` scope. |
+
+Any request can also be refused for its key, its account or its rate (`key_required`, `invalid_key`, `account_suspended`, `plan_excludes_api`, `address_not_allowed`, `rate_limited`); see [the overview](/api-reference/overview).

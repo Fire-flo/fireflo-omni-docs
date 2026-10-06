@@ -179,6 +179,17 @@
                   "developers/reports",
                   "developers/channel-extensions"
                 ]
+              },
+              {
+                "group": "Batteries",
+                "pages": [
+                  "developers/pipelines",
+                  "developers/tickets",
+                  "developers/calendar",
+                  "developers/catalogue",
+                  "developers/customer-data",
+                  "developers/ai-agents"
+                ]
               }
             ]
           },
@@ -316,6 +327,151 @@
                   "api-reference/sms/request-template",
                   "api-reference/sms/withdraw-template",
                   "api-reference/sms/balance"
+                ]
+              },
+              {
+                "group": "Pipelines",
+                "pages": [
+                  "api-reference/pipelines/list-pipelines",
+                  "api-reference/pipelines/create-pipeline",
+                  "api-reference/pipelines/get-pipeline",
+                  "api-reference/pipelines/rename-pipeline",
+                  "api-reference/pipelines/delete-pipeline",
+                  "api-reference/pipelines/add-stage",
+                  "api-reference/pipelines/reorder-stages",
+                  "api-reference/pipelines/change-stage",
+                  "api-reference/pipelines/delete-stage",
+                  "api-reference/pipelines/list-deals",
+                  "api-reference/pipelines/create-deal",
+                  "api-reference/pipelines/get-deal",
+                  "api-reference/pipelines/update-deal",
+                  "api-reference/pipelines/delete-deal",
+                  "api-reference/pipelines/list-notes",
+                  "api-reference/pipelines/add-note",
+                  "api-reference/pipelines/deal-timeline"
+                ]
+              },
+              {
+                "group": "Tickets",
+                "pages": [
+                  "api-reference/tickets/list",
+                  "api-reference/tickets/open",
+                  "api-reference/tickets/get",
+                  "api-reference/tickets/update",
+                  "api-reference/tickets/solve",
+                  "api-reference/tickets/close",
+                  "api-reference/tickets/reopen",
+                  "api-reference/tickets/list-notes",
+                  "api-reference/tickets/add-note",
+                  "api-reference/tickets/list-categories",
+                  "api-reference/tickets/add-category",
+                  "api-reference/tickets/change-category",
+                  "api-reference/tickets/delete-category"
+                ]
+              },
+              {
+                "group": "Calendar",
+                "pages": [
+                  "api-reference/calendar/list-booking-types",
+                  "api-reference/calendar/add-booking-type",
+                  "api-reference/calendar/change-booking-type",
+                  "api-reference/calendar/delete-booking-type",
+                  "api-reference/calendar/list-staff",
+                  "api-reference/calendar/free-times",
+                  "api-reference/calendar/list-appointments",
+                  "api-reference/calendar/book",
+                  "api-reference/calendar/get-appointment",
+                  "api-reference/calendar/update-appointment",
+                  "api-reference/calendar/reschedule",
+                  "api-reference/calendar/confirm",
+                  "api-reference/calendar/complete",
+                  "api-reference/calendar/no-show",
+                  "api-reference/calendar/cancel"
+                ]
+              },
+              {
+                "group": "Catalogue",
+                "pages": [
+                  "api-reference/catalogue/list-products",
+                  "api-reference/catalogue/add-product",
+                  "api-reference/catalogue/get-product",
+                  "api-reference/catalogue/update-product",
+                  "api-reference/catalogue/remove-product",
+                  "api-reference/catalogue/upload-image",
+                  "api-reference/catalogue/import-products",
+                  "api-reference/catalogue/list-sets",
+                  "api-reference/catalogue/add-set",
+                  "api-reference/catalogue/update-set",
+                  "api-reference/catalogue/delete-set",
+                  "api-reference/catalogue/list-orders",
+                  "api-reference/catalogue/open-order",
+                  "api-reference/catalogue/get-order",
+                  "api-reference/catalogue/confirm-order",
+                  "api-reference/catalogue/decline-order",
+                  "api-reference/catalogue/fulfil-order",
+                  "api-reference/catalogue/cancel-order"
+                ]
+              },
+              {
+                "group": "Customer data",
+                "pages": [
+                  "api-reference/customer-data/identify",
+                  "api-reference/customer-data/track",
+                  "api-reference/customer-data/batch",
+                  "api-reference/customer-data/list-audiences",
+                  "api-reference/customer-data/create-audience",
+                  "api-reference/customer-data/get-audience",
+                  "api-reference/customer-data/update-audience",
+                  "api-reference/customer-data/delete-audience",
+                  "api-reference/customer-data/audience-members",
+                  "api-reference/customer-data/refresh-audience",
+                  "api-reference/customer-data/list-traits",
+                  "api-reference/customer-data/add-trait",
+                  "api-reference/customer-data/remove-trait",
+                  "api-reference/customer-data/get-consent",
+                  "api-reference/customer-data/set-consent",
+                  "api-reference/customer-data/list-duplicates",
+                  "api-reference/customer-data/dismiss-duplicate",
+                  "api-reference/customer-data/merge"
+                ]
+              },
+              {
+                "group": "AI agents",
+                "pages": [
+                  "api-reference/ai-agents/list",
+                  "api-reference/ai-agents/create",
+                  "api-reference/ai-agents/get",
+                  "api-reference/ai-agents/update",
+                  "api-reference/ai-agents/delete",
+                  "api-reference/ai-agents/verify",
+                  "api-reference/ai-agents/activate",
+                  "api-reference/ai-agents/disable",
+                  "api-reference/ai-agents/get-workflow",
+                  "api-reference/ai-agents/save-workflow",
+                  "api-reference/ai-agents/publish-workflow",
+                  "api-reference/ai-agents/list-versions",
+                  "api-reference/ai-agents/roll-back",
+                  "api-reference/ai-agents/list-sources",
+                  "api-reference/ai-agents/add-source",
+                  "api-reference/ai-agents/upload-file",
+                  "api-reference/ai-agents/update-source",
+                  "api-reference/ai-agents/delete-source",
+                  "api-reference/ai-agents/reindex-source",
+                  "api-reference/ai-agents/list-collections",
+                  "api-reference/ai-agents/add-collection",
+                  "api-reference/ai-agents/contact-agents",
+                  "api-reference/ai-agents/assign",
+                  "api-reference/ai-agents/pause",
+                  "api-reference/ai-agents/resume",
+                  "api-reference/ai-agents/run",
+                  "api-reference/ai-agents/release",
+                  "api-reference/ai-agents/list-plans",
+                  "api-reference/ai-agents/get-plan",
+                  "api-reference/ai-agents/approve-plan",
+                  "api-reference/ai-agents/reject-plan",
+                  "api-reference/ai-agents/cancel-plan",
+                  "api-reference/ai-agents/list-events",
+                  "api-reference/ai-agents/usage"
                 ]
               },
               {

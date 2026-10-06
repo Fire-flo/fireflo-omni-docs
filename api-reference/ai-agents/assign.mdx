@@ -1,0 +1,139 @@
+---
+title: "POST /v1/agents/contacts/{contact_id}/agents"
+description: "Put a live AI agent on a contact, and on one of their deals."
+---
+
+Puts a live agent on a contact, as assigning one on the panel does. The agent starts at once: its workflow's **Assigned to the agent** start, or a first plan. A contact has at most one agent in each role; putting the same agent on again changes only the deal it works.
+
+<Note>Needs the `agents.contacts:write` scope.</Note>
+
+## Path parameters
+
+| Field | Type | Required | Notes |
+| :--- | :--- | :--- | :--- |
+| `contact_id` | string | Yes | The contact's id. |
+
+## Body
+
+| Field | Type | Required | Notes |
+| :--- | :--- | :--- | :--- |
+| `agent` | integer | Yes | The agent's id. It must be `active`. |
+| `deal` | string | No | The id of one of the contact's deals for it to work. |
+
+## Request
+
+<CodeGroup>
+
+```bash cURL
+curl -X POST "https://api.fireflo.au/v1/agents/contacts/3f6b2a1e-8c4d-4e2a-9b7f-5d1c0e8a9f42/agents" \
+  -H "Authorization: Bearer $OMNI_API_KEY" \
+  -H "Content-Type: application/json" \
+  -H "Idempotency-Key: ravi-priya-2026-10-06" \
+  -d '{
+    "agent": 12
+  }'
+```
+
+```python Python
+import os
+
+import requests
+
+response = requests.post(
+    "https://api.fireflo.au/v1/agents/contacts/3f6b2a1e-8c4d-4e2a-9b7f-5d1c0e8a9f42/agents",
+    headers={
+        "Authorization": f"Bearer {os.environ['OMNI_API_KEY']}",
+        "Idempotency-Key": "ravi-priya-2026-10-06",
+    },
+    json={
+        "agent": 12
+    },
+)
+print(response.status_code, response.json())
+```
+
+```javascript Node
+const response = await fetch("https://api.fireflo.au/v1/agents/contacts/3f6b2a1e-8c4d-4e2a-9b7f-5d1c0e8a9f42/agents", {
+  method: "POST",
+  headers: {
+    Authorization: `Bearer ${process.env.OMNI_API_KEY}`,
+    "Content-Type": "application/json",
+    "Idempotency-Key": "ravi-priya-2026-10-06",
+  },
+  body: JSON.stringify({
+    "agent": 12
+  }),
+});
+console.log(response.status, await response.json());
+```
+
+</CodeGroup>
+
+## Response
+
+`200 OK` — the agents now working the contact. `contact` is the contact, and `data` the agents working them that haven't been released. For each: the `agent`; `status` — `active` (working) or `paused`; `since` when; the `deal` it works (its title and `deal_id`), if any; `paused_reason` and `resume_at` while paused; `needs_attention` when it handed over to the team; the `channels` it can answer on; and `workflow` — where the conversation is in its workflow (the version, the block, and what it is waiting for), or null.
+
+```json
+{
+  "contact": {
+    "id": "3f6b2a1e-8c4d-4e2a-9b7f-5d1c0e8a9f42",
+    "name": "Ravi Kumar",
+    "phone": "+919876500101"
+  },
+  "data": [
+    {
+      "resume_at": null,
+      "paused_by": null,
+      "workflow": null,
+      "agent": {
+        "id": 12,
+        "name": "Priya",
+        "role": "support"
+      },
+      "status": "active",
+      "since": "2026-10-06T10:35:48+05:30",
+      "deal": null,
+      "deal_id": null,
+      "needs_attention": false,
+      "paused_reason": null,
+      "channels": [
+        "whatsapp",
+        "sms"
+      ]
+    },
+    {
+      "resume_at": null,
+      "paused_by": null,
+      "workflow": null,
+      "agent": {
+        "id": 7,
+        "name": "Arjun",
+        "role": "sales"
+      },
+      "status": "active",
+      "since": "2026-09-30T16:02:11+05:30",
+      "deal": "Kumar Electricals — AMC renewal",
+      "deal_id": 3402,
+      "needs_attention": false,
+      "paused_reason": null,
+      "channels": [
+        "whatsapp",
+        "sms"
+      ]
+    }
+  ]
+}
+```
+
+## Errors
+
+Every refusal is `{"error": {"code", "message", "field"}}`; `field` is there when one input is at fault.
+
+| Status | Error code | When |
+| :--- | :--- | :--- |
+| 400 | `invalid_request` | No contact with that id (`field` is `contact`), no agent with that id (`agent`), or the deal isn't one of the contact's (`deal`). |
+| 409 | `invalid_state` | The agent isn't live, or another agent in the same role is already working the contact. |
+| 404 | `module_off` | The account doesn't have AI agents on: they aren't in its plan, or are switched off for it. |
+| 403 | `scope_missing` | The key doesn't have the `agents.contacts:write` scope. |
+
+Any request can also be refused for its key, its account or its rate (`key_required`, `invalid_key`, `account_suspended`, `plan_excludes_api`, `address_not_allowed`, `rate_limited`); see [the overview](/api-reference/overview).

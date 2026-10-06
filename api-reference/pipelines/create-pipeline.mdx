@@ -1,0 +1,109 @@
+---
+title: "POST /v1/crm/pipelines"
+description: "Add a pipeline; it starts with the stages New, Contacted, Proposal and Won."
+---
+
+Adds a pipeline after the account's others. Like one made on the board, it starts with four stages — New, Contacted, Proposal, and Won, its won stage. Add, rename, reorder or remove them afterwards.
+
+<Note>Needs the `crm.pipelines:write` scope.</Note>
+
+## Body
+
+| Field | Type | Required | Notes |
+| :--- | :--- | :--- | :--- |
+| `name` | string | Yes | What the pipeline is called. Up to 100 characters, and not a name another of the account's pipelines has. |
+
+## Request
+
+<CodeGroup>
+
+```bash cURL
+curl -X POST "https://api.fireflo.au/v1/crm/pipelines" \
+  -H "Authorization: Bearer $OMNI_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "Distributor onboarding"
+}'
+```
+
+```python Python
+import os
+
+import requests
+
+response = requests.post(
+    "https://api.fireflo.au/v1/crm/pipelines",
+    headers={"Authorization": f"Bearer {os.environ['OMNI_API_KEY']}"},
+    json={
+        "name": "Distributor onboarding"
+    },
+)
+print(response.status_code, response.json())
+```
+
+```javascript Node
+const response = await fetch("https://api.fireflo.au/v1/crm/pipelines", {
+  method: "POST",
+  headers: {
+    Authorization: `Bearer ${process.env.OMNI_API_KEY}`,
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({
+    "name": "Distributor onboarding"
+  }),
+});
+console.log(response.status, await response.json());
+```
+
+</CodeGroup>
+
+## Response
+
+`201 Created` — the pipeline, with its stages.
+
+```json
+{
+  "id": 4,
+  "name": "Distributor onboarding",
+  "order": 1,
+  "stages": [
+    {
+      "id": 21,
+      "name": "New",
+      "order": 0,
+      "outcome": ""
+    },
+    {
+      "id": 22,
+      "name": "Contacted",
+      "order": 1,
+      "outcome": ""
+    },
+    {
+      "id": 23,
+      "name": "Proposal",
+      "order": 2,
+      "outcome": ""
+    },
+    {
+      "id": 24,
+      "name": "Won",
+      "order": 3,
+      "outcome": "won"
+    }
+  ],
+  "created_at": "2026-10-06T10:15:32+05:30"
+}
+```
+
+## Errors
+
+Every refusal is `{"error": {"code", "message", "field"}}`; `field` is there when one input is at fault.
+
+| Status | Error code | When |
+| :--- | :--- | :--- |
+| 400 | `invalid_request` | `name` is missing, empty, longer than 100 characters, or another pipeline's (`field` is `name`). |
+| 404 | `module_off` | The account doesn't have Pipelines on. |
+| 403 | `scope_missing` | The key doesn't have the `crm.pipelines:write` scope. |
+
+Any request can also be refused for its key, its account or its rate (`key_required`, `invalid_key`, `account_suspended`, `plan_excludes_api`, `address_not_allowed`, `rate_limited`); see [the overview](/api-reference/overview).

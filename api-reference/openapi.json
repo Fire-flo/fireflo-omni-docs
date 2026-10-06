@@ -6,6 +6,935 @@
     "description": "One API for every channel and service in FireFlo OMNI."
   },
   "paths": {
+    "/v1/agents": {
+      "get": {
+        "operationId": "agents_list_agents",
+        "description": "The account's AI agents.",
+        "tags": [
+          "agents"
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "post": {
+        "operationId": "agents_create_agent",
+        "description": "Start an agent: a name, a role and what it should achieve. It starts as a draft; its AI provider key is chosen on the panel.",
+        "tags": [
+          "agents"
+        ],
+        "responses": {
+          "201": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/agents/{agent_id}": {
+      "get": {
+        "operationId": "agents_get_agent",
+        "description": "One agent.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "agent_id",
+            "schema": {
+              "type": "integer"
+            },
+            "required": true
+          }
+        ],
+        "tags": [
+          "agents"
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "patch": {
+        "operationId": "agents_update_agent",
+        "description": "Change an agent's setup: instructions, channels, knowledge, approvals, working hours, limits. A change that needs checking again makes it a draft until verified.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "agent_id",
+            "schema": {
+              "type": "integer"
+            },
+            "required": true
+          }
+        ],
+        "tags": [
+          "agents"
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "delete": {
+        "operationId": "agents_delete_agent",
+        "description": "Delete an agent. One that has worked contacts is kept for the record and switched off.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "agent_id",
+            "schema": {
+              "type": "integer"
+            },
+            "required": true
+          }
+        ],
+        "tags": [
+          "agents"
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/agents/{agent_id}/activate": {
+      "post": {
+        "operationId": "agents_activate_agent",
+        "description": "Put a ready agent live.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "agent_id",
+            "schema": {
+              "type": "integer"
+            },
+            "required": true
+          }
+        ],
+        "tags": [
+          "agents"
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/agents/{agent_id}/disable": {
+      "post": {
+        "operationId": "agents_disable_agent",
+        "description": "Switch an agent off; its open plans stop.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "agent_id",
+            "schema": {
+              "type": "integer"
+            },
+            "required": true
+          }
+        ],
+        "tags": [
+          "agents"
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/agents/{agent_id}/verify": {
+      "post": {
+        "operationId": "agents_verify_agent",
+        "description": "Check the agent's AI provider key and model answer.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "agent_id",
+            "schema": {
+              "type": "integer"
+            },
+            "required": true
+          }
+        ],
+        "tags": [
+          "agents"
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/agents/{agent_id}/workflow": {
+      "get": {
+        "operationId": "agents_get_workflow",
+        "description": "An agent's workflow: the draft graph, its problems, its revision and the live version.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "agent_id",
+            "schema": {
+              "type": "integer"
+            },
+            "required": true
+          }
+        ],
+        "tags": [
+          "agents"
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "put": {
+        "operationId": "agents_save_workflow",
+        "description": "Replace the draft graph. Send the revision you read; someone else's newer save is refused revision_conflict.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "agent_id",
+            "schema": {
+              "type": "integer"
+            },
+            "required": true
+          }
+        ],
+        "tags": [
+          "agents"
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/agents/{agent_id}/workflow/publish": {
+      "post": {
+        "operationId": "agents_publish_workflow",
+        "description": "Make the draft live as a new version, with a note.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "agent_id",
+            "schema": {
+              "type": "integer"
+            },
+            "required": true
+          }
+        ],
+        "tags": [
+          "agents"
+        ],
+        "responses": {
+          "201": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/agents/{agent_id}/workflow/versions": {
+      "get": {
+        "operationId": "agents_list_versions",
+        "description": "Published versions, newest first.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "agent_id",
+            "schema": {
+              "type": "integer"
+            },
+            "required": true
+          }
+        ],
+        "tags": [
+          "agents"
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/agents/{agent_id}/workflow/versions/{number}/rollback": {
+      "post": {
+        "operationId": "agents_roll_back",
+        "description": "Publish an earlier version again, under a new number.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "agent_id",
+            "schema": {
+              "type": "integer"
+            },
+            "required": true
+          },
+          {
+            "in": "path",
+            "name": "number",
+            "schema": {
+              "type": "integer"
+            },
+            "required": true
+          }
+        ],
+        "tags": [
+          "agents"
+        ],
+        "responses": {
+          "201": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/agents/contacts/{contact_id}/agents": {
+      "get": {
+        "operationId": "agents_contact_agents",
+        "description": "The agents working a contact.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "contact_id",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "tags": [
+          "agents"
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "post": {
+        "operationId": "agents_assign_agent",
+        "description": "Put a live agent on a contact (and one of their deals).",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "contact_id",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "tags": [
+          "agents"
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/agents/contacts/{contact_id}/agents/{agent_id}/pause": {
+      "post": {
+        "operationId": "agents_pause_agent",
+        "description": "Pause an agent on a contact.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "agent_id",
+            "schema": {
+              "type": "integer"
+            },
+            "required": true
+          },
+          {
+            "in": "path",
+            "name": "contact_id",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "tags": [
+          "agents"
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/agents/contacts/{contact_id}/agents/{agent_id}/release": {
+      "post": {
+        "operationId": "agents_release_agent",
+        "description": "Take an agent off a contact; open plans stop.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "agent_id",
+            "schema": {
+              "type": "integer"
+            },
+            "required": true
+          },
+          {
+            "in": "path",
+            "name": "contact_id",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "tags": [
+          "agents"
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/agents/contacts/{contact_id}/agents/{agent_id}/resume": {
+      "post": {
+        "operationId": "agents_resume_agent",
+        "description": "Hand a contact back to its agent.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "agent_id",
+            "schema": {
+              "type": "integer"
+            },
+            "required": true
+          },
+          {
+            "in": "path",
+            "name": "contact_id",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "tags": [
+          "agents"
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/agents/contacts/{contact_id}/agents/{agent_id}/run": {
+      "post": {
+        "operationId": "agents_run_agent",
+        "description": "Ask an agent to plan for a contact now, with an optional note.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "agent_id",
+            "schema": {
+              "type": "integer"
+            },
+            "required": true
+          },
+          {
+            "in": "path",
+            "name": "contact_id",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "tags": [
+          "agents"
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/agents/events": {
+      "get": {
+        "operationId": "agents_list_events",
+        "description": "The agents' activity log, newest first; filter by agent or kind.",
+        "tags": [
+          "agents"
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/agents/knowledge/collections": {
+      "get": {
+        "operationId": "agents_list_collections",
+        "description": "Knowledge collections, with how many sources each.",
+        "tags": [
+          "agents"
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "post": {
+        "operationId": "agents_add_collection",
+        "description": "Add a knowledge collection.",
+        "tags": [
+          "agents"
+        ],
+        "responses": {
+          "201": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/agents/knowledge/files": {
+      "post": {
+        "operationId": "agents_upload_file",
+        "description": "Upload a file for agents to read (form field file): PDF, Word, CSV, text or Markdown.",
+        "tags": [
+          "agents"
+        ],
+        "responses": {
+          "201": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/agents/knowledge/sources": {
+      "get": {
+        "operationId": "agents_list_sources",
+        "description": "What agents know: articles, FAQs, files and websites.",
+        "tags": [
+          "agents"
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "post": {
+        "operationId": "agents_add_source",
+        "description": "Add an article or FAQ, or a website for agents to read.",
+        "tags": [
+          "agents"
+        ],
+        "responses": {
+          "201": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/agents/knowledge/sources/{source_id}": {
+      "patch": {
+        "operationId": "agents_update_source",
+        "description": "Change a knowledge source.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "source_id",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "tags": [
+          "agents"
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "delete": {
+        "operationId": "agents_remove_source",
+        "description": "Remove a knowledge source.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "source_id",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "tags": [
+          "agents"
+        ],
+        "responses": {
+          "204": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/agents/knowledge/sources/{source_id}/reindex": {
+      "post": {
+        "operationId": "agents_reindex_source",
+        "description": "Read a source again now.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "source_id",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "tags": [
+          "agents"
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/agents/plans": {
+      "get": {
+        "operationId": "agents_list_plans",
+        "description": "Agents' plans, newest first; status awaiting or open, agent, contact.",
+        "tags": [
+          "agents"
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/agents/plans/{plan_id}": {
+      "get": {
+        "operationId": "agents_get_plan",
+        "description": "One plan and its steps.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "plan_id",
+            "schema": {
+              "type": "integer"
+            },
+            "required": true
+          }
+        ],
+        "tags": [
+          "agents"
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/agents/plans/{plan_id}/approve": {
+      "post": {
+        "operationId": "agents_approve_plan",
+        "description": "Approve a plan waiting for approval, with optional edits to its steps.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "plan_id",
+            "schema": {
+              "type": "integer"
+            },
+            "required": true
+          }
+        ],
+        "tags": [
+          "agents"
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/agents/plans/{plan_id}/cancel": {
+      "post": {
+        "operationId": "agents_cancel_plan",
+        "description": "Stop a plan that still has work ahead.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "plan_id",
+            "schema": {
+              "type": "integer"
+            },
+            "required": true
+          }
+        ],
+        "tags": [
+          "agents"
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/agents/plans/{plan_id}/reject": {
+      "post": {
+        "operationId": "agents_reject_plan",
+        "description": "Reject a plan waiting for approval, with a note.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "plan_id",
+            "schema": {
+              "type": "integer"
+            },
+            "required": true
+          }
+        ],
+        "tags": [
+          "agents"
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/agents/usage": {
+      "get": {
+        "operationId": "agents_usage",
+        "description": "AI use per day — tokens, plans and replies — for 7, 14 or 30 days.",
+        "tags": [
+          "agents"
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/batch": {
+      "post": {
+        "operationId": "cdp_batch",
+        "description": "Up to 100 identify and track events at once.",
+        "tags": [
+          "batch"
+        ],
+        "responses": {
+          "202": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
     "/v1/broadcasts": {
       "get": {
         "operationId": "list_broadcasts",
@@ -216,6 +1145,373 @@
         ]
       }
     },
+    "/v1/calendar/appointments": {
+      "get": {
+        "operationId": "calendar_list_appointments",
+        "description": "Appointments, newest first; filter by from and to (dates), status, staff (an email) or contact.",
+        "tags": [
+          "calendar"
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "post": {
+        "operationId": "calendar_book_appointment",
+        "description": "Book a contact into a free time of a booking type. The contact is sent the account's confirmation and reminders. A time no longer free is refused slot_taken.",
+        "tags": [
+          "calendar"
+        ],
+        "responses": {
+          "201": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/calendar/appointments/{appointment_id}": {
+      "get": {
+        "operationId": "calendar_get_appointment",
+        "description": "One appointment, with its history.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "appointment_id",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "tags": [
+          "calendar"
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "patch": {
+        "operationId": "calendar_update_appointment",
+        "description": "Change an appointment's notes, place, meeting link or mode.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "appointment_id",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "tags": [
+          "calendar"
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/calendar/appointments/{appointment_id}/cancel": {
+      "post": {
+        "operationId": "calendar_cancel",
+        "description": "Cancel an upcoming appointment, with an optional note.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "appointment_id",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "tags": [
+          "calendar"
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/calendar/appointments/{appointment_id}/complete": {
+      "post": {
+        "operationId": "calendar_complete",
+        "description": "Mark an appointment done.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "appointment_id",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "tags": [
+          "calendar"
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/calendar/appointments/{appointment_id}/confirm": {
+      "post": {
+        "operationId": "calendar_confirm",
+        "description": "Confirm a requested appointment.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "appointment_id",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "tags": [
+          "calendar"
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/calendar/appointments/{appointment_id}/no-show": {
+      "post": {
+        "operationId": "calendar_no_show",
+        "description": "Mark that the contact didn't come.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "appointment_id",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "tags": [
+          "calendar"
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/calendar/appointments/{appointment_id}/reschedule": {
+      "post": {
+        "operationId": "calendar_reschedule",
+        "description": "Move an upcoming appointment to another free time, optionally to another teammate.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "appointment_id",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "tags": [
+          "calendar"
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/calendar/booking-types": {
+      "get": {
+        "operationId": "calendar_list_booking_types",
+        "description": "What people can book: how long it lasts, prep before it, who takes it.",
+        "tags": [
+          "calendar"
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "post": {
+        "operationId": "calendar_add_booking_type",
+        "description": "Add a booking type. Teammates are named by email.",
+        "tags": [
+          "calendar"
+        ],
+        "responses": {
+          "201": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/calendar/booking-types/{type_id}": {
+      "patch": {
+        "operationId": "calendar_change_booking_type",
+        "description": "Change a booking type.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "type_id",
+            "schema": {
+              "type": "integer"
+            },
+            "required": true
+          }
+        ],
+        "tags": [
+          "calendar"
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "delete": {
+        "operationId": "calendar_delete_booking_type",
+        "description": "Delete a booking type — or switch it off, when appointments were booked as it.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "type_id",
+            "schema": {
+              "type": "integer"
+            },
+            "required": true
+          }
+        ],
+        "tags": [
+          "calendar"
+        ],
+        "responses": {
+          "204": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/calendar/free-times": {
+      "get": {
+        "operationId": "calendar_free_times",
+        "description": "Free starts for a booking type from one day to another (a week unless to says), per teammate — minimum notice and how far ahead included.",
+        "tags": [
+          "calendar"
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/calendar/staff": {
+      "get": {
+        "operationId": "calendar_list_staff",
+        "description": "The team, and whether each can be booked.",
+        "tags": [
+          "calendar"
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
     "/v1/calls": {
       "get": {
         "operationId": "list_calls",
@@ -300,6 +1596,811 @@
         ]
       }
     },
+    "/v1/catalogue/orders": {
+      "get": {
+        "operationId": "catalogue_list_orders",
+        "description": "Orders, newest first; filter by status or contact.",
+        "tags": [
+          "catalogue"
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "post": {
+        "operationId": "catalogue_open_order",
+        "description": "Place an order for a contact: items naming a product (or a sku), with a quantity. Prices are the product's own unless given.",
+        "tags": [
+          "catalogue"
+        ],
+        "responses": {
+          "201": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/catalogue/orders/{order_id}": {
+      "get": {
+        "operationId": "catalogue_get_order",
+        "description": "One order, with its history.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "order_id",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "tags": [
+          "catalogue"
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/catalogue/orders/{order_id}/cancel": {
+      "post": {
+        "operationId": "catalogue_cancel_order",
+        "description": "Cancel an order.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "order_id",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "tags": [
+          "catalogue"
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/catalogue/orders/{order_id}/confirm": {
+      "post": {
+        "operationId": "catalogue_confirm_order",
+        "description": "Confirm an order. The customer is sent the account's confirmation on the channel the order came in on.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "order_id",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "tags": [
+          "catalogue"
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/catalogue/orders/{order_id}/decline": {
+      "post": {
+        "operationId": "catalogue_decline_order",
+        "description": "Decline an order; a reason, when given, is sent to the customer.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "order_id",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "tags": [
+          "catalogue"
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/catalogue/orders/{order_id}/fulfil": {
+      "post": {
+        "operationId": "catalogue_fulfil_order",
+        "description": "Mark an order fulfilled.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "order_id",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "tags": [
+          "catalogue"
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/catalogue/products": {
+      "get": {
+        "operationId": "catalogue_list_products",
+        "description": "Products, newest first; filter by active, category, set or sku, or search with q (best matches first).",
+        "tags": [
+          "catalogue"
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "post": {
+        "operationId": "catalogue_add_product",
+        "description": "Add a product: a sku and a name at least, money in minor units. It is queued for the WhatsApp catalogue.",
+        "tags": [
+          "catalogue"
+        ],
+        "responses": {
+          "201": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/catalogue/products/{product_id}": {
+      "get": {
+        "operationId": "catalogue_get_product",
+        "description": "One product.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "product_id",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "tags": [
+          "catalogue"
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "patch": {
+        "operationId": "catalogue_update_product",
+        "description": "Change a product; only what is sent changes. The sku can't change once WhatsApp has the product.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "product_id",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "tags": [
+          "catalogue"
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "delete": {
+        "operationId": "catalogue_remove_product",
+        "description": "Take a product off sale. It stays for the orders that name it.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "product_id",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "tags": [
+          "catalogue"
+        ],
+        "responses": {
+          "204": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/catalogue/products/{product_id}/image": {
+      "post": {
+        "operationId": "catalogue_upload_image",
+        "description": "Give a product its picture (form field image): PNG, JPEG or WebP, 8 MB at most.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "product_id",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "tags": [
+          "catalogue"
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/catalogue/products/import": {
+      "post": {
+        "operationId": "catalogue_import_products",
+        "description": "Add or update products from a CSV (form field file), keyed on the sku.",
+        "tags": [
+          "catalogue"
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/catalogue/sets": {
+      "get": {
+        "operationId": "catalogue_list_sets",
+        "description": "Product sets, with how many products each holds.",
+        "tags": [
+          "catalogue"
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "post": {
+        "operationId": "catalogue_add_set",
+        "description": "Add a product set.",
+        "tags": [
+          "catalogue"
+        ],
+        "responses": {
+          "201": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/catalogue/sets/{set_id}": {
+      "patch": {
+        "operationId": "catalogue_change_set",
+        "description": "Rename a set or change its description.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "set_id",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "tags": [
+          "catalogue"
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "delete": {
+        "operationId": "catalogue_delete_set",
+        "description": "Delete a set; its products stay.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "set_id",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "tags": [
+          "catalogue"
+        ],
+        "responses": {
+          "204": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/cdp/audiences": {
+      "get": {
+        "operationId": "cdp_list_audiences",
+        "description": "Audiences, with how many are in each.",
+        "tags": [
+          "cdp"
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "post": {
+        "operationId": "cdp_create_audience",
+        "description": "Save an audience from rules; its members are worked out in the background.",
+        "tags": [
+          "cdp"
+        ],
+        "responses": {
+          "201": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/cdp/audiences/{audience_id}": {
+      "get": {
+        "operationId": "cdp_get_audience",
+        "description": "One audience and its rules.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "audience_id",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "tags": [
+          "cdp"
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "patch": {
+        "operationId": "cdp_update_audience",
+        "description": "Rename an audience or change its rules (its members are worked out again).",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "audience_id",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "tags": [
+          "cdp"
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "delete": {
+        "operationId": "cdp_delete_audience",
+        "description": "Delete an audience no agent or workflow uses.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "audience_id",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "tags": [
+          "cdp"
+        ],
+        "responses": {
+          "204": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/cdp/audiences/{audience_id}/members": {
+      "get": {
+        "operationId": "cdp_audience_members",
+        "description": "Who is in an audience, latest to join first.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "audience_id",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "tags": [
+          "cdp"
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/cdp/audiences/{audience_id}/refresh": {
+      "post": {
+        "operationId": "cdp_refresh_audience",
+        "description": "Work an audience's members out again now.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "audience_id",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "tags": [
+          "cdp"
+        ],
+        "responses": {
+          "202": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/cdp/contacts/{contact_id}/consent": {
+      "get": {
+        "operationId": "cdp_get_consent",
+        "description": "Where a contact stands on each channel, for marketing and updates, and the history.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "contact_id",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "tags": [
+          "cdp"
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "post": {
+        "operationId": "cdp_set_consent",
+        "description": "Record consent for a channel (or all) and purpose, with proof — what the contact said, and where.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "contact_id",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "tags": [
+          "cdp"
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/cdp/duplicates": {
+      "get": {
+        "operationId": "cdp_list_duplicates",
+        "description": "Pairs of contacts that look like one person, newest first.",
+        "tags": [
+          "cdp"
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/cdp/duplicates/{duplicate_id}/dismiss": {
+      "post": {
+        "operationId": "cdp_dismiss_duplicate",
+        "description": "Say two contacts aren't the same person; they won't be suggested again.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "duplicate_id",
+            "schema": {
+              "type": "integer"
+            },
+            "required": true
+          }
+        ],
+        "tags": [
+          "cdp"
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/cdp/merge": {
+      "post": {
+        "operationId": "cdp_merge_contacts",
+        "description": "Merge lose into keep: messages, deals, tickets and the rest move; choices picks whose name, phone or fields win.",
+        "tags": [
+          "cdp"
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/cdp/traits": {
+      "get": {
+        "operationId": "cdp_list_traits",
+        "description": "Built-in traits, and the account's own: counts, sums and last times of an event.",
+        "tags": [
+          "cdp"
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "post": {
+        "operationId": "cdp_add_trait",
+        "description": "Add a trait worked out from an event over a window of days.",
+        "tags": [
+          "cdp"
+        ],
+        "responses": {
+          "201": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/cdp/traits/{key}": {
+      "delete": {
+        "operationId": "cdp_remove_trait",
+        "description": "Remove one of the account's traits.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "key",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "tags": [
+          "cdp"
+        ],
+        "responses": {
+          "204": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
     "/v1/channels/sms/balance": {
       "get": {
         "operationId": "sms_balance",
@@ -344,7 +2445,7 @@
           "channels"
         ],
         "responses": {
-          "200": {
+          "201": {
             "description": "No response body"
           }
         },
@@ -409,7 +2510,7 @@
           "channels"
         ],
         "responses": {
-          "200": {
+          "201": {
             "description": "No response body"
           }
         },
@@ -474,7 +2575,7 @@
           "channels"
         ],
         "responses": {
-          "200": {
+          "201": {
             "description": "No response body"
           }
         },
@@ -851,6 +2952,459 @@
         ]
       }
     },
+    "/v1/crm/deals": {
+      "get": {
+        "operationId": "crm_list_deals",
+        "description": "Deals, newest first; filter by pipeline, stage, status or contact.",
+        "tags": [
+          "crm"
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "post": {
+        "operationId": "crm_create_deal",
+        "description": "Create a deal in a pipeline — in its first stage unless stage says which.",
+        "tags": [
+          "crm"
+        ],
+        "responses": {
+          "201": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/crm/deals/{deal_id}": {
+      "get": {
+        "operationId": "crm_get_deal",
+        "description": "One deal.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "deal_id",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "tags": [
+          "crm"
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "patch": {
+        "operationId": "crm_update_deal",
+        "description": "Move a deal, win or lose it, or change its title, value, contact or notes. A closing stage closes it; marking it won moves it to the won stage.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "deal_id",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "tags": [
+          "crm"
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "delete": {
+        "operationId": "crm_delete_deal",
+        "description": "Delete a deal.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "deal_id",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "tags": [
+          "crm"
+        ],
+        "responses": {
+          "204": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/crm/deals/{deal_id}/notes": {
+      "get": {
+        "operationId": "crm_list_notes",
+        "description": "A deal's notes, newest first.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "deal_id",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "tags": [
+          "crm"
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "post": {
+        "operationId": "crm_add_note",
+        "description": "Add a note to a deal, signed as from the API.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "deal_id",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "tags": [
+          "crm"
+        ],
+        "responses": {
+          "201": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/crm/deals/{deal_id}/timeline": {
+      "get": {
+        "operationId": "crm_deal_timeline",
+        "description": "A deal's story, newest first: its own changes and notes, and what happened with its contact since it began. before pages back.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "deal_id",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "tags": [
+          "crm"
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/crm/pipelines": {
+      "get": {
+        "operationId": "crm_list_pipelines",
+        "description": "The account's pipelines, in board order, each with its stages.",
+        "tags": [
+          "crm"
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "post": {
+        "operationId": "crm_create_pipeline",
+        "description": "Add a pipeline. It starts with New, Contacted, Proposal and Won.",
+        "tags": [
+          "crm"
+        ],
+        "responses": {
+          "201": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/crm/pipelines/{pipeline_id}": {
+      "get": {
+        "operationId": "crm_get_pipeline",
+        "description": "One pipeline and its stages.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "pipeline_id",
+            "schema": {
+              "type": "integer"
+            },
+            "required": true
+          }
+        ],
+        "tags": [
+          "crm"
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "patch": {
+        "operationId": "crm_rename_pipeline",
+        "description": "Rename a pipeline.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "pipeline_id",
+            "schema": {
+              "type": "integer"
+            },
+            "required": true
+          }
+        ],
+        "tags": [
+          "crm"
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "delete": {
+        "operationId": "crm_delete_pipeline",
+        "description": "Delete a pipeline with no open deals; its closed deals go with it.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "pipeline_id",
+            "schema": {
+              "type": "integer"
+            },
+            "required": true
+          }
+        ],
+        "tags": [
+          "crm"
+        ],
+        "responses": {
+          "204": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/crm/pipelines/{pipeline_id}/stages": {
+      "post": {
+        "operationId": "crm_add_stage",
+        "description": "Add a stage at the end. outcome won or lost makes it the closing stage.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "pipeline_id",
+            "schema": {
+              "type": "integer"
+            },
+            "required": true
+          }
+        ],
+        "tags": [
+          "crm"
+        ],
+        "responses": {
+          "201": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/crm/pipelines/{pipeline_id}/stages/{stage_id}": {
+      "patch": {
+        "operationId": "crm_change_stage",
+        "description": "Rename a stage, or make it (or stop it being) a closing stage.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "pipeline_id",
+            "schema": {
+              "type": "integer"
+            },
+            "required": true
+          },
+          {
+            "in": "path",
+            "name": "stage_id",
+            "schema": {
+              "type": "integer"
+            },
+            "required": true
+          }
+        ],
+        "tags": [
+          "crm"
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "delete": {
+        "operationId": "crm_delete_stage",
+        "description": "Delete a stage. If it holds deals, move_to names the stage they go to.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "pipeline_id",
+            "schema": {
+              "type": "integer"
+            },
+            "required": true
+          },
+          {
+            "in": "path",
+            "name": "stage_id",
+            "schema": {
+              "type": "integer"
+            },
+            "required": true
+          }
+        ],
+        "tags": [
+          "crm"
+        ],
+        "responses": {
+          "204": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/crm/pipelines/{pipeline_id}/stages/reorder": {
+      "post": {
+        "operationId": "crm_reorder_stages",
+        "description": "Put the stages in a new order: every stage id, once.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "pipeline_id",
+            "schema": {
+              "type": "integer"
+            },
+            "required": true
+          }
+        ],
+        "tags": [
+          "crm"
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
     "/v1/events": {
       "get": {
         "operationId": "list_event_types",
@@ -860,6 +3414,25 @@
         ],
         "responses": {
           "200": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/identify": {
+      "post": {
+        "operationId": "cdp_identify",
+        "description": "Who someone is: their user id, phone or email, and traits. Applied in the background.",
+        "tags": [
+          "identify"
+        ],
+        "responses": {
+          "202": {
             "description": "No response body"
           }
         },
@@ -1351,6 +3924,352 @@
         ],
         "responses": {
           "204": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/tickets": {
+      "get": {
+        "operationId": "tickets_list_tickets",
+        "description": "Tickets, newest first; filter by status, priority, assignee (an email), category or contact.",
+        "tags": [
+          "tickets"
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "post": {
+        "operationId": "tickets_open_ticket",
+        "description": "Open a ticket on a conversation, with a subject and optionally a priority, category and assignee. A ticket already open there is solved first.",
+        "tags": [
+          "tickets"
+        ],
+        "responses": {
+          "201": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/tickets/{ticket_id}": {
+      "get": {
+        "operationId": "tickets_get_ticket",
+        "description": "One ticket, with its history.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ticket_id",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "tags": [
+          "tickets"
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "patch": {
+        "operationId": "tickets_update_ticket",
+        "description": "Change a ticket's status, priority, assignee, category or subject. On an open ticket the conversation changes with it, as in the Inbox.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ticket_id",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "tags": [
+          "tickets"
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/tickets/{ticket_id}/close": {
+      "post": {
+        "operationId": "tickets_close_ticket",
+        "description": "Close a ticket. A closed ticket can't reopen.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ticket_id",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "tags": [
+          "tickets"
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/tickets/{ticket_id}/notes": {
+      "get": {
+        "operationId": "tickets_list_notes",
+        "description": "A ticket's internal notes, oldest first.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ticket_id",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "tags": [
+          "tickets"
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "post": {
+        "operationId": "tickets_add_note",
+        "description": "Add an internal note — never sent to the customer.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ticket_id",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "tags": [
+          "tickets"
+        ],
+        "responses": {
+          "201": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/tickets/{ticket_id}/reopen": {
+      "post": {
+        "operationId": "tickets_reopen_ticket",
+        "description": "Open a solved ticket again, unless another is open in its conversation.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ticket_id",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "tags": [
+          "tickets"
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/tickets/{ticket_id}/solve": {
+      "post": {
+        "operationId": "tickets_solve_ticket",
+        "description": "Solve a ticket.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ticket_id",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "tags": [
+          "tickets"
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/tickets/categories": {
+      "get": {
+        "operationId": "tickets_list_categories",
+        "description": "The account's ticket categories.",
+        "tags": [
+          "tickets"
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "post": {
+        "operationId": "tickets_add_category",
+        "description": "Add a category: a name and a colour.",
+        "tags": [
+          "tickets"
+        ],
+        "responses": {
+          "201": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/tickets/categories/{category_id}": {
+      "patch": {
+        "operationId": "tickets_change_category",
+        "description": "Rename or recolour a category.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "category_id",
+            "schema": {
+              "type": "integer"
+            },
+            "required": true
+          }
+        ],
+        "tags": [
+          "tickets"
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "delete": {
+        "operationId": "tickets_delete_category",
+        "description": "Delete a category; its tickets keep no category.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "category_id",
+            "schema": {
+              "type": "integer"
+            },
+            "required": true
+          }
+        ],
+        "tags": [
+          "tickets"
+        ],
+        "responses": {
+          "204": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/track": {
+      "post": {
+        "operationId": "cdp_track",
+        "description": "Something someone did: an event name and its properties.",
+        "tags": [
+          "track"
+        ],
+        "responses": {
+          "202": {
             "description": "No response body"
           }
         },

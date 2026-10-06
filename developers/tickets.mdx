@@ -1,0 +1,114 @@
+---
+title: "Tickets"
+description: "Open, follow, change, solve and close support tickets from your own systems, keep notes on them, manage categories, and hear about every change."
+---
+
+A ticket is one piece of support work inside a person's conversation: it opens when
+the customer writes in (or the team starts one), is answered, and is solved and in time
+closed. Through the API they are the same tickets the panel's Tickets screen and the
+Inbox show — changes you make appear there, with the same trail, and changes your team
+makes reach you as webhook events.
+
+- The endpoints exist when the account's plan includes Tickets; otherwise every one
+  answers `404 module_off`.
+- You need a key with **`tickets:read`** to see tickets, their notes and history, and
+  categories, and **`tickets:write`** to open, change, solve and close them, add notes
+  and manage categories (see [Keys and scopes](/developers/keys-and-scopes)).
+- Teammates are named by their email, as `assignee`. The conversation a ticket lives in
+  is named by the id [/v1/conversations](/developers/conversations) uses: the contact's id.
+- Every change made through the API is signed **API · \<key name\>** in the ticket's
+  history and on its notes.
+
+## Tickets
+
+| | |
+| :--- | :--- |
+| [`GET /v1/tickets`](/api-reference/tickets/list) | Tickets, newest first; filter by status, priority, assignee, category or contact |
+| [`POST /v1/tickets`](/api-reference/tickets/open) | Open a ticket on a conversation |
+| [`GET /v1/tickets/{ticket_id}`](/api-reference/tickets/get) | One ticket, with its history |
+| [`PATCH /v1/tickets/{ticket_id}`](/api-reference/tickets/update) | Change its status, priority, assignee, category or subject |
+| [`POST …/solve`](/api-reference/tickets/solve) | Solve it |
+| [`POST …/close`](/api-reference/tickets/close) | Close it for good |
+| [`POST …/reopen`](/api-reference/tickets/reopen) | Open a solved ticket again |
+
+## Notes
+
+Internal notes are for the team: they are never sent to the customer.
+
+| | |
+| :--- | :--- |
+| [`GET /v1/tickets/{ticket_id}/notes`](/api-reference/tickets/list-notes) | A ticket's notes, oldest first |
+| [`POST /v1/tickets/{ticket_id}/notes`](/api-reference/tickets/add-note) | Add a note, up to 5,000 characters |
+
+## Categories
+
+| | |
+| :--- | :--- |
+| [`GET /v1/tickets/categories`](/api-reference/tickets/list-categories) | The account's categories |
+| [`POST /v1/tickets/categories`](/api-reference/tickets/add-category) | Add one: a name and a colour |
+| [`PATCH /v1/tickets/categories/{category_id}`](/api-reference/tickets/change-category) | Rename or recolour one |
+| [`DELETE /v1/tickets/categories/{category_id}`](/api-reference/tickets/delete-category) | Delete one; its tickets are left with none |
+
+## How tickets behave
+
+A ticket is `open` or `pending` while it is being worked on — **live** — then `solved`,
+then `closed`.
+
+- **One live ticket per conversation.** Opening a ticket on a conversation that already
+  has one open or pending solves that one first. Reopening a solved ticket is refused
+  while another is live there.
+- **The ticket and its conversation stay in step.** A live ticket's priority and
+  assignee are its conversation's: changing them on the ticket changes the conversation,
+  as in the Inbox. Opening or reopening a ticket opens its conversation.
+- **Solving closes the conversation** when the account keeps tickets and conversations
+  in step (in its Ticket settings).
+- **A closed ticket can't reopen.** Closing a live ticket solves it first. If the
+  customer writes again later, a new ticket starts.
+- **Tickets close by themselves.** A solved ticket is closed once the account's window
+  has passed, and a pending ticket nobody answers is solved after a while — both set in
+  Ticket settings.
+- **Asking at the wrong moment is refused.** Reopening a closed ticket, or one whose
+  conversation has another live ticket, through
+  [POST …/reopen](/api-reference/tickets/reopen) answers `invalid_state` (409); the same
+  change through [PATCH](/api-reference/tickets/update) `status` answers
+  `invalid_request` (400) with `field` `status`. Solving a solved ticket, or closing a
+  closed one, leaves it as it is.
+
+## Webhook events
+
+Rather than asking, subscribe a [webhook endpoint](/developers/webhooks) to:
+
+| Event | When |
+| :--- | :--- |
+| `ticket.opened` | A ticket was opened — by the customer writing in, the team, an AI agent or the API. |
+| `ticket.updated` | Its status (to `open` or `pending`), assignee, priority, category or subject changed. |
+| `ticket.solved` | It was solved. |
+| `ticket.closed` | It was closed. |
+| `ticket.reopened` | A solved ticket was opened again. |
+
+Each carries the ticket, as `ticket`, in the shape
+[GET /v1/tickets/\{ticket_id\}](/api-reference/tickets/get) answers (without its
+history), and the change, as `change` — `{kind, detail, by, at}`, the entry it added to
+the ticket's history:
+
+```json
+{
+  "ticket": {
+    "id": "b84f2c10-5e7a-4c3d-9a61-0f2d7e9c4a18",
+    "number": 1042,
+    "subject": "Order A-1042 not delivered",
+    "status": "open",
+    "priority": "urgent",
+    "...": "..."
+  },
+  "change": {
+    "kind": "priority",
+    "detail": "urgent",
+    "by": "Priya Nair",
+    "at": "2026-10-06T11:20:45+05:30"
+  }
+}
+```
+
+Notes aren't sent as events. Tickets closed automatically once the account's window has
+passed are sent as `ticket.closed` too, with the ticket alone and no `change`.

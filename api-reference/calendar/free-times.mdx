@@ -1,0 +1,106 @@
+---
+title: "GET /v1/calendar/free-times"
+description: "The free start times for a booking type, per teammate, from one day to another."
+---
+
+The times a booking type can start, for each teammate who takes it — the same free times the panel offers. A time is free when the appointment and its prep time both fit in the teammate's working hours, clear of time off, busy times on their connected calendar, and their other upcoming appointments (with those appointments' prep). The account's minimum notice and how far ahead it can be booked are applied.
+
+<Note>Needs the `calendar:read` scope.</Note>
+
+## Query parameters
+
+| Field | Type | Required | Notes |
+| :--- | :--- | :--- | :--- |
+| `booking_type` | integer | Yes | The booking type's id. It must be switched on. |
+| `from` | string | No | The first day, `YYYY-MM-DD`, in the account's timezone. Today when left out. |
+| `to` | string | No | The last day, `YYYY-MM-DD`. A week from `from` (seven days) when left out; at most 31 days in one ask. |
+| `staff` | string | No | A teammate's email: only their free times. |
+
+## Request
+
+<CodeGroup>
+
+```bash cURL
+curl "https://api.fireflo.au/v1/calendar/free-times?booking_type=3&from=2026-10-08&to=2026-10-08" \
+  -H "Authorization: Bearer $OMNI_API_KEY"
+```
+
+```python Python
+import os
+
+import requests
+
+response = requests.get(
+    "https://api.fireflo.au/v1/calendar/free-times?booking_type=3&from=2026-10-08&to=2026-10-08",
+    headers={"Authorization": f"Bearer {os.environ['OMNI_API_KEY']}"},
+)
+print(response.status_code, response.json())
+```
+
+```javascript Node
+const response = await fetch("https://api.fireflo.au/v1/calendar/free-times?booking_type=3&from=2026-10-08&to=2026-10-08", {
+  headers: { Authorization: `Bearer ${process.env.OMNI_API_KEY}` },
+});
+console.log(response.status, await response.json());
+```
+
+</CodeGroup>
+
+## Response
+
+`200 OK` — every free start, earliest first, in `data`; when several teammates are free at the same time, each is listed. Times are in the account's timezone, with its offset. `ends_at` is when the appointment ends; prep time comes before `starts_at`. Pass a `starts_at` unchanged to [POST /v1/calendar/appointments](/api-reference/calendar/book).
+
+Days past how far ahead the account takes bookings are left out. `data` is empty when nobody who takes the booking type is free — or when `staff` names someone who doesn't take it.
+
+```json
+{
+  "booking_type": 3,
+  "data": [
+    {
+      "staff": {
+        "name": "Priya Sharma",
+        "email": "priya@acme.in"
+      },
+      "starts_at": "2026-10-08T10:00:00+05:30",
+      "ends_at": "2026-10-08T10:30:00+05:30"
+    },
+    {
+      "staff": {
+        "name": "Rahul Verma",
+        "email": "rahul@acme.in"
+      },
+      "starts_at": "2026-10-08T10:00:00+05:30",
+      "ends_at": "2026-10-08T10:30:00+05:30"
+    },
+    {
+      "staff": {
+        "name": "Priya Sharma",
+        "email": "priya@acme.in"
+      },
+      "starts_at": "2026-10-08T10:30:00+05:30",
+      "ends_at": "2026-10-08T11:00:00+05:30"
+    },
+    {
+      "staff": {
+        "name": "Rahul Verma",
+        "email": "rahul@acme.in"
+      },
+      "starts_at": "2026-10-08T11:30:00+05:30",
+      "ends_at": "2026-10-08T12:00:00+05:30"
+    }
+  ]
+}
+```
+
+## Errors
+
+Every refusal is `{"error": {"code", "message", "field"}}`; `field` is there when one input is at fault.
+
+| Status | Error code | When |
+| :--- | :--- | :--- |
+| 400 | `invalid_request` | `booking_type` is missing, unknown or switched off, `staff` isn't anyone's email in your team, or `to` is 31 or more days after `from` (`field` names it). |
+| 409 | `calendar_off` | Appointments are switched off in the account's Calendar settings. |
+| 404 | `module_off` | The account's plan doesn't include Calendar. |
+| 403 | `scope_missing` | The key doesn't have the `calendar:read` scope. |
+
+Any request can also be refused for its key, its account or its rate (`key_required`, `invalid_key`, `account_suspended`, `plan_excludes_api`, `address_not_allowed`, `rate_limited`); see [the overview](/api-reference/overview).
