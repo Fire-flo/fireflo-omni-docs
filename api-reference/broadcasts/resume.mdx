@@ -1,0 +1,85 @@
+---
+title: "POST /v1/broadcasts/{broadcast_id}/resume"
+description: "Resume a paused broadcast, from where it stopped."
+---
+
+Resumes a paused broadcast: it carries on from where it stopped, taking the next free turn. A `broadcast.resumed` event follows.
+
+<Note>Needs the `broadcasts:write` scope.</Note>
+
+## Path parameters
+
+| Field | Type | Required | Notes |
+| :--- | :--- | :--- | :--- |
+| `broadcast_id` | string | Yes | The broadcast's id. |
+
+## Request
+
+<CodeGroup>
+
+```bash cURL
+curl -X POST "https://api.fireflo.au/v1/broadcasts/7c1e9b52-3f0a-4d8e-9b6c-2a5d4e1f8c33/resume" \
+  -H "Authorization: Bearer $OMNI_API_KEY"
+```
+
+```python Python
+import os
+
+import requests
+
+response = requests.post(
+    "https://api.fireflo.au/v1/broadcasts/7c1e9b52-3f0a-4d8e-9b6c-2a5d4e1f8c33/resume",
+    headers={"Authorization": f"Bearer {os.environ['OMNI_API_KEY']}"},
+)
+print(response.status_code, response.json())
+```
+
+```javascript Node
+const response = await fetch("https://api.fireflo.au/v1/broadcasts/7c1e9b52-3f0a-4d8e-9b6c-2a5d4e1f8c33/resume", {
+  method: "POST",
+  headers: { Authorization: `Bearer ${process.env.OMNI_API_KEY}` },
+});
+console.log(response.status, await response.json());
+```
+
+</CodeGroup>
+
+## Response
+
+`200 OK` — the broadcast, now `queued`.
+
+```json
+{
+  "id": "7c1e9b52-3f0a-4d8e-9b6c-2a5d4e1f8c33",
+  "name": "Diwali offer",
+  "channel": "whatsapp",
+  "status": "queued",
+  "purpose": "marketing",
+  "recipients": 1840,
+  "counts": {
+    "skipped": 12,
+    "sent": 1204,
+    "delivered": 1179,
+    "failed": 9,
+    "waiting": 624
+  },
+  "percent": 66,
+  "error": "",
+  "scheduled_for": null,
+  "created": "2026-10-06T09:12:04+05:30",
+  "started": "2026-10-06T09:12:31+05:30",
+  "finished": null
+}
+```
+
+## Errors
+
+Every refusal is `{"error": {"code", "message", "field"}}`; `field` is there when one input is at fault.
+
+| Status | Error code | When |
+| :--- | :--- | :--- |
+| 409 | `invalid_state` | Only a paused broadcast can be resumed. `message` says why. |
+| 404 | `not_found` | No broadcast of this account's has that id. |
+| 403 | `scope_missing` | The key doesn't have the `broadcasts:write` scope. |
+
+Any request can also be refused for its key, its account or its rate (`key_required`, `invalid_key`, `account_suspended`, `plan_excludes_api`, `address_not_allowed`, `rate_limited`); see [the overview](/api-reference/overview).

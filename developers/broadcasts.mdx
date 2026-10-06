@@ -1,0 +1,122 @@
+---
+title: "Broadcasts"
+description: "Send one message to many people on one channel from your own systems, follow it as it goes, and pause, resume or cancel it."
+---
+
+A broadcast sends one message — filled in for each person — to many people on one
+channel. Through the API it is the same broadcast the panel's
+[Broadcasts](/using/broadcasts) screen sends: OMNI checks every number, leaves out
+people who may not be messaged, sends at the channel's pace, and shows it in the panel
+beside the ones your team started.
+
+Use a broadcast when everyone gets the same message on the same channel. To reach one
+person with a fallback to other channels, send a
+[message with failover](/developers/messages-with-failover) instead.
+
+You need a key with **`broadcasts:write`** to start and control broadcasts, and
+**`broadcasts:read`** to follow them (see [Keys and scopes](/developers/keys-and-scopes)).
+
+## Starting one
+
+[POST /v1/broadcasts](/api-reference/broadcasts/create) takes the channel, a name, the
+channel's content, and the audience:
+
+```json
+{
+  "channel": "sms",
+  "name": "Order shipped — 6 Oct",
+  "content": { "text": "Hi {{name}}, order {{order}} is on its way." },
+  "audience": {
+    "recipients": [
+      { "to": "+919876500101", "values": { "name": "Ravi", "order": "A-1042" } },
+      { "to": "+919876500102", "values": { "name": "Asha", "order": "A-1043" } }
+    ]
+  },
+  "purpose": "transactional"
+}
+```
+
+It answers at once, `preparing`; the audience is read and checked on OMNI's side, however
+large it is. Send an `Idempotency-Key` header so a retried request starts it only once.
+
+### What each channel sends
+
+`content` is the channel's own, with the same names
+[messages with failover](/developers/messages-with-failover#what-to-send-templates-and-content)
+use. `{{tags}}` in it are filled for each person.
+
+| Channel | `content` |
+| :--- | :--- |
+| SMS | `text`, and `sender` — one of your sender IDs. |
+| WhatsApp | `template` (an approved template's name), `language`, and `params` — its `{{1}}`, `{{2}}`… in order. Broadcasts on WhatsApp go as approved templates. |
+| RCS | `template` (approved on the bots your routes use) and its `values` by name. Each number goes through the bot its country routes to. |
+| Voice | `ivr` (a published outbound IVR), `caller_id`, and `values` the IVR says back. Needs your own Voice organisation. |
+
+### Who it goes to
+
+Give one kind of audience:
+
+- **`recipients`** — up to 10,000 numbers, each with the `values` for its `{{tags}}`. The
+  way to send what your own system has worked out per person.
+- **`contacts`, `segments` and `numbers`** — your saved contacts (up to 500 by id), whole
+  segments (up to 50), and up to 500 more numbers. A contact's name, number and fields
+  fill the tags: `{{name}}`, `{{msisdn}}`, `{{city}}`…
+- **`audience`** — one of your saved audiences, with
+  [Customer data](/batteries/customer-data).
+
+For more than 10,000 people with values of their own, save them as contacts first and
+send to their segment.
+
+A `{{tag}}` nothing in the audience can fill is refused before anything is sent — it is
+almost always a typo, and a blank would reach everyone.
+
+### Who is left out
+
+Every number is checked the way the panel checks a broadcast:
+
+- Numbers that aren't valid, and repeats, are skipped.
+- People who asked never to be contacted, or opted out, are skipped — of marketing when
+  `purpose` is `marketing` (the default), of everything when they stopped everything.
+- On RCS, a number whose country has no route, or whose bot hasn't approved the template,
+  is skipped.
+
+`counts.skipped` says how many; the rest are sent.
+
+## Following it
+
+[GET /v1/broadcasts/\{broadcast_id\}](/api-reference/broadcasts/get) gives its status and
+counts — skipped, sent, delivered, failed, waiting — and
+[its messages](/api-reference/broadcasts/messages) say how each one ended.
+[GET /v1/broadcasts](/api-reference/broadcasts/list) lists them all, the panel's too.
+
+Rather than asking, subscribe a [webhook endpoint](/developers/webhooks) to:
+
+| Event | When |
+| :--- | :--- |
+| `broadcast.scheduled` | It is ready and waiting for `scheduled_for`. |
+| `broadcast.sending` | It started sending. |
+| `broadcast.paused` | It was paused. |
+| `broadcast.resumed` | It was resumed. |
+| `broadcast.sent` | It finished: every message it could send was handed to the channel. |
+| `broadcast.failed` | It couldn't be sent — nobody reachable, or every message refused. |
+| `broadcast.canceled` | It was canceled. |
+
+Each carries the broadcast, as `broadcast`, in the shape GET answers. Each message also
+sends its own `channel_message.*` events, with the broadcast's id in `campaign`.
+
+## Pausing, resuming and canceling
+
+| To | Call | When it can |
+| :--- | :--- | :--- |
+| Pause | [POST …/pause](/api-reference/broadcasts/pause) | While it is preparing, queued or sending. |
+| Resume | [POST …/resume](/api-reference/broadcasts/resume) | When paused. It carries on from where it stopped. |
+| Cancel | [POST …/cancel](/api-reference/broadcasts/cancel) | Until it has finished. What was sent stays sent. |
+| Send now | [POST …/send-now](/api-reference/broadcasts/send-now) | When scheduled. |
+
+Asking for one at the wrong moment — pausing a finished broadcast, say — is refused with
+`invalid_state` (409), and the message says why.
+
+<Note>
+An account sends a few broadcasts at a time; others wait their turn, `queued`. A
+broadcast's messages are charged like any other send.
+</Note>

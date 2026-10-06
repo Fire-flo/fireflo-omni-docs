@@ -1,0 +1,90 @@
+---
+title: "GET /v1/broadcasts/{broadcast_id}/messages"
+description: "Each message a broadcast sent: who it went to and how it ended."
+---
+
+Each message a broadcast sent, newest first: the number, what it said, and how it ended. Each also arrives as a `channel_message.*` [webhook event](/api-reference/scopes-and-events#webhook-events) carrying the broadcast's id in `campaign`.
+
+<Note>Needs the `broadcasts:read` scope.</Note>
+
+## Path parameters
+
+| Field | Type | Required | Notes |
+| :--- | :--- | :--- | :--- |
+| `broadcast_id` | string | Yes | The broadcast's id. |
+
+## Query parameters
+
+| Field | Type | Required | Notes |
+| :--- | :--- | :--- | :--- |
+| `status` | string | No | `queued`, `pending`, `sent`, `delivered`, `read`, `replied` or `failed`. |
+| `limit` | integer | No | 1 to 100; 50 by default. |
+| `starting_after` | string | No | The last id of the previous page. |
+
+## Request
+
+<CodeGroup>
+
+```bash cURL
+curl "https://api.fireflo.au/v1/broadcasts/7c1e9b52-3f0a-4d8e-9b6c-2a5d4e1f8c33/messages?status=failed" \
+  -H "Authorization: Bearer $OMNI_API_KEY"
+```
+
+```python Python
+import os
+
+import requests
+
+response = requests.get(
+    "https://api.fireflo.au/v1/broadcasts/7c1e9b52-3f0a-4d8e-9b6c-2a5d4e1f8c33/messages?status=failed",
+    headers={"Authorization": f"Bearer {os.environ['OMNI_API_KEY']}"},
+)
+print(response.status_code, response.json())
+```
+
+```javascript Node
+const response = await fetch("https://api.fireflo.au/v1/broadcasts/7c1e9b52-3f0a-4d8e-9b6c-2a5d4e1f8c33/messages?status=failed", {
+  headers: { Authorization: `Bearer ${process.env.OMNI_API_KEY}` },
+});
+console.log(response.status, await response.json());
+```
+
+</CodeGroup>
+
+## Response
+
+`200 OK` — each message as the [channel_message events](/developers/webhooks) show it.
+
+```json
+{
+  "data": [
+    {
+      "id": "cm_918273",
+      "channel": "whatsapp",
+      "direction": "outbound",
+      "to": "+919876500102",
+      "from": "+918045678900",
+      "status": "failed",
+      "text": "[template diwali_offer] Asha, 20%",
+      "error": "Not a WhatsApp number",
+      "campaign": "7c1e9b52-3f0a-4d8e-9b6c-2a5d4e1f8c33",
+      "created": "2026-10-06T09:13:02+05:30",
+      "status_at": "2026-10-06T09:13:05+05:30"
+    }
+  ],
+  "has_more": false,
+  "next": null
+}
+```
+
+## Errors
+
+Every refusal is `{"error": {"code", "message", "field"}}`; `field` is there when one input is at fault.
+
+| Status | Error code | When |
+| :--- | :--- | :--- |
+| 404 | `not_found` | No broadcast of this account's has that id. |
+| 400 | `invalid_request` | `limit` or `starting_after` isn't one. |
+| 403 | `scope_missing` | The key doesn't have the `broadcasts:read` scope. |
+
+Any request can also be refused for its key, its account or its rate (`key_required`, `invalid_key`, `account_suspended`, `plan_excludes_api`, `address_not_allowed`, `rate_limited`); see [the overview](/api-reference/overview).

@@ -171,6 +171,7 @@
                 "group": "Guides",
                 "pages": [
                   "developers/messages-with-failover",
+                  "developers/broadcasts",
                   "developers/webhooks",
                   "developers/contacts-and-consent",
                   "developers/conversations",
@@ -199,6 +200,19 @@
                   "api-reference/messages/list",
                   "api-reference/messages/get",
                   "api-reference/messages/cancel"
+                ]
+              },
+              {
+                "group": "Broadcasts",
+                "pages": [
+                  "api-reference/broadcasts/create",
+                  "api-reference/broadcasts/list",
+                  "api-reference/broadcasts/get",
+                  "api-reference/broadcasts/messages",
+                  "api-reference/broadcasts/pause",
+                  "api-reference/broadcasts/resume",
+                  "api-reference/broadcasts/cancel",
+                  "api-reference/broadcasts/send-now"
                 ]
               },
               {

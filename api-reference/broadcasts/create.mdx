@@ -1,0 +1,205 @@
+---
+title: "POST /v1/broadcasts"
+description: "Send one message to many people on one channel — prepared, screened and paced like a broadcast from the panel."
+---
+
+Starts a broadcast: one message, filled in for each person, to many people on one channel. OMNI prepares it — checking every number, skipping people who opted out, asked not to be contacted or may not be reached on this channel — then sends it at the channel's pace, now or at `scheduled_for`. It is the same broadcast the panel sends, and shows there too.
+
+<Note>Needs the `broadcasts:write` scope.</Note>
+
+## Body
+
+| Field | Type | Required | Notes |
+| :--- | :--- | :--- | :--- |
+| `channel` | string | Yes | `sms`, `whatsapp`, `rcs` or `firetone` (Voice) — one the account has and has set up. |
+| `name` | string | Yes | What the broadcast is called, here and in the panel. Up to 200 characters. |
+| `content` | object | Yes | What the channel sends — below. `{{tags}}` in it are filled per recipient. |
+| `audience` | object | Yes | Who it goes to — below. One kind of audience per broadcast. |
+| `purpose` | string | No | `marketing` (the default) or `transactional`: which consent it is checked against. |
+| `scheduled_for` | string | No | An ISO time to send it at, from 2 minutes to 30 days ahead. Now when left out. |
+
+`content`, per channel:
+
+| Channel | Fields |
+| :--- | :--- |
+| SMS | `text` — the message; `sender` — one of your sender IDs (your default otherwise). |
+| WhatsApp | `template` — an approved template's name; `language` (default `en`); `params` — its `{{1}}`, `{{2}}`… in order. |
+| RCS | `template` — an RCS template's name or id, approved on your bots; `values` — its variables by name. |
+| Voice | `ivr` — one of your published outbound IVRs ([GET /v1/calls/targets](/api-reference/calls/targets)); `caller_id` — one of your numbers; `values` — what the IVR says back, by tag. Needs your own Voice organisation. |
+
+`audience`, one of:
+
+| Kind | Fields |
+| :--- | :--- |
+| Recipients | `recipients` — up to 10,000 `{ "to", "values" }`: a number with its country code, and the text for each `{{tag}}` for that person. |
+| Saved contacts | `contacts` (up to 500 contact ids), `segments` (up to 50 names) and `numbers` (up to 500 more numbers), in any mix. A contact's name, number and fields fill `{{tags}}`. |
+| A saved audience | `audience` — an audience's id, with Customer data. |
+
+Send an `Idempotency-Key` header to start it once however often the request is retried.
+
+## Request
+
+<CodeGroup>
+
+```bash cURL
+curl -X POST "https://api.fireflo.au/v1/broadcasts" \
+  -H "Authorization: Bearer $OMNI_API_KEY" \
+  -H "Content-Type: application/json" \
+  -H "Idempotency-Key: diwali-2026" \
+  -d '{
+  "channel": "whatsapp",
+  "name": "Diwali offer",
+  "content": {
+    "template": "diwali_offer",
+    "language": "en",
+    "params": [
+      "{{name}}",
+      "20%"
+    ]
+  },
+  "audience": {
+    "recipients": [
+      {
+        "to": "+919876500101",
+        "values": {
+          "name": "Ravi"
+        }
+      },
+      {
+        "to": "+919876500102",
+        "values": {
+          "name": "Asha"
+        }
+      }
+    ]
+  },
+  "purpose": "marketing"
+}'
+```
+
+```python Python
+import os
+
+import requests
+
+response = requests.post(
+    "https://api.fireflo.au/v1/broadcasts",
+    headers={
+        "Authorization": f"Bearer {os.environ['OMNI_API_KEY']}",
+        "Idempotency-Key": "diwali-2026",
+    },
+    json={
+    "channel": "whatsapp",
+    "name": "Diwali offer",
+    "content": {
+        "template": "diwali_offer",
+        "language": "en",
+        "params": [
+            "{{name}}",
+            "20%"
+        ]
+    },
+    "audience": {
+        "recipients": [
+            {
+                "to": "+919876500101",
+                "values": {
+                    "name": "Ravi"
+                }
+            },
+            {
+                "to": "+919876500102",
+                "values": {
+                    "name": "Asha"
+                }
+            }
+        ]
+    },
+    "purpose": "marketing"
+},
+)
+print(response.status_code, response.json())
+```
+
+```javascript Node
+const response = await fetch("https://api.fireflo.au/v1/broadcasts", {
+  method: "POST",
+  headers: {
+    Authorization: `Bearer ${process.env.OMNI_API_KEY}`,
+    "Content-Type": "application/json",
+    "Idempotency-Key": "diwali-2026",
+  },
+  body: JSON.stringify({
+  "channel": "whatsapp",
+  "name": "Diwali offer",
+  "content": {
+    "template": "diwali_offer",
+    "language": "en",
+    "params": [
+      "{{name}}",
+      "20%"
+    ]
+  },
+  "audience": {
+    "recipients": [
+      {
+        "to": "+919876500101",
+        "values": {
+          "name": "Ravi"
+        }
+      },
+      {
+        "to": "+919876500102",
+        "values": {
+          "name": "Asha"
+        }
+      }
+    ]
+  },
+  "purpose": "marketing"
+}),
+});
+console.log(response.status, await response.json());
+```
+
+</CodeGroup>
+
+## Response
+
+`201 Created` — the broadcast, `preparing` while its audience is read. Follow it with [GET /v1/broadcasts/\{broadcast_id\}](/api-reference/broadcasts/get), or the `broadcast.*` [webhook events](/api-reference/scopes-and-events#webhook-events).
+
+```json
+{
+  "id": "7c1e9b52-3f0a-4d8e-9b6c-2a5d4e1f8c33",
+  "name": "Diwali offer",
+  "channel": "whatsapp",
+  "status": "preparing",
+  "purpose": "marketing",
+  "recipients": 2,
+  "counts": {
+    "skipped": 0,
+    "sent": 0,
+    "delivered": 0,
+    "failed": 0,
+    "waiting": 2
+  },
+  "percent": 0,
+  "error": "",
+  "scheduled_for": null,
+  "created": "2026-10-06T09:12:04+05:30",
+  "started": null,
+  "finished": null
+}
+```
+
+## Errors
+
+Every refusal is `{"error": {"code", "message", "field"}}`; `field` is there when one input is at fault.
+
+| Status | Error code | When |
+| :--- | :--- | :--- |
+| 400 | `invalid_request` | Something in the request can't be sent: `field` names `name`, `content`, `audience`, `purpose` or `scheduled_for`. For example a `{{tag}}` nothing in the audience fills, a template that isn't approved, more than 10,000 recipients, or two kinds of audience at once. |
+| 400 | `channel_unavailable` | The channel isn't one the account has, isn't set up, or can't be broadcast to. |
+| 403 | `scope_missing` | The key doesn't have the `broadcasts:write` scope. |
+
+Any request can also be refused for its key, its account or its rate (`key_required`, `invalid_key`, `account_suspended`, `plan_excludes_api`, `address_not_allowed`, `rate_limited`); see [the overview](/api-reference/overview).

@@ -6,6 +6,216 @@
     "description": "One API for every channel and service in FireFlo OMNI."
   },
   "paths": {
+    "/v1/broadcasts": {
+      "get": {
+        "operationId": "list_broadcasts",
+        "description": "The account's broadcasts, newest first — sent from the panel or the API. Filter by status or channel.",
+        "tags": [
+          "broadcasts"
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "post": {
+        "operationId": "create_broadcast",
+        "description": "Send one message to many people on one channel: inline recipients with the values for their {{tags}}, saved contacts and segments, or a saved audience. It is prepared, screened for consent, quiet hours and stops, and sent at the channel's pace — now, or at scheduled_for.",
+        "tags": [
+          "broadcasts"
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/broadcasts/{broadcast_id}": {
+      "get": {
+        "operationId": "get_broadcast",
+        "description": "One broadcast: its status, how many recipients it has, and how many were skipped, sent, delivered, failed or are still waiting.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "broadcast_id",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "tags": [
+          "broadcasts"
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/broadcasts/{broadcast_id}/cancel": {
+      "post": {
+        "operationId": "cancel_broadcast",
+        "description": "Cancel a broadcast with messages still to send: what was sent stays sent, and the rest are closed as never sent.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "broadcast_id",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "tags": [
+          "broadcasts"
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/broadcasts/{broadcast_id}/messages": {
+      "get": {
+        "operationId": "list_broadcast_messages",
+        "description": "Each message a broadcast sent: who it went to and how it ended, newest first. Filter by status: queued, sent, delivered, read, failed…",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "broadcast_id",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "tags": [
+          "broadcasts"
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/broadcasts/{broadcast_id}/pause": {
+      "post": {
+        "operationId": "pause_broadcast",
+        "description": "Pause a broadcast that hasn't finished; nothing goes until it resumes.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "broadcast_id",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "tags": [
+          "broadcasts"
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/broadcasts/{broadcast_id}/resume": {
+      "post": {
+        "operationId": "resume_broadcast",
+        "description": "Resume a paused broadcast: it carries on from where it stopped.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "broadcast_id",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "tags": [
+          "broadcasts"
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/broadcasts/{broadcast_id}/send-now": {
+      "post": {
+        "operationId": "send_broadcast_now",
+        "description": "Send a scheduled broadcast now instead of at its time.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "broadcast_id",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "tags": [
+          "broadcasts"
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
     "/v1/calls": {
       "get": {
         "operationId": "list_calls",

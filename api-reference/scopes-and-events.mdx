@@ -25,6 +25,8 @@ A key may only do what its scopes allow; anything else is refused with `scope_mi
 | `calls:read` | See calls, what was said on them, and what a call can go into |
 | `calls:write` | Ring people into an IVR or have a voice agent call them |
 | `usage:read` | See what was sent, received and called, and what it cost |
+| `broadcasts:read` | See broadcasts, how they are going and the messages they sent |
+| `broadcasts:write` | Start broadcasts, and pause, resume, cancel or send them now |
 | `webhooks:read` | See webhook endpoints and what was sent to them |
 | `webhooks:write` | Add, change and remove webhook endpoints |
 
@@ -73,5 +75,12 @@ How they are delivered, signed and retried: [Webhooks](/developers/webhooks).
 | `call.ended` | `call` | A call ended after being answered |
 | `call.failed` | `call` | A call you placed wasn't answered |
 | `call.missed` | `call` | A call rang in and nobody took it |
+| `broadcast.scheduled` | `broadcast` | A broadcast is ready and waiting for its time |
+| `broadcast.sending` | `broadcast` | A broadcast started sending |
+| `broadcast.paused` | `broadcast` | A broadcast was paused |
+| `broadcast.resumed` | `broadcast` | A paused broadcast was resumed |
+| `broadcast.sent` | `broadcast` | A broadcast finished: every message was handed to the channel |
+| `broadcast.failed` | `broadcast` | A broadcast couldn't be sent |
+| `broadcast.canceled` | `broadcast` | A broadcast was canceled |
 | `report.delivered` | `report`, `schedule`, `period`, `columns`, `totals`, `rows`, `file` | A [scheduled report](/developers/reports#scheduled-reports-to-your-webhooks) was sent — with Analytics |
 | `webhook.test` | `endpoint` | A test, sent from the endpoint's screen or the API |
