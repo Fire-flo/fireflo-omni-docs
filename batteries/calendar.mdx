@@ -142,6 +142,12 @@ How reminders go on each channel:
 
 Calendar does not send on RCS or Voice.
 
+With the [OMNI API](/developers/overview) in your deployment, a message to a contact that
+isn't **delivered** within 15 minutes goes on the next channel — a reminder WhatsApp took
+but couldn't deliver goes out as SMS, if its text matches a DLT template. A reminder no
+channel delivers before the appointment starts shows as failed, with why. Each reminder
+shows the channel it finally went on.
+
 ### Confirmations and no-shows
 
 - **Ask contacts to confirm** — on WhatsApp, with Confirm, Reschedule and Cancel buttons.

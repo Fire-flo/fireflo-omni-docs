@@ -304,7 +304,8 @@
                   "api-reference/webhooks/delete",
                   "api-reference/webhooks/rotate-secret",
                   "api-reference/webhooks/test",
-                  "api-reference/webhooks/deliveries"
+                  "api-reference/webhooks/deliveries",
+                  "api-reference/webhooks/resend"
                 ]
               },
               {

@@ -76,9 +76,30 @@ console.log(response.status, await response.json());
       "succeed_on": "delivered",
       "within": 900
     }
+  ],
+  "channels": [
+    {
+      "key": "whatsapp",
+      "label": "WhatsApp",
+      "goals": ["sent", "delivered", "read"],
+      "fields": [
+        { "field": "text", "label": "Text", "kind": "text" },
+        { "field": "template", "label": "Template", "kind": "line" }
+      ]
+    },
+    {
+      "key": "sms",
+      "label": "SMS",
+      "goals": ["sent", "delivered"],
+      "fields": [{ "field": "text", "label": "Text", "kind": "text" }]
+    }
   ]
 }
 ```
+
+`builtin_default` is what a message that names no route is tried on: your default route's
+steps, or OMNI's own order while no route is the default. `channels` lists the channels a
+step may name, with the `goals` each can report (abbreviated above).
 
 ## Errors
 

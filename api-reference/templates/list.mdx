@@ -68,11 +68,33 @@ console.log(response.status, await response.json());
         "name",
         "order"
       ],
-      "updated": "2026-10-01T06:12:44.580Z"
+      "updated": "2026-10-01T06:12:44.580Z",
+      "recent_sends": 128
+    }
+  ],
+  "channels": [
+    {
+      "key": "whatsapp",
+      "label": "WhatsApp",
+      "goals": ["sent", "delivered", "read"],
+      "fields": [
+        { "field": "text", "label": "Text", "kind": "text" },
+        { "field": "template", "label": "Template", "kind": "line" }
+      ]
+    },
+    {
+      "key": "sms",
+      "label": "SMS",
+      "goals": ["sent", "delivered"],
+      "fields": [{ "field": "text", "label": "Text", "kind": "text" }]
     }
   ]
 }
 ```
+
+`recent_sends` is how many messages used the template in the last 30 days. `channels`
+lists the channels a variant may be written for, and the fields each takes (abbreviated
+above).
 
 ## Errors
 

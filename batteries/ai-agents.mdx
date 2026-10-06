@@ -140,6 +140,14 @@ stage can narrow them further: an action a stage does not list is off there.
 | **SMS** | Only text that fills in one of your registered DLT templates word for word; only the variable parts change. Anything else is blocked, not sent. When no template fits, the agent drafts one and asks for it to be registered. |
 | **RCS** | Agents do not reply on RCS, because RCS carries approved templates, not typed text. |
 
+An agent's message goes on the channel it was planned for, and stays there: a message
+approved for WhatsApp is never quietly sent as SMS. When a message is time-sensitive, the
+agent may plan a **fallback** — "WhatsApp, then SMS if not delivered in 15 min" — which
+the plan step shows. While editing a plan before approving, × on the fallback takes it
+off. With **Fall back to other channels when a message isn't delivered** on in the agent's
+settings, messages that need no approval go on the agent's next channel when one isn't
+delivered. Fallback needs the [OMNI API](/developers/overview) in your deployment.
+
 Template requests an agent drafts appear under **Template requests** on the Approvals
 screen. Check the wording, then approve to submit it. OMNI checks every 10 minutes
 whether it has been decided; waiting conversations carry on once it is
@@ -177,7 +185,7 @@ replies, a deal changes stage, a follow-up falls due, a person chooses **Run now
 contact, or a workflow block asks for it.
 
 **AI agents → Approvals** lists the plans waiting for a person. You can edit a note or an
-amount, or drop a step, before approving — what you approve is exactly what runs. To
+amount, take off a message's fallback, or drop a step, before approving — what you approve is exactly what runs. To
 reject, tell the agent why; it reads your note the next time it plans for that contact.
 
 An unanswered plan is dropped after a time you set (24 hours by default), not run late.

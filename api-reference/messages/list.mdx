@@ -3,7 +3,7 @@ title: "GET /v1/messages"
 description: "The messages sent through the API, newest first."
 ---
 
-The latest 50 messages sent through the API, newest first, each with every attempt on every channel. Narrow it with `reference` or `status`.
+The latest messages, newest first — 50 unless `limit` says — each with every attempt on every channel. Narrow it with `reference`, `status` or `q`.
 
 <Note>Needs the `messages:read` scope.</Note>
 
@@ -13,6 +13,8 @@ The latest 50 messages sent through the API, newest first, each with every attem
 | :--- | :--- | :--- | :--- |
 | `reference` | string | No | Only messages sent with this `reference`. |
 | `status` | string | No | `delivering`, `postponed`, `succeeded`, `failed`, `expired` or `canceled`. |
+| `q` | string | No | Messages whose reference, number or contact's name contains this. |
+| `limit` | integer | No | How many, from 1 to 100. 50 when left out. |
 
 ## Request
 
@@ -51,7 +53,7 @@ console.log(response.status, await response.json());
 
 ## Response
 
-`200 OK` — `data` holds up to 50 messages, shaped as in [POST /v1/messages](/api-reference/messages/send).
+`200 OK` — `data` holds the messages, shaped as in [GET /v1/messages/\{message_id\}](/api-reference/messages/get) without its `webhooks`; `statuses` lists every status a message can have.
 
 ```json
 {
@@ -103,9 +105,17 @@ console.log(response.status, await response.json());
         }
       ],
       "created": "2026-10-05T09:14:22.413512+00:00",
-      "finished_at": "2026-10-05T09:24:36.710348+00:00"
+      "finished_at": "2026-10-05T09:24:36.710348+00:00",
+      "contact": {
+        "id": "3f6b2a1e-8c4d-4e2a-9b7f-5d1c0e8a9f42",
+        "name": "Ravi Kumar"
+      },
+      "template": "order_shipped",
+      "key": "Billing sync",
+      "source": "api"
     }
-  ]
+  ],
+  "statuses": ["delivering", "postponed", "succeeded", "failed", "expired", "canceled"]
 }
 ```
 

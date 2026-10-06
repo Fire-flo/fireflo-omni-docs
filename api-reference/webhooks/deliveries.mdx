@@ -47,7 +47,7 @@ console.log(response.status, await response.json());
 
 ## Response
 
-`200 OK` — each delivery: `status` is `pending`, `delivered` or `failed`.
+`200 OK` — the latest 100 deliveries, each with the `payload` that was sent: `status` is `pending`, `delivered` or `failed`. Send one again with [POST /v1/webhooks/deliveries/\{delivery_id\}/resend](/api-reference/webhooks/resend).
 
 ```json
 {
@@ -61,7 +61,8 @@ console.log(response.status, await response.json());
       "error": "Answered 503",
       "next_at": "2026-10-05T09:30:12.004Z",
       "delivered_at": null,
-      "created": "2026-10-05T09:24:36.802Z"
+      "created": "2026-10-05T09:24:36.802Z",
+      "payload": { "id": "evt_9e2b…", "event": "message.succeeded", "data": { "message": { "id": "msg_8f14e45fceea167a5a36dedd4bea2543" } } }
     },
     {
       "id": "e9a1c3b5-7d2f-4e6a-8b0c-1f3d5e7a9c24",
@@ -72,7 +73,13 @@ console.log(response.status, await response.json());
       "error": "",
       "next_at": null,
       "delivered_at": "2026-10-05T09:14:23.108Z",
-      "created": "2026-10-05T09:14:22.413Z"
+      "created": "2026-10-05T09:14:22.413Z",
+      "payload": {
+        "id": "evt_4c1f9a7e2b6d4e8a9c3f5b7d1e2a4c6b",
+        "event": "webhook.test",
+        "created": "2026-10-05T09:14:22.413Z",
+        "data": { "endpoint": "c4e8f2a6-1b3d-4c5e-9f7a-8b6d4e2c0a19" }
+      }
     }
   ]
 }

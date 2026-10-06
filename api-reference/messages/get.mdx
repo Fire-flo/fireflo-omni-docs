@@ -97,7 +97,25 @@ console.log(response.status, await response.json());
     }
   ],
   "created": "2026-10-05T09:14:22.413512+00:00",
-  "finished_at": "2026-10-05T09:24:36.710348+00:00"
+  "finished_at": "2026-10-05T09:24:36.710348+00:00",
+  "contact": {
+    "id": "3f6b2a1e-8c4d-4e2a-9b7f-5d1c0e8a9f42",
+    "name": "Ravi Kumar"
+  },
+  "template": "order_shipped",
+  "key": "Billing sync",
+  "source": "api",
+  "expires_at": "2026-10-06T09:14:22.413512+00:00",
+  "next_at": null,
+  "webhooks": [
+    {
+      "event": "message.succeeded",
+      "url": "https://hooks.acmeretail.in/omni",
+      "status": "delivered",
+      "response_status": 200,
+      "created": "2026-10-05T09:24:36.802Z"
+    }
+  ]
 }
 ```
 
@@ -115,6 +133,12 @@ console.log(response.status, await response.json());
 | `steps` | The route it follows: each `{"channel", "succeed_on", "within"}`. |
 | `attempts` | One per channel tried: `step` (from 0), `channel`, `status` (`refused`, `sent`, `delivered`, `read`, `answered`, `failed` or `timed_out`), `code` and `reason` when refused, `channel_message` (the `cm_` id of the message it sent, or null), `call` (the id of the call a Voice step placed, or null), `at`, `updated`. |
 | `created`, `finished_at` | When it was asked for, and when it settled (null until then). |
+| `contact` | The contact it was for, `{"id", "name"}`, or null. |
+| `template` | The name of the template it was written from, or null. |
+| `key` | The name of the key that sent it, or null when OMNI sent it itself. |
+| `source` | Who asked for it: `api` (a key), `code` (a one-time code), `reminder` (a Calendar reminder) or `agent` (an AI agent's message). |
+| `expires_at`, `next_at` | When it stops being tried, and when it is next looked at (while it waits on a channel or on quiet hours). |
+| `webhooks` | What your webhook endpoints were told about it, in order: `event`, `url`, `status`, `response_status`, `created`. Only on this page, not in lists or webhooks. |
 
 An attempt is `refused` when its channel can't take the message now and the next step runs at once. Its `code` says why: `channel_off`, `no_content`, `window_closed` (WhatsApp's 24-hour window is closed and no approved template was given), `no_dlt_match` (the SMS text fills in none of your registered DLT templates), `not_permitted` or `provider_refused`.
 

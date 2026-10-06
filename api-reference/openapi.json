@@ -3465,7 +3465,7 @@
     "/v1/messages": {
       "get": {
         "operationId": "list_messages",
-        "description": "Messages sent through the API, newest first; filter by reference or status.",
+        "description": "Messages sent through the API, newest first; filter by reference, status, or q (a reference, number or contact's name); limit up to 100.",
         "tags": [
           "messages"
         ],
@@ -3501,7 +3501,7 @@
     "/v1/messages/{message_id}": {
       "get": {
         "operationId": "get_message",
-        "description": "One message, with every attempt on every channel.",
+        "description": "One message, with every attempt on every channel and what your webhooks were told about it.",
         "parameters": [
           {
             "in": "path",
@@ -4424,7 +4424,7 @@
     "/v1/webhooks/{endpoint_id}/deliveries": {
       "get": {
         "operationId": "list_webhook_deliveries",
-        "description": "The latest deliveries to an endpoint: each event, its answer and its tries.",
+        "description": "The latest deliveries to an endpoint: each event, what was sent, its answer and its tries.",
         "parameters": [
           {
             "in": "path",
@@ -4489,6 +4489,36 @@
           {
             "in": "path",
             "name": "endpoint_id",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "required": true
+          }
+        ],
+        "tags": [
+          "webhooks"
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/webhooks/deliveries/{delivery_id}/resend": {
+      "post": {
+        "operationId": "resend_webhook_delivery",
+        "description": "Send a delivery again now, as a new delivery with the same event.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "delivery_id",
             "schema": {
               "type": "string",
               "format": "uuid"
