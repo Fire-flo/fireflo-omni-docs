@@ -3,10 +3,10 @@ title: "Reports"
 description: "Run Analytics reports from your own systems and BI tools, count anything a source offers, and receive scheduled reports at your webhooks."
 ---
 
-Everything [Analytics](/batteries/analytics) counts is open to your own systems: list the
+Everything [Analytics](/analytics/reports) counts is open to your own systems: list the
 reports your account can run, run one for any period as JSON or CSV, count anything a
 source offers with a query of your own, and have
-[scheduled reports](/batteries/analytics-schedules) arrive at your webhooks.
+[scheduled reports](/analytics/schedules) arrive at your webhooks.
 
 You need a key with the **`reports:read`** scope (see
 [Keys and scopes](/developers/keys-and-scopes)). Keys made before reports existed don't
@@ -86,7 +86,7 @@ else. A refresh counts towards the key's rate limit like any request.
 
 ## Scheduled reports to your webhooks
 
-A [schedule](/batteries/analytics-schedules) can send its report to your
+A [schedule](/analytics/schedules) can send its report to your
 [webhook endpoints](/developers/webhooks) as a **`report.delivered`** event, signed and
 retried like every other. Add the event to an endpoint first; a schedule can only send
 to webhooks once one listens.

@@ -135,8 +135,6 @@
                 "pages": [
                   "batteries/overview",
                   "batteries/ai-agents",
-                  "batteries/analytics",
-                  "batteries/analytics-schedules",
                   "batteries/knowledge",
                   "batteries/calendar",
                   "batteries/catalogue",
@@ -144,6 +142,15 @@
                   "batteries/pipelines",
                   "batteries/tickets"
                 ]
+              }
+            ]
+          },
+          {
+            "tab": "Analytics",
+            "groups": [
+              {
+                "group": "Analytics",
+                "pages": ["analytics/reports", "analytics/schedules"]
               }
             ]
           },

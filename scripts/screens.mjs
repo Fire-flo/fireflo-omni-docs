@@ -47,9 +47,9 @@ export const SCREENS = [
   { file: "channels/voice-settings", path: "/channels/firetone", as: CALLING },
 
   // Batteries
-  { file: "batteries/analytics", path: "/analytics", as: ACME },
-  { file: "batteries/analytics-new", path: "/analytics/new", as: ACME },
-  { file: "batteries/analytics-schedules", path: "/analytics/schedules?built_in=messages.delivery", as: ACME },
+  { file: "analytics/reports", path: "/analytics", as: ACME },
+  { file: "analytics/designer", path: "/analytics/new", as: ACME },
+  { file: "analytics/schedules", path: "/analytics/schedules?built_in=messages.delivery", as: ACME },
   { file: "batteries/agents-overview", path: "/agents/overview", as: ACME },
   { file: "batteries/agents", path: "/agents", as: ACME },
   { file: "batteries/agent-approvals", path: "/agents/approvals", as: ACME },

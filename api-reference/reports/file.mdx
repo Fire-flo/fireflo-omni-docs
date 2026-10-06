@@ -3,7 +3,7 @@ title: "GET /v1/reports/files/{file_id}"
 description: "A file a scheduled report wrote, CSV or Excel — the one a report.delivered event points to."
 ---
 
-Download a file a [scheduled report](/batteries/analytics-schedules) wrote. A
+Download a file a [scheduled report](/analytics/schedules) wrote. A
 `report.delivered` [webhook event](/developers/reports#scheduled-reports-to-your-webhooks)
 names it in `file` — fetch it when the event's rows are not all of them
 (`rows_complete` is false). Files are kept while they are among the account's most recent
