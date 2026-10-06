@@ -29,3 +29,12 @@ limits.
 with your key. Use a test key there.
 
 Every scope and every webhook event is on [Scopes and events](/api-reference/scopes-and-events).
+
+## Changes
+
+<Note>
+**The voice channel is `voice`.** It was `firetone`: every answer and webhook now says
+`"channel": "voice"`. A request that still names `firetone` — a broadcast's channel, a
+route's step, a message's content or a template's variants — is read as `voice` for now,
+so nothing you send stops working; change what your code compares against.
+</Note>

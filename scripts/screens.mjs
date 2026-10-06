@@ -40,11 +40,11 @@ export const SCREENS = [
   { file: "channels/whatsapp-dashboard", path: "/dashboard/whatsapp", as: ACME },
   { file: "channels/whatsapp-send", path: "/channels/whatsapp/send", as: ACME },
   { file: "channels/whatsapp-templates", path: "/channels/whatsapp/templates", as: ACME },
-  { file: "channels/voice-dashboard", path: "/dashboard/firetone", as: CALLING },
-  { file: "channels/voice-calls", path: "/channels/firetone/calls", as: CALLING },
-  { file: "channels/voice-numbers", path: "/channels/firetone/numbers", as: CALLING },
-  { file: "channels/voice-ivrs", path: "/channels/firetone/ivr", as: CALLING },
-  { file: "channels/voice-settings", path: "/channels/firetone", as: CALLING },
+  { file: "channels/voice-dashboard", path: "/dashboard/voice", as: CALLING },
+  { file: "channels/voice-calls", path: "/channels/voice/calls", as: CALLING },
+  { file: "channels/voice-numbers", path: "/channels/voice/numbers", as: CALLING },
+  { file: "channels/voice-ivrs", path: "/channels/voice/ivr", as: CALLING },
+  { file: "channels/voice-settings", path: "/channels/voice", as: CALLING },
 
   // Batteries
   { file: "analytics/reports", path: "/analytics", as: ACME },

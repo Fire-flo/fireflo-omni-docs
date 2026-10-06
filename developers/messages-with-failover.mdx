@@ -62,7 +62,7 @@ When your account has Voice, a route can end with a call: *WhatsApp, then SMS, t
 them into an IVR, done when answered*.
 
 ```json
-{ "channel": "firetone", "succeed_on": "answered", "within": 120 }
+{ "channel": "voice", "succeed_on": "answered", "within": 120 }
 ```
 
 The call is placed like one from [`POST /v1/calls`](/developers/calls) — screened for
@@ -116,7 +116,7 @@ channel instead of a template — or as well, to change one part of it:
 | SMS | `text` |
 | WhatsApp | Inside the 24-hour window: `text`, and as well `media`, `buttons` or `list` (see [WhatsApp media and buttons](#whatsapp-media-and-buttons)). Outside it: `template`, `language`, `params` — an approved WhatsApp template |
 | RCS | `template` — the name of an RCS template approved on the bot that serves the person's country — and its `values` by name (or `params` in order). The number's country picks the bot; a number with no RCS route, or a template not approved on that bot, is refused (`no_rcs_route`, `not_approved`) and the next step runs |
-| Voice (`firetone`) | `ivr` — the id of one of your IVRs to ring them into — or `voice_agent`, one of your voice agents to call them; and `variables`, what the IVR or agent says back. Ids from [`GET /v1/calls/targets`](/api-reference/calls/targets) |
+| Voice (`voice`) | `ivr` — the id of one of your IVRs to ring them into — or `voice_agent`, one of your voice agents to call them; and `variables`, what the IVR or agent says back. Ids from [`GET /v1/calls/targets`](/api-reference/calls/targets) |
 
 ### WhatsApp media and buttons
 

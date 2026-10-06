@@ -11,7 +11,7 @@ Starts a broadcast: one message, filled in for each person, to many people on on
 
 | Field | Type | Required | Notes |
 | :--- | :--- | :--- | :--- |
-| `channel` | string | Yes | `sms`, `whatsapp`, `rcs` or `firetone` (Voice) — one the account has and has set up. |
+| `channel` | string | Yes | `sms`, `whatsapp`, `rcs` or `voice` (Voice) — one the account has and has set up. |
 | `name` | string | Yes | What the broadcast is called, here and in the panel. Up to 200 characters. |
 | `content` | object | Yes | What the channel sends — below. `{{tags}}` in it are filled per recipient. |
 | `audience` | object | Yes | Who it goes to — below. One kind of audience per broadcast. |

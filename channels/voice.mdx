@@ -3,7 +3,7 @@ title: "Voice"
 description: "What Voice does — numbers, IVRs, click-to-call, voice broadcasts, voice agents and a call log with recordings — how to connect it, and what needs your own voice organisation."
 ---
 
-**Voice** is FireFlo's voice service, run on FireTone. It answers your numbers with
+**Voice** is FireFlo's voice service. It answers your numbers with
 IVRs, rings people from OMNI, keeps a log of every call with its recording, and — on
 your own organisation — runs voice broadcasts and voice agents. Calls sit on each
 contact's timeline beside their messages.
@@ -27,49 +27,49 @@ Calls, Voice agents, Numbers, IVRs and Settings.
 Open **Voice → Settings**. Under **Connection**, choose one of two:
 
 <Tabs>
-  <Tab title="FireFlo's FireTone">
+  <Tab title="FireFlo's Voice">
     Included; nothing to set up. You call through FireFlo's organisation, on the numbers
     FireFlo gives your account. FireFlo also designs your IVRs, sets each person's phone
     extension and connects your full call log — ask support@fireflo.au.
   </Tab>
-  <Tab title="My own FireTone">
+  <Tab title="My own Voice">
     Your organisation's own numbers, phones, IVRs and voice agents, and its own bill.
-    Enter, from FireTone:
+    Enter, from Voice:
 
-    - the **Integration key** (FireTone → Developer → API keys → New key). It needs the
+    - the **Integration key** (Voice → Developer → API keys → New key). It needs the
       click-to-call, read calls, campaigns and webhooks permissions, and OMNI's address
-      among the key's allowed addresses, or FireTone refuses it.
-    - the **Callback signing secret** (FireTone → Developer → Webhooks & callbacks). It is
+      among the key's allowed addresses, or Voice refuses it.
+    - the **Callback signing secret** (Voice → Developer → Webhooks & callbacks). It is
       shown once, when it is made.
-    - a **Caller ID** (optional) — one of your FireTone numbers, for calls to show as
+    - a **Caller ID** (optional) — one of your Voice numbers, for calls to show as
       coming from.
 
     **Save and test** checks the key straight away.
   </Tab>
 </Tabs>
 
-**Events from FireTone** shows whether FireTone has been heard from — how a call's
+**Events from Voice** shows whether Voice has been heard from — how a call's
 answer, end and recording reach OMNI. It is sent with every call automatically; there is
 nothing to paste anywhere.
 
-<Frame caption="Voice settings: the connection and the events heard from FireTone.">
+<Frame caption="Voice settings: the connection and the events heard from Voice.">
   <img src="/images/channels/voice-settings.png" alt="The Voice settings page" />
 </Frame>
 
 ## What needs your own voice organisation
 
 Most of Voice works the same on either connection. Two features need **your own
-FireTone organisation**, because FireTone bills the organisation that places the calls:
+Voice organisation**, because Voice bills the organisation that places the calls:
 
 - **Voice broadcasts** — ringing a whole audience into an IVR.
 - **Voice agents** — an AI voice that calls a contact for you.
 
-On FireFlo's organisation, Voice in a broadcast reads "Needs your own FireTone
+On FireFlo's organisation, Voice in a broadcast reads "Needs your own Voice
 organisation", and **Voice → Voice agents** explains how to connect it.
 
 The rest differs only in who does what:
 
-| | Your own FireTone | FireFlo's FireTone |
+| | Your own Voice | FireFlo's Voice |
 | :--- | :--- | :--- |
 | **Numbers** | Every number in your organisation, with its monthly rental | The numbers FireFlo gave your account; rental not shown |
 | **Where a number's calls go** | One of your IVRs, an extension or another number | One of your IVRs; anything else is set by FireFlo |
@@ -82,7 +82,7 @@ The rest differs only in who does what:
 
 **Voice → Dashboard** reports on the call log over 24 hours, 7 or 30 days: **Calls** (in
 and out, with the change on the period before), **Answered** %, **Missed**, and **Talk
-time** with the average length. On your own organisation it adds what FireTone charged.
+time** with the average length. On your own organisation it adds what Voice charged.
 
 A chart shows incoming, outgoing and missed calls per hour or day, and the breakdowns
 show calls and answers **by kind**, **by your number**, **by IVR** and **by agent** (a

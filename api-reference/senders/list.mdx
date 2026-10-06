@@ -14,7 +14,7 @@ Everything your messages and calls can come from, on every channel you have, in 
 | `channel` | string | No | Only this channel's: one the account has, e.g. `sms`. |
 | `status` | string | No | `approved`, `pending`, `rejected`, `withdrawn`, `active` or `inactive`. |
 
-Each sender has `channel`, `id`, `kind` (`sender_id`, `number` or `bot`), `value` (what the person sees), `name`, `status`, `default` (used when a send names none) and `details`, which depend on the channel: an SMS sender ID's `reason` for a decision, whether a WhatsApp number is FireFlo's `shared` one, an RCS bot's `category` and `countries`, where a Voice number's `calls_go_to`. Voice appears as the channel `firetone`.
+Each sender has `channel`, `id`, `kind` (`sender_id`, `number` or `bot`), `value` (what the person sees), `name`, `status`, `default` (used when a send names none) and `details`, which depend on the channel: an SMS sender ID's `reason` for a decision, whether a WhatsApp number is FireFlo's `shared` one, an RCS bot's `category` and `countries`, where a Voice number's `calls_go_to`. Voice appears as the channel `voice`.
 
 ## Request
 
@@ -85,7 +85,7 @@ console.log(response.status, await response.json());
   ],
   "unavailable": [
     {
-      "channel": "firetone",
+      "channel": "voice",
       "message": "Voice can't be asked right now. Try again shortly."
     }
   ]

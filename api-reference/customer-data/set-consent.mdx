@@ -17,7 +17,7 @@ Records a change to a contact's consent: an opt-in, a stop, or back to the accou
 
 | Field | Type | Required | Notes |
 | :--- | :--- | :--- | :--- |
-| `channel` | string | Yes | A channel people can stop — `sms`, `whatsapp`, `rcs` or `firetone` (Voice), those your account has — or `all`. |
+| `channel` | string | Yes | A channel people can stop — `sms`, `whatsapp`, `rcs` or `voice` (Voice), those your account has — or `all`. |
 | `purpose` | string | Yes | `marketing`, `transactional` or `all`. |
 | `status` | string | Yes | `granted` (opted in), `revoked` (stopped) or `cleared` (back to the account's default). |
 | `proof` | string | Yes | What they said, and where. Up to 500 characters; kept with the change. |
