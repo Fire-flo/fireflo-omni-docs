@@ -493,6 +493,7 @@
                   "operators/pricing",
                   "operators/channel-connections",
                   "operators/modules",
+                  "operators/archive",
                   "operators/domains-and-email",
                   "operators/resellers"
                 ]

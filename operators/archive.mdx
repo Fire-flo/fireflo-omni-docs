@@ -1,0 +1,254 @@
+---
+title: "Archive and table health"
+description: "How the Archive keeps old records as files instead of losing them, how long each kind of record stays, how to find and download archived records, how to read the database's health, and how to rehearse a busy day."
+---
+
+OMNI writes a lot: every message, delivery report, call, API request and webhook
+delivery. Kept forever, those tables grow until the panel slows down. The **Archive**
+keeps them in check:
+
+- Old records are written to **files** before they leave the database, so nothing is
+  lost. You can still find and download them.
+- Every kind of record has a **policy**: how long it stays in the database.
+- **Health** shows how the database's tables are holding up, with warnings that say what
+  to do.
+- **Drill** rehearses a busy day, so you know how the panel copes before your customers
+  find out.
+
+Everything is under **Platform → Archive**, for platform staff only. Customers never see
+it.
+
+<Note>
+  The Archive is an optional module. Without it, records past their retention period
+  are still deleted on schedule, as they always were. They are simply gone.
+</Note>
+
+## Where archived records go
+
+Archived records go to an **S3-compatible bucket** (Amazon S3, Cloudflare R2, MinIO,
+DigitalOcean Spaces and the like) when one is set. Without one, they go to the server's
+own disk. The **Stored** figure on the Overview says which, and warns when it's the disk.
+
+Records are stored by kind, by account and by month. Each file is compressed JSON, one
+record per line, and comes with a small lookup index and a checksum. The database keeps
+only the list of files, never the records themselves.
+
+## How long records stay
+
+Each kind of record has a policy. Some kinds already had their own schedule before the
+Archive, and they keep it: the Archive keeps their records as that schedule deletes them.
+The others are trimmed by the Archive itself, each night.
+
+| Records | Kept in the database | Who removes them |
+| :--- | :--- | :--- |
+| Messages, broadcast recipients and Inbox actions | 12 months | Their own schedule |
+| Contact events | 12 months, a month at a time | Their own schedule |
+| API request log | 30 days | Their own schedule |
+| AI agents' activity | 180 days | Their own schedule |
+| Pipeline activity | 365 days | Their own schedule |
+| Webhook deliveries | 90 days; never while still being retried | The Archive |
+| API messages and their attempts | 180 days; only finished ones | The Archive |
+| Calls and Voice receipts | 12 months | The Archive |
+| AI plans' steps | 180 days; only for plans that are over | The Archive |
+| Workflow runs | 180 days; only finished or failed ones | The Archive |
+| Billing ledger and usage charges | Copied after 24 months, **never removed** | The Archive |
+
+A kind of record appears only when the module it belongs to is installed: no Voice, no
+calls. The billing ledger and usage charges are only copied, for safekeeping. They stay in
+the database for good.
+
+### What your customers notice
+
+<Warning>
+  Records the Archive removes no longer show in the panel or the OMNI API. Before you
+  install the Archive, tell your customers:
+
+  - an endpoint's **webhook delivery** history covers the last **90 days**;
+  - **API messages** (`GET /v1/messages`) go back **180 days**;
+  - **call history** goes back **12 months**.
+</Warning>
+
+**Usage figures don't change.** Calls, call minutes, API requests and errors, and AI
+tokens are counted once a day, and the panel, reports and `GET /v1/usage` read past days
+from those counts. A day is always counted before any of its records are removed, so a
+figure never shrinks because the records behind it were archived.
+
+### The nightly run
+
+Each night at **04:10** (India time), after the other scheduled clean-ups, the Archive
+works through its tables:
+
+- Records past their policy are written to files, then removed, in batches.
+- The billing ledger and usage charges are copied from where the last copy ended.
+- The run stops after **45 minutes** and carries on the next night.
+
+If a file can't be written (the bucket refuses, the disk is full), **nothing is
+removed**: the records stay for the next night. The run is marked failed, and every
+staff member gets a notice.
+
+### Changing a policy
+
+You can change a policy only for the kinds of record the Archive removes itself. Kinds
+with their own schedule show it, and keep it.
+
+<Steps>
+  <Step title="Open the policy">
+    On the **Overview**, select **Change** on its row.
+  </Step>
+  <Step title="Set the days">
+    Enter how many days records stay in the database, then select **Save**. The form
+    says what the panel loses when they go.
+  </Step>
+</Steps>
+
+To stop archiving a kind of record for now, switch on **Pause archiving this table**.
+**Back to the default** returns to the module's own policy.
+
+## The Overview
+
+<CardGroup cols={2}>
+  <Card title="Stored" icon="box-archive">
+    How much is archived, and where: the bucket or the server's disk.
+  </Card>
+  <Card title="Rows archived" icon="layer-group">
+    Records archived so far, and in how many files.
+  </Card>
+  <Card title="Last night" icon="moon">
+    What last night's run archived, and how long it took.
+  </Card>
+  <Card title="Next run" icon="clock">
+    When the next run starts.
+  </Card>
+</CardGroup>
+
+**Policies** lists every kind of record with its policy, how many records the table holds
+now, its oldest record, and how many have been archived. The status says how it stands:
+
+| Status | What it means |
+| :--- | :--- |
+| **Up to date** | Nothing is more than a couple of nights past its policy. |
+| **N days behind** | The oldest record is N days past its policy: the nightly run isn't keeping up. Shorten the policy, or see Health. |
+| **Kept as pruned** | Its own schedule removes it; the Archive keeps what it removes. |
+| **Copied** | Copied for safekeeping, never removed. |
+| **Paused** | Archiving is paused for this kind. |
+
+**Runs** lists the last 20 runs: each night's run, and each day's hand-over as other
+schedules removed records. Each shows what it archived and removed, how long it took, and
+why it failed if it did.
+
+## Finding and downloading archived records
+
+**Records** looks inside the archive without downloading it.
+
+<Steps>
+  <Step title="Choose where to look">
+    Pick the **Table**, then the **Account** whose records to look in, and the months:
+    **From** and **To**.
+  </Step>
+  <Step title="Say what you're looking for">
+    Pick what to **Find by**, such as a number, an id or a reference. The choices
+    depend on the kind of record. Enter the **Value**, then select **Look up**.
+  </Step>
+  <Step title="Open a record">
+    Up to 50 matches are listed, newest month first. Select **View** to see a record
+    whole.
+  </Step>
+</Steps>
+
+A lookup reads only the small index beside each file, then the lines it points at. It's
+quick even across many months. Narrow the months when there are more than 50 matches.
+
+**Files** lists each archived month for that table and account, with its records, size
+and where it's stored. Select **Download** to get the month as one compressed file, with
+one record per line in JSON. Each part of the month is checked against its checksum as
+it downloads; a part that doesn't match stops the download.
+
+## Health
+
+**Health** reads the database's own statistics:
+
+- **Database**: its size, tables and indexes apart.
+- **Growing**: how much it grows a day, over the last fortnight.
+- **Until** a size you set: how many days before the database reaches it, at that pace.
+  The size is a deployment setting (600 GB unless you change it; see below).
+- **Warnings**, and how many need someone.
+
+**Growth** charts the database's size each day, from a snapshot taken every night at
+04:50. The chart and the daily figures start once two snapshots are in.
+
+**Tables** lists the 15 largest tables with their rows, size, index size, daily growth,
+share of dead rows, last vacuum, and how many of their reads used an index.
+
+### Warnings
+
+| Warning | What to do |
+| :--- | :--- |
+| **Grows faster than it is archived** | The nightly run stops at its time limit before catching up. Shorten the policy. |
+| **Full scans since yesterday** | A big table is being read end to end, many times a day. A query is missing an index; contact support@fireflo.au. |
+| **Of its rows are dead** | Deleted and updated rows haven't been cleared. The database's automatic vacuum may need to run more often for that table. |
+| **Has never been used** | A large index that no read uses, but every write pays for. |
+
+## Drill: rehearsing a busy day
+
+**Drill** shows how the panel copes with a day of heavy traffic, without risking anything.
+
+<Steps>
+  <Step title="Set the volumes">
+    Enter how many records of each kind to write: messages, contact events, API
+    requests, webhook deliveries and calls. Each kind appears only when its module is
+    installed. Up to 20 million of each.
+  </Step>
+  <Step title="Run the drill">
+    Select **Run the drill**. The page refreshes while it runs.
+  </Step>
+  <Step title="Read the results">
+    **Written** shows how fast each kind was written, in rows a second. The screens
+    table shows how long the panel's heavy screens took at that size against what they
+    should take (the Inbox, a contact's timeline, a broadcast's delivery report, the
+    message log, the 30-day dashboard and the contacts list). Slow ones are marked.
+  </Step>
+</Steps>
+
+The drill writes into a **scratch account of its own** that is never billed. Nothing is
+sent, dialled or delivered to a webhook. When it finishes, everything it wrote is
+removed, even if it failed or was stopped.
+
+A drill is **refused while real traffic is busy**: above 40,000 messages an hour unless
+you change it (see below). The page shows the current rate. If traffic climbs past the
+limit during a drill, the drill stops and clears up. Only one drill runs at a time.
+
+## Settings
+
+These are set on the server, by whoever runs your deployment.
+
+| Setting | What it does |
+| :--- | :--- |
+| `ARCHIVE_S3_BUCKET` | The bucket to archive to. Without it, files go to the server's disk. |
+| `ARCHIVE_S3_ENDPOINT` | The bucket's address, for anything other than Amazon S3. |
+| `ARCHIVE_S3_REGION` | The bucket's region, where the service needs one. |
+| `ARCHIVE_S3_ACCESS_KEY`, `ARCHIVE_S3_SECRET_KEY` | The key the Archive writes and reads with. |
+| `ARCHIVE_DB_SIZE_ALERT_GB` | The database size Health counts the days to. 600 unless set. |
+| `ARCHIVE_DRILL_MAX_LIVE_RATE` | Messages an hour above which a drill is refused or stopped. 40,000 unless set. |
+
+The periods kept by the records with their own schedule are deployment settings too:
+`MESSAGE_RETENTION_MONTHS`, `EVENT_RETENTION_MONTHS`, `AGENT_EVENT_RETENTION_DAYS` and
+`ACTIVITY_RETENTION_DAYS`.
+
+## Messages are stored by month
+
+The messages table is stored **by month**, which keeps each month's part of it, and its
+indexes, a manageable size however large the whole grows.
+
+A new deployment is set up this way from the start. **When you upgrade a deployment that
+already holds many messages** (more than about 200,000), the upgrade asks for the
+messages to be reorganised first. Run the server command `partition_messages` (the same
+way you run the upgrade itself).
+
+The panel keeps running while it works. It copies the messages across in batches, copies
+again anything that changed meanwhile, then switches over. Writes pause for a moment
+during the switch. In rehearsal, 5 million messages took about four minutes in all. Then
+finish the upgrade.
+
+The previous copy of the table is kept until you're satisfied. Remove it with
+`partition_messages --drop-old`. `partition_messages --status` says where a
+reorganisation stands. Each step can be run again, and carries on from where it stopped.
