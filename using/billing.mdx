@@ -1,6 +1,6 @@
 ---
 title: "Billing"
-description: "Your prepaid balance, what you have sent this month, what each message costs, and every movement on the ledger."
+description: "Your wallet and the pots set aside from it, what each channel and battery costs, and every movement on the ledger."
 ---
 
 Billing answers **"how much do we have, and what does sending cost?"**
@@ -14,10 +14,28 @@ to see the ledger, which the same four roles have.
 
 ## The Billing screen
 
-- **Balance**: your prepaid balance. It shows in red below zero, and it is also in the
-  top bar of every screen. Credit is added by FireFlo when a payment is received; an
-  account never tops itself up. For a reseller's customer, credit comes from the
-  reseller.
+- **Wallet and pots**: your prepaid **wallet**, and beside it a **pot** for each channel
+  and battery you have. The wallet shows in red below zero, and it is also in the side
+  menu of every screen. Credit is added by FireFlo when a payment is received; an account
+  never tops itself up. For a reseller's customer, credit comes from the reseller.
+
+  A pot is money set aside for one module. While a channel has a pot it spends **only**
+  from that pot: when the pot is empty, sends on that channel pause until you move more
+  money in, however much the wallet holds. A channel with no pot spends from the wallet.
+  Each row shows what is in the pot, what the module spent this month, and its state:
+  **OK**, **Empty — sends paused**, or **No pot — spends from wallet**.
+
+  **Create pot** opens a pot with a first amount; **Move money** moves money either way
+  between the wallet and the pot; **Remove pot** (only when it is empty) closes it, and
+  the module spends from the wallet again. Owners and the Billing role may move money.
+
+  The SMS pot works one way when SMS runs on FireFlo's connection: money moved into it
+  goes on to your SMS gateway and is spent on SMS. It does not come back to the wallet,
+  and the row says so.
+
+  The **Plan and batteries** rows show what each costs a month, when it next renews, and
+  whether it is **Included in plan**, **Active**, or **Suspended**. See
+  [Batteries](#batteries).
 - **This month**: messages sent this month, per channel, and the total.
 - **Recent movements**: the latest changes to the balance, each with what it was, the
   amount and the balance after it. **All transactions** opens the full ledger.
@@ -42,14 +60,32 @@ balance as it goes, at your prices for the recipient's country:
 - **Your own connections aren't charged.** Messages through your own SMS gateway,
   WhatsApp account or RCS provider, and calls on your own Voice organisation, are billed
   to you by that provider directly.
-- **When the balance runs out.** A message the balance can't cover isn't sent, and says
-  why. A broadcast pauses itself and carries on, by itself, as soon as credit is added.
-  A call isn't placed on an empty balance; one already under way finishes, and may take
-  the balance a little below zero.
+- **When the money runs out.** A message its pot (or, without a pot, the wallet) can't
+  cover isn't sent, and says which ran out. A broadcast pauses itself and carries on, by
+  itself, as soon as money reaches the side it pays from: a channel with a pot resumes
+  when the pot is filled, not when the wallet is. A call isn't placed on an empty pot or
+  wallet; one already under way finishes, and may take it a little below zero.
 - **Not priced, not charged.** A channel or country with no price on your list costs
   nothing.
 
-The Balance card shows what has been charged this month.
+The Wallet and pots card shows what has been charged this month, in all and per module.
+
+## Batteries
+
+Batteries are paid for month by month from the wallet. On each battery's renewal date
+its monthly fee leaves the wallet and the battery is on for another month. Where your
+plan includes a battery, it reads **Included in plan** and costs nothing more.
+
+- **Subscribe** starts paying for a battery your plan does not include: the first month
+  is charged now, and it renews on the same day each month.
+- **Auto-renew** off stops the renewal; the battery stays on until the month already
+  paid for ends, then reads **Not renewing**.
+- When the wallet cannot pay a renewal the battery is **Suspended**: it is off, and
+  Modules says why. Add money to the wallet and it comes back on by itself, or select
+  **Renew now**. The owner is emailed once when this happens.
+
+The plan itself renews the same way: its monthly price leaves the wallet on the renewal
+date. See [Paying](#paying).
 
 ## Transactions
 
@@ -68,16 +104,23 @@ balance after it. Search the descriptions, and filter by kind:
 | **Credit allocated** | Credit you, as a reseller, moved to a customer |
 | **Usage** | What messages and calls cost — grouped, like "WhatsApp · 214 messages" or a broadcast's own line |
 | **Refund** | What came back for messages a channel refused |
+| **Moved to pot** / **Moved from pot** | Money moved between the wallet and a pot: one line on each side |
+| **Battery fee** | A battery's month, paid from the wallet |
+| **Plan fee** | The plan's month, paid from the wallet |
+
+**Wallet and pots** narrows the ledger to the wallet's own lines or to one pot's. The
+**After** column is the running figure of whichever side the line is on.
 
 Usage is grouped so the ledger stays readable: a line grows while nothing else happens
 on the account, for up to an hour, and the next movement starts a new one.
 
 ## Paying
 
-Paying for your plan is offline, by bank transfer or cheque. The
-[Plan](/using/plan-and-modules) page says how, and your paid time starts once FireFlo
-has recorded the payment. If a payment is due, sending, campaigns and agents pause
-until it is recorded.
+Your plan is paid from your wallet: on the renewal date its monthly price leaves the
+wallet and your paid time runs a month on. Money reaches the wallet by bank transfer or
+cheque, recorded by FireFlo; the [Plan](/using/plan-and-modules) page says how. If the
+wallet cannot pay the renewal, sending, campaigns and agents pause until money is added,
+and the plan is paid as soon as it is.
 
 Questions about a payment or your balance: write to
 [support@fireflo.au](mailto:support@fireflo.au).

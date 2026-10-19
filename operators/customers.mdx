@@ -110,24 +110,37 @@ product says. A withdrawn module can't be switched on for one customer.
 
 ### Billing
 
-This tab holds the customer's money: their subscription payments and their message wallet.
+This tab holds the customer's money: their wallet, the pots set aside from it, their
+plan and battery fees, and their payments.
 
 **Record a payment** is for money received outside the panel, by transfer or cheque.
 Enter the **Amount**, the **Months it pays for** (1 to 36), the date it was
 **Received on**, and a **Reference** such as a UTR or cheque number. Then select **Record
-payment**. The months are added from today, or from the date they're already paid until
-if that is later. The account becomes **Active**, and its owner gets an email.
+payment**. The money goes into the wallet, and the wallet pays the plan for those months,
+from today or from the date already paid until if that is later. The account becomes
+**Active**, and its owner gets an email. A payment smaller than the months' fee is
+refused with the shortfall named; record it for fewer months, or add credit first.
 
 The **Wallet** is the customer's prepaid credit for messages. Enter an **Amount** and say
 **Why**, then select **Update wallet**. A positive amount adds credit. A minus sign takes
 credit away, and only this kind of correction may take a wallet below zero.
+
+**Wallet and pots** is the customer's own card, with what staff may do on top. **Move
+money** and **Create pot** move money between the wallet and a module's pot (SMS on
+FireFlo's connection is one-way: money moved in goes to the gateway). For each battery
+you can type a **Monthly fee** for this customer alone — leave it blank to follow their
+price list — tick **Included** to grant the battery without a fee, switch **Auto-renew**,
+or select **Renew now**, which pays the next month even if it takes the wallet below
+zero: the way to switch a suspended battery back on before a payment has landed. Default
+fees per battery live on each [price list](/operators/pricing).
 
 **Prices** sets which per-message prices this customer pays. Leave it on **Their
 product's list**, or choose another [price list](/operators/pricing) when this customer
 has negotiated prices of their own.
 
 Below these you'll find the history of **Payments** (with who recorded each) and the
-**Wallet history**: every movement, its kind, the balance after it, and why.
+**Wallet history**: every movement, its kind, which side it was on (the wallet or a
+pot), the figure after it, and why.
 
 ### Usage
 
