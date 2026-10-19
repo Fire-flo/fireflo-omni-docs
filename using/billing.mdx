@@ -27,7 +27,9 @@ to see the ledger, which the same four roles have.
 
   **Create pot** opens a pot with a first amount; **Move money** moves money either way
   between the wallet and the pot; **Remove pot** (only when it is empty) closes it, and
-  the module spends from the wallet again. Owners and the Billing role may move money.
+  the module spends from the wallet again. A refund for a message charged to a removed pot
+  reopens it, so the money is where you can see it. Owners and the Billing role may move
+  money, and may move it back to the wallet even while a payment is due.
 
   The SMS pot works one way when SMS runs on FireFlo's connection: money moved into it
   goes on to your SMS gateway and is spent on SMS. It does not come back to the wallet,
