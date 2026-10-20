@@ -20,7 +20,7 @@ Releases are delivered by FireFlo under your licence. Ask
 | **PostgreSQL** | 14 or newer, with the `pg_trgm` extension, and `pgvector` when AI Agents or Calendar is loaded |
 | **Redis** | 6 or newer, or Valkey |
 | **Domains** | two names pointing at the server: one for the API and one for the panel. They can't share a name |
-| **In front** | nginx or Apache with TLS. The installer writes the nginx configuration for you |
+| **In front** | a reverse proxy with TLS, such as nginx, Apache or Caddy, which you set up |
 
 The release files are:
 
@@ -83,20 +83,26 @@ The release files are:
     sms,whatsapp,crm`. A module that needs another brings it, and the installer says so.
     A set that couldn't start is refused before anything is installed.
   </Step>
-  <Step title="Put the domains behind TLS">
-    The API and the panel listen only on the server itself, on ports 8200 and 3200, for the
-    web server in front to reach. The installer writes an nginx site for each domain to `/opt/fireflo/shared/nginx/`. Enable them, then
-    let certbot add TLS:
+  <Step title="Put a reverse proxy in front">
+    The installer writes no web-server configuration. The API and the panel listen only on
+    the server itself, and your reverse proxy forwards each domain to its port. The
+    installer prints the same list when it finishes.
 
-    ```bash
-    sudo cp /opt/fireflo/shared/nginx/*.conf /etc/nginx/sites-available/
-    sudo ln -s /etc/nginx/sites-available/api.example.com.conf /etc/nginx/sites-available/app.example.com.conf /etc/nginx/sites-enabled/
-    sudo nginx -t && sudo systemctl reload nginx
-    sudo certbot --nginx -d api.example.com -d app.example.com --redirect
-    ```
+    | Domain | Forward to, on the server itself | Request bodies up to |
+    | --- | --- | --- |
+    | the API's, over HTTPS | port 8200 | 215 MB, for audience uploads |
+    | the panel's, over HTTPS | port 3200 | 6 MB |
 
-    Serve both over HTTPS: the panel's sign-in cookie is secure-only, and over plain HTTP
-    nobody stays signed in.
+    For both domains:
+
+    - serve HTTPS only. The panel's sign-in cookie is secure-only, so over plain HTTP
+      nobody stays signed in;
+    - pass the `Host` header through unchanged;
+    - set `X-Forwarded-Proto: https`, `X-Forwarded-For` and `X-Real-IP`;
+    - use HTTP/1.1 to the backend with a read timeout of at least 65 seconds, and leave
+      redirects as they are.
+
+    Webhooks from SMS gateways and Meta arrive on the API's domain.
   </Step>
   <Step title="Sign in">
     Open the panel's domain and sign in as the admin address you gave. That login is
