@@ -488,6 +488,7 @@
                 "group": "Running OMNI for your customers",
                 "pages": [
                   "operators/overview",
+                  "operators/installing",
                   "operators/customers",
                   "operators/products-and-plans",
                   "operators/pricing",

@@ -1,0 +1,195 @@
+---
+title: "Installing OMNI on your own server"
+description: "How to install a FireFlo OMNI release on a Linux server you run, put its two domains behind TLS, choose its modules, and upgrade it."
+---
+
+An OMNI release is one file per processor type. It carries the API, the panel and every
+channel, battery and plugin, with its own Python and Node.js, so the server needs no build
+tools and downloads nothing while it installs. You choose which modules the server runs at
+install time, and change that later on the server.
+
+Releases are delivered by FireFlo under your licence. Ask
+[support@fireflo.au](mailto:support@fireflo.au) for the current release and its files.
+
+## Before you begin
+
+| | Requirement |
+| --- | --- |
+| **Processor** | Linux on x86-64, or aarch64 (ARM, such as AWS Graviton). There is one release file for each |
+| **Operating system** | Ubuntu 22.04, 24.04 or 26.04, or Debian 12 or 13, with systemd and root access |
+| **PostgreSQL** | 14 or newer, with the `pg_trgm` extension, and `pgvector` when AI Agents or Calendar is loaded |
+| **Redis** | 6 or newer, or Valkey |
+| **Domains** | two names pointing at the server: one for the API and one for the panel. They can't share a name |
+| **In front** | nginx or Apache with TLS. The installer writes the nginx configuration for you |
+
+The release files are:
+
+- the release itself, `fireflo-omni-<version>-single-amd64.tar.gz` or `…-arm64.tar.gz`;
+- `SHA256SUMS` and `SHA256SUMS.asc`, its checksum and FireFlo's signature over it;
+- `SIGNING-KEY.asc`, FireFlo's public signing key;
+- `setup.sh`, which installs the services OMNI needs on a fresh server.
+
+## Install
+
+<Steps>
+  <Step title="Copy the files to the server">
+    ```bash
+    scp fireflo-omni-<version>-single-amd64.tar.gz SHA256SUMS SHA256SUMS.asc SIGNING-KEY.asc setup.sh root@your-server:/root/
+    ```
+  </Step>
+  <Step title="Verify them">
+    The checksum proves the download is intact; the signature proves it came from FireFlo.
+
+    ```bash
+    gpg --import SIGNING-KEY.asc
+    gpg --verify SHA256SUMS.asc SHA256SUMS
+    sha256sum -c SHA256SUMS
+    ```
+
+    Check the key's fingerprint rather than trusting the file beside the release:
+    `3A9B 256F DE50 75CA 5F76  ADAF 42D7 A01A ED0D 03BA`.
+  </Step>
+  <Step title="Prepare the server">
+    `setup.sh` installs PostgreSQL with `pgvector` and `pg_trgm`, and Redis. It creates no
+    database, role or password. `--dry-run` shows what it would do.
+
+    ```bash
+    sudo ./setup.sh --dry-run
+    sudo ./setup.sh
+    ```
+  </Step>
+  <Step title="Unpack and install">
+    Type the two passwords at prompts and put them in an answers file only root can read,
+    so neither appears in the shell history or the process list:
+
+    ```bash
+    read -rsp 'Database password: ' DB_PW; echo; read -rsp 'Admin password: ' ADMIN_PW; echo
+    sudo install -m 600 /dev/null /root/omni-answers.env
+    printf 'DB_PASSWORD=%s\nADMIN_PASSWORD=%s\n' "$DB_PW" "$ADMIN_PW" | sudo tee /root/omni-answers.env >/dev/null
+    ```
+
+    Then one command installs everything:
+
+    ```bash
+    tar xzf fireflo-omni-<version>-single-amd64.tar.gz && cd fireflo-omni-<version>-single-amd64
+    sudo ./install.sh --env-file /root/omni-answers.env --modules all \
+      --api-domain api.example.com --panel-domain app.example.com \
+      --db-name omni --db-user omni \
+      --admin-email you@example.com --admin-name "Your name"
+    sudo rm /root/omni-answers.env
+    ```
+
+    Name the modules instead of `all` to run only some, for example `--modules
+    sms,whatsapp,crm`. A module that needs another brings it, and the installer says so.
+    A set that couldn't start is refused before anything is installed.
+  </Step>
+  <Step title="Put the domains behind TLS">
+    The API and the panel listen only on the server itself, on ports 8200 and 3200, for the
+    web server in front to reach. The installer writes an nginx site for each domain to `/opt/fireflo/shared/nginx/`. Enable them, then
+    let certbot add TLS:
+
+    ```bash
+    sudo cp /opt/fireflo/shared/nginx/*.conf /etc/nginx/sites-available/
+    sudo ln -s /etc/nginx/sites-available/api.example.com.conf /etc/nginx/sites-available/app.example.com.conf /etc/nginx/sites-enabled/
+    sudo nginx -t && sudo systemctl reload nginx
+    sudo certbot --nginx -d api.example.com -d app.example.com --redirect
+    ```
+
+    Serve both over HTTPS: the panel's sign-in cookie is secure-only, and over plain HTTP
+    nobody stays signed in.
+  </Step>
+  <Step title="Sign in">
+    Open the panel's domain and sign in as the admin address you gave. That login is
+    platform staff: it sees the **Platform** section, where you set up products, prices
+    and channel connections. See [Running OMNI for your customers](/operators/overview).
+  </Step>
+</Steps>
+
+### What the installer asks for
+
+Anything you leave out is asked for, or read from an answers file given with
+`--env-file` (the release carries an example with every key). A flag given on the command
+line wins over the same key in the file.
+
+| Flag | What | Default |
+| --- | --- | --- |
+| `--modules` | the channels, batteries and plugins to run, or `all` | asked |
+| `--api-domain`, `--panel-domain` | the two domains | asked |
+| `--db-host`, `--db-port`, `--db-name`, `--db-user` | the database; its password is `DB_PASSWORD` in the answers file. Or one `--database-url` | this server, `5432`, `omni`, `omni` |
+| `--redis-url` | Redis | the local one |
+| `--admin-email`, `--admin-name` | the first staff login. Its password is `ADMIN_PASSWORD` in the answers file | none |
+| `--user` | the Linux user the services run as, created if missing | `omni` |
+| `--api-port`, `--panel-port` | the ports the API and the panel listen on, on the server itself | `8200`, `3200` |
+
+**The database.** With PostgreSQL on the same server, the installer creates the role and
+the database when they're missing, with both extensions. A role that already exists keeps
+its password, so give the one it has. With PostgreSQL on another server, create the role,
+the database and both extensions there first. `--no-create-db` skips the creating
+altogether.
+
+<Warning>
+  Back up `/opt/fireflo/shared/.env`. Its secret key encrypts the provider credentials
+  OMNI stores, such as SMS logins and WhatsApp tokens. Without it, those can't be read
+  again, and a restored database won't send.
+</Warning>
+
+## Choose modules on the server
+
+```bash
+sudo fireflo-omni modules list
+sudo fireflo-omni modules enable tickets calendar
+sudo fireflo-omni modules disable tickets
+```
+
+Enabling a module brings along what it needs, runs its database changes and switches it on.
+Disabling switches it off and keeps its data. Either restarts the services for a few seconds.
+**Platform → Modules** in the panel shows the same switches, and is where a module's data is
+backed up and removed. See [Modules](/operators/modules).
+
+Loading a module gives it to no one yet: customers get it through their product, or one at
+a time from their page under **Platform → Customers**.
+
+## Upgrade to a new release
+
+Copy the new release to the server, verify it as above, then:
+
+```bash
+tar xzf fireflo-omni-<new-version>-single-amd64.tar.gz && cd fireflo-omni-<new-version>-single-amd64
+sudo ./upgrade.sh
+```
+
+The server keeps its modules. The new release installs beside the running one, applies its
+database changes, switches over, restarts and waits for both the API and the panel to
+answer. **If it isn't healthy within 90 seconds, it switches back** to the release that was
+running. Database changes only ever add, so switching back is safe. The last three releases
+are kept.
+
+Take a database dump before an upgrade all the same:
+
+```bash
+sudo -u postgres pg_dump -Fc omni > /root/omni-before-upgrade-$(date +%F).dump
+```
+
+`sudo fireflo-omni status` shows what runs, and `sudo fireflo-omni logs` its recent logs.
+
+## ARM servers
+
+The ARM release carries the panel ready to build rather than built, because the panel's
+server packages are compiled for one processor type. `install.sh` builds it on the server
+with the Node.js inside the release, which adds a few minutes to the install and to each
+upgrade. Nothing else differs.
+
+## Without root
+
+`--user-mode --prefix ~/omni` installs under your own home and runs OMNI as your user's
+services, with no root at all. It suits a trial or a staging server. The database must
+already exist, because creating one needs PostgreSQL's administrator.
+
+## Next
+
+- Set up products, prices and the connections customers send through:
+  [Products and plans](/operators/products-and-plans), [Pricing](/operators/pricing) and
+  [Channel connections](/operators/channel-connections).
+- Give your panel your own domain and mail: [Domains and email](/operators/domains-and-email).
+
+Questions about a release or an install: [support@fireflo.au](mailto:support@fireflo.au).
