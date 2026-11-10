@@ -1,6 +1,6 @@
 ---
 title: "Billing"
-description: "Your wallet and the pots set aside from it, what each channel and battery costs, and every movement on the ledger."
+description: "Your wallet and the pockets set aside from it, what each channel and battery costs, and every movement on the ledger."
 ---
 
 Billing answers **"how much do we have, and what does sending cost?"**
@@ -14,24 +14,24 @@ to see the ledger, which the same four roles have.
 
 ## The Billing screen
 
-- **Wallet and pots**: your prepaid **wallet**, and beside it a **pot** for each channel
+- **Wallet and pockets**: your prepaid **wallet**, and beside it a **pocket** for each channel
   and battery you have. The wallet shows in red below zero, and it is also in the side
   menu of every screen. Credit is added by FireFlo when a payment is received; an account
   never tops itself up. For a reseller's customer, credit comes from the reseller.
 
-  A pot is money set aside for one module. While a channel has a pot it spends **only**
-  from that pot: when the pot is empty, sends on that channel pause until you move more
-  money in, however much the wallet holds. A channel with no pot spends from the wallet.
-  Each row shows what is in the pot, what the module spent this month, and its state:
-  **OK**, **Empty — sends paused**, or **No pot — spends from wallet**.
+  A pocket is money set aside for one module. While a channel has a pocket it spends **only**
+  from that pocket: when the pocket is empty, sends on that channel pause until you move more
+  money in, however much the wallet holds. A channel with no pocket spends from the wallet.
+  Each row shows what is in the pocket, what the module spent this month, and its state:
+  **OK**, **Empty — sends paused**, or **No pocket — spends from wallet**.
 
-  **Create pot** opens a pot with a first amount; **Move money** moves money either way
-  between the wallet and the pot; **Remove pot** (only when it is empty) closes it, and
-  the module spends from the wallet again. A refund for a message charged to a removed pot
+  **Create pocket** opens a pocket with a first amount; **Move money** moves money either way
+  between the wallet and the pocket; **Remove pocket** (only when it is empty) closes it, and
+  the module spends from the wallet again. A refund for a message charged to a removed pocket
   reopens it, so the money is where you can see it. Owners and the Billing role may move
   money, and may move it back to the wallet even while a payment is due.
 
-  The SMS pot works one way when SMS runs on FireFlo's connection: money moved into it
+  The SMS pocket works one way when SMS runs on FireFlo's connection: money moved into it
   goes on to your SMS gateway and is spent on SMS. It does not come back to the wallet,
   and the row says so.
 
@@ -62,15 +62,15 @@ balance as it goes, at your prices for the recipient's country:
 - **Your own connections aren't charged.** Messages through your own SMS gateway,
   WhatsApp account or RCS provider, and calls on your own Voice organisation, are billed
   to you by that provider directly.
-- **When the money runs out.** A message its pot (or, without a pot, the wallet) can't
+- **When the money runs out.** A message its pocket (or, without a pocket, the wallet) can't
   cover isn't sent, and says which ran out. A broadcast pauses itself and carries on, by
-  itself, as soon as money reaches the side it pays from: a channel with a pot resumes
-  when the pot is filled, not when the wallet is. A call isn't placed on an empty pot or
+  itself, as soon as money reaches the side it pays from: a channel with a pocket resumes
+  when the pocket is filled, not when the wallet is. A call isn't placed on an empty pocket or
   wallet; one already under way finishes, and may take it a little below zero.
 - **Not priced, not charged.** A channel or country with no price on your list costs
   nothing.
 
-The Wallet and pots card shows what has been charged this month, in all and per module.
+The Wallet and pockets card shows what has been charged this month, in all and per module.
 
 ## Batteries
 
@@ -106,11 +106,11 @@ balance after it. Search the descriptions, and filter by kind:
 | **Credit allocated** | Credit you, as a reseller, moved to a customer |
 | **Usage** | What messages and calls cost — grouped, like "WhatsApp · 214 messages" or a broadcast's own line |
 | **Refund** | What came back for messages a channel refused |
-| **Moved to pot** / **Moved from pot** | Money moved between the wallet and a pot: one line on each side |
+| **Moved to pocket** / **Moved from pocket** | Money moved between the wallet and a pocket: one line on each side |
 | **Battery fee** | A battery's month, paid from the wallet |
 | **Plan fee** | The plan's month, paid from the wallet |
 
-**Wallet and pots** narrows the ledger to the wallet's own lines or to one pot's. The
+**Wallet and pockets** narrows the ledger to the wallet's own lines or to one pocket's. The
 **After** column is the running figure of whichever side the line is on.
 
 Usage is grouped so the ledger stays readable: a line grows while nothing else happens
