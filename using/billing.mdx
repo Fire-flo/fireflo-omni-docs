@@ -1,12 +1,12 @@
 ---
 title: "Billing"
-description: "Your wallet and the pockets set aside from it, what each channel and battery costs, and every movement on the ledger."
+description: "Your wallet and the pockets set aside from it, your plan and add-ons, what each channel costs, and every movement on the ledger."
 ---
 
 Billing answers **"how much do we have, and what does sending cost?"**
 
-<Frame caption="Billing: the balance, this month's volumes, recent movements and your prices.">
-  <img src="/images/using/billing.png" alt="The Billing screen with the balance, monthly volumes, recent movements and price list" />
+<Frame caption="Billing: the wallet on top, then Pockets, Plan & add-ons, Allocations and Prices.">
+  <img src="/images/using/billing.png" alt="The Billing screen with the wallet summary and its tabs" />
 </Frame>
 
 **Who can use it:** Owner, Admin, Billing and Reseller. **Transactions** needs permission
@@ -14,35 +14,67 @@ to see the ledger, which the same four roles have.
 
 ## The Billing screen
 
-- **Wallet and pockets**: your prepaid **wallet**, and beside it a **pocket** for each channel
-  and battery you have. The wallet shows in red below zero, and it is also in the side
-  menu of every screen. Credit is added by FireFlo when a payment is received; an account
-  never tops itself up. For a reseller's customer, credit comes from the reseller.
+Billing shows only what your account has: the channels in your plan and connected, and
+the batteries you have. A module your plan doesn't include, or one switched off, isn't
+listed, unless money is still set aside for it (see [Pockets](#pockets)).
 
-  A pocket is money set aside for one module. While a channel has a pocket it spends **only**
-  from that pocket: when the pocket is empty, sends on that channel pause until you move more
-  money in, however much the wallet holds. A channel with no pocket spends from the wallet.
-  Each row shows what is in the pocket, what the module spent this month, and its state:
-  **OK**, **Empty — sends paused**, or **No pocket · uses wallet**.
+At the top, on every tab, is the **wallet**:
 
-  **Create pocket** opens a pocket with a first amount; **Move money** moves money either way
-  between the wallet and the pocket; **Remove pocket** (only when it is empty) closes it, and
-  the module spends from the wallet again. A refund for a message charged to a removed pocket
-  reopens it, so the money is where you can see it. Owners and the Billing role may move
-  money, and may move it back to the wallet even while a payment is due.
+- **Wallet**: your prepaid balance, with **OK**, **Low** or **Empty**. It shows in red below
+  zero, and it is also in the side menu of every screen. **Warn me** sets the amount below
+  which you're told it's running low.
+- **Charged in** this month: what messages and calls have cost so far this month, with the
+  number of messages under it.
+- **In pockets**: the money set aside in pockets, and how many are open.
+- **Add money**: credit is added by your provider when a payment is received; an account
+  never tops itself up. For a reseller's customer, credit comes from the reseller. It also
+  shows your plan's next renewal, and **How to pay** opens your [Plan](/using/plan-and-modules).
 
-  The SMS pocket works one way when SMS runs on FireFlo's connection: money moved into it
-  goes on to your SMS gateway and is spent on SMS. It does not come back to the wallet,
-  and the row says so.
+Below it are four tabs.
 
-  The **Plan and batteries** rows show what each costs a month, when it next renews, and
-  whether it is **Included in plan**, **Active**, or **Suspended**. See
-  [Batteries](#batteries).
-- **This month**: messages sent this month, per channel, and the total.
-- **Recent movements**: the latest changes to the balance, each with what it was, the
-  amount and the balance after it. **All transactions** opens the full ledger.
-- **Your prices**: what each message costs, per channel and country, for the channels
-  your account has. Until prices are published for your account, this card says so.
+### Pockets
+
+A pocket is money set aside for one module. While a channel has a pocket it spends **only**
+from that pocket: when the pocket is empty, sends on that channel pause until you move more
+money in, however much the wallet holds. A channel with no pocket spends from the wallet.
+
+Each row shows what is in the pocket, what the module spent this month, and its state:
+**OK**, **Low**, **Empty — sends paused**, or **Uses wallet** when it has no pocket.
+
+- **Create pocket** opens a pocket with a first amount; **Move money** moves money either way
+  between the wallet and the pocket.
+- The **⋯** menu on each row holds **Warn me** (a low-balance warning for that pocket), its
+  allocations, and **Remove pocket**, which closes an empty pocket so the module spends from
+  the wallet again. A refund for a message charged to a removed pocket reopens it, so the
+  money is where you can see it.
+- A module that is no longer in your plan but still has money in its pocket stays listed
+  as **Holds money**, with only **Move to wallet**: no new money goes in.
+- Owners and the Billing role may move money, and may move it back to the wallet even
+  while a payment is due.
+
+The SMS pocket works one way when SMS runs on FireFlo's connection: money moved into it
+goes on to your SMS gateway and is spent on SMS. It does not come back to the wallet, and
+the row says so.
+
+### Plan & add-ons
+
+- **Your plan**: its monthly fee, its next renewal and its status, with **Change plan**.
+- **Your batteries**: what each costs a month (or **Included**), when it next renews with
+  **Auto-renew**, and whether it is **Included in plan**, renewing, or **Suspended** — then
+  **Renew now** switches it back on. See [Batteries](#batteries).
+- **Add-ons**: batteries your plan doesn't include that you can add, each with its monthly
+  fee and **Subscribe**. Batteries your provider has switched off, or hasn't priced, aren't
+  offered.
+
+### Allocations
+
+The latest changes to the wallet and pockets, each with when, what it was, the amount and
+the wallet after it. **All transactions** opens the full ledger.
+
+### Prices
+
+What each message costs, per channel and country, for the channels your account has. Until
+prices are published for your account, this tab says so.
 
 ## How sends are charged
 
@@ -70,7 +102,7 @@ balance as it goes, at your prices for the recipient's country:
 - **Not priced, not charged.** A channel or country with no price on your list costs
   nothing.
 
-The Wallet and pockets card shows what has been charged this month, in all and per module.
+The wallet shows what has been charged this month, and the Pockets tab what each module spent.
 
 ## Batteries
 
@@ -110,7 +142,7 @@ balance after it. Search the descriptions, and filter by kind:
 | **Battery fee** | A battery's month, paid from the wallet |
 | **Plan fee** | The plan's month, paid from the wallet |
 
-**Wallet and pockets** narrows the ledger to the wallet's own lines or to one pocket's. The
+The **Wallet and pockets** filter narrows the ledger to the wallet's own lines or to one pocket's. The
 **After** column is the running figure of whichever side the line is on.
 
 Usage is grouped so the ledger stays readable: a line grows while nothing else happens
