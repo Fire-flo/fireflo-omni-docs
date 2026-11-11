@@ -156,10 +156,13 @@ sudo ./install.sh --prefix /srv/acme/omni --user acme \
 The user isn't created when it already exists, and its home is left as it is. OMNI's
 services are system services that run as that user.
 
+From release 1.5.2, an upgrade finds the folder and the user by itself: `sudo ./upgrade.sh`
+is enough, and it says what it found under "Checking this server".
+
 <Warning>
-  Upgrade with the same folder **and** the same user:
-  `sudo ./upgrade.sh --prefix /srv/acme/omni --user acme`. Without `--user`, an
-  upgrade runs the services as the default `omni` user instead.
+  An install on 1.5.1 or earlier: upgrade with the same folder **and** the same user,
+  `sudo ./upgrade.sh --prefix /srv/acme/omni --user acme`. Without `--user`, those
+  releases run the services as the default `omni` user instead.
 </Warning>
 
 If the virtual host's web server is managed by a hosting control panel, that panel owns
@@ -308,9 +311,10 @@ tar xzf fireflo-omni-<new-version>-single-amd64.tar.gz && cd fireflo-omni-<new-v
 sudo ./upgrade.sh
 ```
 
-The server keeps its modules, ports, bind address and settings. An install made with
-`--prefix` or `--user` upgrades with the same flags (see
-[Install under a hosting account](#install-under-a-hosting-account)). The new release installs beside the running one,
+The server keeps its modules, ports, bind address and settings, and from 1.5.2 its folder
+and the user its services run as (see
+[Install under a hosting account](#install-under-a-hosting-account) for earlier releases).
+The new release installs beside the running one,
 applies its database changes, switches over and restarts in stages: the API, then the
 panel, then the background workers, waiting for each to answer. **If one isn't healthy
 within 180 seconds, it switches back** to the release that was running
