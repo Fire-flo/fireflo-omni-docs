@@ -102,7 +102,9 @@ The release files are:
     - use HTTP/1.1 to the backend with a read timeout of at least 65 seconds, and leave
       redirects as they are.
 
-    Webhooks from SMS gateways and Meta arrive on the API's domain.
+    Webhooks from SMS gateways and Meta arrive on the API's domain, so it must be reachable
+    from the internet over HTTPS. See [An nginx configuration](#an-nginx-configuration)
+    for a complete example.
   </Step>
   <Step title="Sign in">
     Open the panel's domain and sign in as the admin address you gave. That login is
@@ -124,6 +126,7 @@ line wins over the same key in the file.
 | `--db-host`, `--db-port`, `--db-name`, `--db-user` | the database; its password is `DB_PASSWORD` in the answers file. Or one `--database-url` | this server, `5432`, `omni`, `omni` |
 | `--redis-url` | Redis | the local one |
 | `--admin-email`, `--admin-name` | the first staff login. Its password is `ADMIN_PASSWORD` in the answers file | none |
+| `--prefix` | the folder OMNI is installed in | `/opt/fireflo` |
 | `--user` | the Linux user the services run as, created if missing | `omni` |
 | `--api-port`, `--panel-port` | the ports the API and the panel listen on, on the server itself | `8200`, `3200` |
 
@@ -134,10 +137,151 @@ the database and both extensions there first. `--no-create-db` skips the creatin
 altogether.
 
 <Warning>
-  Back up `/opt/fireflo/shared/.env`. Its secret key encrypts the provider credentials
-  OMNI stores, such as SMS logins and WhatsApp tokens. Without it, those can't be read
-  again, and a restored database won't send.
+  Back up `/opt/fireflo/shared/.env` (`<prefix>/shared/.env` with `--prefix`). Its secret
+  key encrypts the provider credentials OMNI stores, such as SMS logins and WhatsApp
+  tokens. Without it, those can't be read again, and a restored database won't send.
 </Warning>
+
+## Install under a hosting account
+
+On a server where each site lives under its own Linux user, such as the account behind a
+virtual host, OMNI can live inside that account and run as that user. Give the folder
+with `--prefix` and the user with `--user`:
+
+```bash
+sudo ./install.sh --prefix /srv/acme/omni --user acme \
+  --env-file /root/omni-answers.env --modules all --yes
+```
+
+The user isn't created when it already exists, and its home is left as it is. OMNI's
+services are system services that run as that user.
+
+<Warning>
+  Upgrade with the same folder **and** the same user:
+  `sudo ./upgrade.sh --prefix /srv/acme/omni --user acme`. Without `--user`, an
+  upgrade runs the services as the default `omni` user instead.
+</Warning>
+
+If the virtual host's web server is managed by a hosting control panel, that panel owns
+its configuration files. Put the proxy settings below into the panel's custom
+configuration for each domain rather than into your own file, which the panel may
+overwrite.
+
+## An nginx configuration
+
+A complete configuration for both domains, with Let's Encrypt certificates. Replace
+`api.example.com` and `app.example.com` with your two domains; both must already point at
+the server.
+
+<Steps>
+  <Step title="Get a certificate for both domains">
+    ```bash
+    sudo apt install -y nginx certbot python3-certbot-nginx
+    sudo certbot certonly --nginx -d api.example.com -d app.example.com
+    ```
+  </Step>
+  <Step title="Write the configuration">
+    Save it as `/etc/nginx/sites-available/omni.conf`:
+
+    ```nginx
+    map $http_upgrade $omni_connection_upgrade {
+        default upgrade;
+        ''      close;
+    }
+
+    # plain HTTP only sends people to HTTPS and lets certbot renew
+    server {
+        listen 80;
+        listen [::]:80;
+        server_name api.example.com app.example.com;
+        location /.well-known/acme-challenge/ { root /var/www/html; }
+        location / { return 301 https://$host$request_uri; }
+    }
+
+    # the API
+    server {
+        listen 443 ssl;
+        listen [::]:443 ssl;
+        http2 on;
+        server_name api.example.com;
+
+        ssl_certificate     /etc/letsencrypt/live/api.example.com/fullchain.pem;
+        ssl_certificate_key /etc/letsencrypt/live/api.example.com/privkey.pem;
+        include /etc/letsencrypt/options-ssl-nginx.conf;
+        ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
+
+        client_max_body_size 215m;
+
+        location / {
+            proxy_pass http://127.0.0.1:8200;
+            proxy_http_version 1.1;
+            proxy_set_header Host              $host;
+            proxy_set_header X-Forwarded-Proto https;
+            proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
+            proxy_set_header X-Real-IP         $remote_addr;
+            proxy_set_header Upgrade           $http_upgrade;
+            proxy_set_header Connection        $omni_connection_upgrade;
+            proxy_redirect off;
+            proxy_read_timeout 120s;
+            proxy_send_timeout 120s;
+            proxy_request_buffering off;
+        }
+    }
+
+    # the panel
+    server {
+        listen 443 ssl;
+        listen [::]:443 ssl;
+        http2 on;
+        server_name app.example.com;
+
+        ssl_certificate     /etc/letsencrypt/live/api.example.com/fullchain.pem;
+        ssl_certificate_key /etc/letsencrypt/live/api.example.com/privkey.pem;
+        include /etc/letsencrypt/options-ssl-nginx.conf;
+        ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
+
+        client_max_body_size 6m;
+
+        location / {
+            proxy_pass http://127.0.0.1:3200;
+            proxy_http_version 1.1;
+            proxy_set_header Host              $host;
+            proxy_set_header X-Forwarded-Proto https;
+            proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
+            proxy_set_header X-Real-IP         $remote_addr;
+            proxy_set_header Upgrade           $http_upgrade;
+            proxy_set_header Connection        $omni_connection_upgrade;
+            proxy_redirect off;
+            proxy_read_timeout 120s;
+            proxy_buffering off;
+        }
+    }
+    ```
+
+    Certbot saves the one certificate for both names under the first one, so both blocks
+    point at `api.example.com`. Change the ports if you installed with `--api-port` or
+    `--panel-port`.
+  </Step>
+  <Step title="Turn it on">
+    ```bash
+    sudo ln -s /etc/nginx/sites-available/omni.conf /etc/nginx/sites-enabled/
+    sudo nginx -t && sudo systemctl reload nginx
+    ```
+  </Step>
+  <Step title="Check it from outside">
+    ```bash
+    curl -s -o /dev/null -w "API %{http_code}\n" https://api.example.com/api/health/
+    curl -s -o /dev/null -w "panel %{http_code}\n" https://app.example.com/login
+    ```
+
+    Both should answer `200`.
+  </Step>
+</Steps>
+
+<Note>
+  `http2 on;` needs nginx 1.25.1 or newer. On an older nginx, remove that line and write
+  `listen 443 ssl http2;` instead.
+</Note>
 
 ## Choose modules on the server
 
@@ -164,11 +308,14 @@ tar xzf fireflo-omni-<new-version>-single-amd64.tar.gz && cd fireflo-omni-<new-v
 sudo ./upgrade.sh
 ```
 
-The server keeps its modules. The new release installs beside the running one, applies its
-database changes, switches over, restarts and waits for both the API and the panel to
-answer. **If it isn't healthy within 90 seconds, it switches back** to the release that was
-running. Database changes only ever add, so switching back is safe. The last three releases
-are kept.
+The server keeps its modules, ports, bind address and settings. An install made with
+`--prefix` or `--user` upgrades with the same flags (see
+[Install under a hosting account](#install-under-a-hosting-account)). The new release installs beside the running one,
+applies its database changes, switches over and restarts in stages: the API, then the
+panel, then the background workers, waiting for each to answer. **If one isn't healthy
+within 180 seconds, it switches back** to the release that was running
+(`--health-timeout` changes the wait). Database changes only ever add, so switching back is
+safe. The last three releases are kept.
 
 Take a database dump before an upgrade all the same:
 

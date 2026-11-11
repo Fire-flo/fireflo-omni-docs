@@ -89,11 +89,14 @@ const FORBIDDEN = [
   [/[\w.+-]+@(?!fireflo\.au\b)(?!acme\.in\b)(?!example\.com\b)[\w-]+\.[\w.]+/i, "an email address other than support@fireflo.au"],
   [/\b(?:127\.0\.0\.1|localhost|0\.0\.0\.0)\b/i, "a local address"],
 ];
+// The one page that needs a loopback address: the install guide's reverse-proxy example
+// forwards to where OMNI listens on the server itself (owner's call, 2026-11-11).
+const ALLOWED = { "operators/installing.mdx": ["a local address"] };
 for (const [file, text] of Object.entries(texts)) {
   // The gap between a page and a mistake is rarely the code samples: check them too.
   for (const [pattern, what] of FORBIDDEN) {
     const found = text.match(pattern);
-    if (found) problems.push(`${file}: ${what} ("${found[0]}")`);
+    if (found && !(ALLOWED[file] ?? []).includes(what)) problems.push(`${file}: ${what} ("${found[0]}")`);
   }
   if (/support@/.test(text) && /support@(?!fireflo\.au)/.test(text)) problems.push(`${file}: support routed elsewhere`);
 }

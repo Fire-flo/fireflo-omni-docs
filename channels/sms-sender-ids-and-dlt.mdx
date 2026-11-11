@@ -1,6 +1,6 @@
 ---
 title: "Sender IDs and DLT"
-description: "How to request SMS sender IDs and templates, how a message is matched against a template, and how India's DLT identifiers are added."
+description: "How to request SMS sender IDs and templates, how a message is matched against a template, how optional stamps are added by sender ID and template, and how India's DLT identifiers are added."
 ---
 
 Before an SMS goes out, your provider may check two things: that it comes from an
@@ -135,26 +135,65 @@ template a **template ID**. Messages to India carry them.
 
 <Steps>
   <Step title="Switch DLT on">
-    In **SMS → Settings → DLT (India)**, turn on **We send to India under DLT**.
+    In **SMS → Settings → Stamps and DLT**, turn on **We send to India under DLT**.
   </Step>
   <Step title="Enter your DLT entity ID">
     Issued once per business by the DLT registry. It goes with every send.
   </Step>
   <Step title="Add the DLT template ID to each template">
-    The template and sender ID forms now have an **Advanced · DLT (India)** section. Enter
-    the **DLT template ID** from your DLT portal — it is numeric. A sender ID or template
-    can carry its own entity ID; it defaults to the one in SMS settings.
+    The template and sender ID forms now show **DLT template ID** and **DLT entity ID**
+    fields. Enter the DLT template ID from your DLT portal — it is numeric. A sender ID or
+    template can carry its own entity ID; it defaults to the one in SMS settings.
   </Step>
 </Steps>
 
-With DLT off, none of these fields appear anywhere.
+With DLT off, these DLT fields don't appear. The identifiers travel as stamps (below):
+**0x1400** for the entity ID and **0x1402** for the template ID, unless your provider uses
+other tags, which you can change in the same settings.
 
-**Tags and a default stamp (advanced).** The identifiers travel as tagged values,
-**0x1400** for the entity ID and **0x1402** for the template ID unless your provider uses
-others. You can change the tags, and add one more stamp to every send. On a sender ID you
-can propose extra stamps; your provider decides what is attached. When you send, OMNI
-lists the stamps the message will carry and where each came from — your account, the
-sender ID, or the template.
+## Stamps
+
+A **stamp** is an extra value an SMS carries alongside its text: a tagged parameter, such
+as a registration reference your provider or a carrier asks for. Stamps are entirely
+optional. A sender ID, template or account with none sends its messages without any.
+
+| Where you set it | It goes on |
+| :--- | :--- |
+| **SMS → Settings → Stamps and DLT → Add a stamp to every SMS** | every SMS from your account |
+| A sender ID's **Stamps** | every SMS sent from that sender ID |
+| A template's **Stamps** | every SMS sent with that template |
+
+To add one, open the sender ID or template, choose **Add a stamp**, and enter a **tag**
+and a **value**. **Remove stamp** takes one off; with none left, nothing is stamped. The
+Sender IDs and Templates lists show each one's stamps in a **Stamps** column.
+
+- **Sender ID and template stamps apply once they're approved.** A request still waiting
+  for approval shows its stamps with **Applied once approved**. Changing stamps doesn't
+  send an approved sender ID or template back for approval.
+- **Every SMS, however it's sent, carries them.** That covers the Send page, scheduled
+  sends, broadcasts, Inbox replies, AI agents, fallback from other channels, verification
+  codes and the OMNI API.
+- **The every-SMS stamp works with DLT on or off.**
+- **The most specific value wins.** When two sources set the same tag, the template's
+  value beats the sender ID's, which beats your account's. A stamp set on a single send
+  through the OMNI API beats them all.
+- **The Send page and the broadcast wizard show what a message will carry.** They list
+  each stamp, saying whether it comes from your account, the sender ID or the template.
+
+**Tags and values:**
+
+- Write a tag in hex, like `0x1501` (at most `0xFFFF`). A bare number such as `5120` is
+  refused, with the hex to use instead (`0x1400`).
+- On a sender ID or a template, the tag is plain hex. The every-SMS stamp can also name a
+  type, such as `name_0x1600:Int4`, and then its value must be a whole number that fits
+  that type.
+- A value is up to 255 characters.
+
+<Note>
+  Stamps travel to your provider as your own parameters. Your provider may set its own
+  value for a sender ID or template, which takes the place of yours, and a carrier passes
+  on only the tags it accepts.
+</Note>
 
 <Tip>
   Write tags as hex, like `0x1401`. A bare number is read as decimal, and the carrier
@@ -170,5 +209,6 @@ and [templates](/api-reference/sms/list-templates), with the same rules.
 
 Requesting, editing and withdrawing sender IDs and templates needs the permission to
 **manage sender IDs and template registrations** — the **Owner** and **Admin** roles by
-default. Switching DLT on and setting the entity ID is in SMS settings, which needs the
-permission to **configure channel modules** (Owner and Admin by default).
+default; the same permission sets their stamps. Switching DLT on, setting the entity ID
+and the every-SMS stamp is in SMS settings, which needs the permission to **configure
+channel modules** (Owner and Admin by default).
