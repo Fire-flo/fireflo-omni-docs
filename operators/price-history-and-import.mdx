@@ -1,0 +1,96 @@
+---
+title: "Price history, export and import"
+description: "How to see every change to a price and the price on any date, export prices by country and product type, and import a file after checking a preview of what it changes."
+---
+
+Three tools sit beside the grid on **Platform → Pricing**: **History**, **Export** and
+**Import**. Each works on one price list and one channel at a time.
+
+**Who can use it:** platform staff.
+
+## Price history
+
+**History** lists every change to a price in the list, newest first: when, the country,
+the product type, the **Old** and **New** price, who made it (**By**) and how (**How**).
+A removed price reads **removed**.
+
+| How | What made the change |
+| :--- | :--- |
+| **Grid** | Someone saved it in the pricing grid. |
+| **Import** | A file was imported. An import's rows sit under one line naming its file; **Only this import** shows that import alone. |
+| **Opening price** | The price in place when history began. |
+
+History starts on the day your install moved to the release that brought it. The prices
+in place that day are recorded as opening prices.
+
+### Filter and export
+
+Narrow the list by **Price list**, **Channel**, **Country**, **Product type**, **Changed
+by** (anyone, the system, or one person) and the dates **From** and **To**. **Export
+history** downloads the changes that match the filters as a CSV.
+
+### Price on a date
+
+**Price on a date** answers "what did this cost on that day?". Choose a country (or **All
+other countries**), a product type and a date, and select **Show the price**. The answer
+gives the price in force that day, when it was set and by whom, and until when — or says
+there was no price that day.
+
+## Export
+
+Select **Export** on the grid. Choose:
+
+- **Price list** and **Channel**: any list and channel, not only the one on screen.
+- **Countries**: **All countries on this list**, or **Only these**. Add a country by its
+  name, its two-letter code, or its calling code with or without "+".
+- **Product types**: tick the ones to include.
+- **Layout**: one of two, both of which import back.
+
+| Layout | Columns |
+| :--- | :--- |
+| **One row per price** | `country`, `country_name`, `calling_code`, `product_type`, `price`, `currency` |
+| **One column per product type** | `country`, then a column per product type |
+
+The first lines of the file are shown before you download it.
+
+## Import
+
+Select **Import** on the grid. An import has three steps: **File chosen**, **Check what
+will change**, **Saved in OMNI**. Nothing is saved until you confirm.
+
+<Steps>
+  <Step title="Choose the file">
+    Select **Choose a CSV file**. It can be in either layout. Export a file first to see
+    the shape.
+  </Step>
+  <Step title="Check what will change">
+    OMNI reads every row and shows it beside the price today, saving nothing. The summary
+    counts rows **Added**, **Changed**, **Removed**, **Same as now** and **Refused**. Each
+    row shows its line, the country as typed and what it was **Read as**, the product
+    type, the price **Now** and **New**, and its result. A refused row says why, and the
+    other rows are still previewed. **All**, **Changes** and **Refused** filter the rows.
+  </Step>
+  <Step title="Save">
+    Select **Save N changes in OMNI**, or **Cancel** to leave every price as it is. The
+    import is saved as one entry in the history.
+  </Step>
+</Steps>
+
+How a file is read:
+
+- **The country** can be its two-letter code (`IN`), its name (`India`), or its calling
+  code with or without "+" (`91` or `+91`). `*` is **All other countries**. A calling
+  code several countries share, such as `+1`, prices all of them, and the row says so.
+- **An empty price** removes that price in the one-row-per-price layout. In the
+  one-column-per-type layout, an empty cell is left alone.
+- **Prices not in the file** stay as they are.
+- **A row is refused** when its country or product type is unknown, its price is
+  negative or not a number, or its currency differs from the list's.
+- **A whole file is refused** when it isn't text or holds more than 2,000 rows.
+
+A preview is kept for 30 minutes. After that, import the file again.
+
+<Note>
+  An import saves prices in OMNI. For SMS, the gateway keeps its current prices: the
+  change joins [Waiting to apply](/operators/pricing#apply-sms-prices-to-the-gateway).
+</Note>

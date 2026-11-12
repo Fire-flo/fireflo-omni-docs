@@ -492,6 +492,8 @@
                   "operators/customers",
                   "operators/products-and-plans",
                   "operators/pricing",
+                  "operators/price-history-and-import",
+                  "operators/countries",
                   "operators/channel-connections",
                   "operators/modules",
                   "operators/archive",

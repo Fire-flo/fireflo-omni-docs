@@ -1,0 +1,89 @@
+---
+title: "Countries"
+description: "The one country directory every channel reads a number's country from: number prefixes, trying a number, switching a country off, and exporting or importing the list."
+---
+
+**Platform → Countries** is one list of countries for SMS, WhatsApp, RCS and Voice. Each
+channel finds a number's country here: for its prices, its reports and the
+[allowed countries](/operators/customers#sending) of each account. For SMS, the prefixes
+are also what the gateway matches when it prices a message.
+
+**Who can use it:** platform staff. **Countries** on the Pricing page leads here too.
+
+## How a number's country is found
+
+Each country has **number prefixes**: usually just its calling code. A number belongs to
+the country with the **longest prefix** it starts with. A leading "+" or "00" is ignored,
+so `+14165550123`, `14165550123` and `0014165550123` all read the same.
+
+That is how countries that share a calling code are told apart. Canada's area codes are
+prefixes of their own, so a number starting `1416` is Canada, and any other `+1` number
+no other country claims is the United States. The two can then have prices of their own.
+
+A country that shares a calling code but has no prefixes of its own reads as the main
+country for that code until you give it some.
+
+## The directory
+
+Each row shows the **Country**, its **Calling code**, its **Number prefixes** and its
+**Status**:
+
+| Status | Meaning |
+| :--- | :--- |
+| **On** | As the standard list has it. |
+| **Changed** | Staff changed its prefixes, name or switch. |
+| **Off · nobody can send** | Switched off. No account can send there, on any channel. |
+
+Search with **Find a country, IN, 91 or +91**, and narrow the list to **Changed from the
+standard list** or **Switched off**.
+
+## Try a number
+
+Type a number in **Try a number** and select **Read it**. The answer names the country it
+was read as and the prefix that decided it, and confirms the same answer with "+",
+without it and with "00". Use it before and after editing prefixes.
+
+## Edit a country
+
+Select **Edit** on a country's row.
+
+- **Number prefixes**: digits only, with or without "+", separated by commas, spaces or
+  new lines. Leave the calling code alone to treat all of that code as one country. A
+  prefix can belong to one country only: one already used by another is refused, with
+  the country that has it.
+- **On: accounts may send here when their allowed countries include it**: untick it to
+  switch the country off for everyone.
+- **Back to the standard list** undoes your changes to that country.
+
+Select **Save**, or **Cancel** to leave it as it was.
+
+What saving does:
+
+- WhatsApp, RCS and Voice use the new prefixes at once.
+- For SMS, the prefixes become the gateway's rules for every account priced in that
+  country. Those accounts join
+  [Waiting to apply](/operators/pricing#apply-sms-prices-to-the-gateway) on the Pricing
+  page. The gateway isn't changed until staff apply.
+
+<Warning>
+  Prefixes decide which country, and so which price, a number gets. Giving a country
+  prefixes inside a shared calling code splits it from the main country: its numbers then
+  take its own prices, and its own place in each account's allowed countries.
+</Warning>
+
+## Export and import
+
+**Export** downloads the whole directory as a CSV with the columns `iso`, `name`,
+`calling_code`, `prefixes` (separated by spaces) and `active` (`yes` or `no`).
+
+**Import** reads a file in the same shape and shows which countries it would change and
+which rows it refuses, and why. Nothing is saved until you select **Save N countries**.
+A row whose country isn't in the directory, or whose prefix belongs to another country, is
+refused. A file can hold up to 1,000 rows.
+
+## When you upgrade
+
+The directory is filled from a standard list of the world's numbering plans when you
+upgrade to the release that brought it. See
+[Upgrade to a new release](/operators/installing#upgrade-to-a-new-release). Running the
+setup again adds countries the directory lacks and never changes a country staff edited.
