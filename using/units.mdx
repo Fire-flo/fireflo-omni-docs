@@ -1,0 +1,101 @@
+---
+title: "Units"
+description: "How accounts below a reseller send with units instead of money: what one unit is, where units come from, what happens when they or the reseller's money run out."
+---
+
+An account below a reseller doesn't pay for its messages with money. It sends with
+**units**, which its reseller gives it. This page explains units for everyone involved:
+the reseller that gives them, a sub-reseller that passes them on, and the customer that
+uses them.
+
+## One unit is one message
+
+A unit is **one message of one channel and product type**: an SMS part, a WhatsApp
+message, an RCS message, a call minute. Units are kept separately for each channel and
+product type, such as SMS Transactional, SMS Promotional or WhatsApp Marketing. Units of
+one kind can't be used for another.
+
+A unit works for any country the account is [allowed to send to](/using/billing#countries-you-can-send-to).
+
+## Who holds what
+
+<Tabs>
+  <Tab title="A reseller">
+    FireFlo gives a reseller money (its wallet and pockets) and a price list. The reseller
+    sets no prices and no markup. It gives units to the customers directly below it.
+
+    **Units you can still give**, per channel and product type, is worked out from the
+    money that pays for that channel, less what the units already given out would cost,
+    divided by the reseller's own price in its home country. Giving more than that is
+    refused. Giving units moves no money: each message is charged to the reseller when it
+    is sent.
+
+    What the reseller charges its customers for units is between them.
+  </Tab>
+  <Tab title="A sub-reseller">
+    A reseller can make one of its customers a **sub-reseller**, with customers of its
+    own, up to ten levels below FireFlo. A sub-reseller holds a real stock of units,
+    received from the reseller above it, and passes on only what it holds. It has no
+    pockets and no prices.
+
+    A sub-reseller that sends messages itself uses its own units.
+  </Tab>
+  <Tab title="A customer">
+    A customer below a reseller sees its **Units** on [Billing](/using/billing#accounts-below-a-reseller):
+    what it has left of each kind. It keeps a wallet for its plan and battery fees only. It
+    has no message pockets and sees no prices.
+  </Tab>
+</Tabs>
+
+## When a message is sent
+
+- **It uses one unit** of its channel and product type from the account that sent it. A
+  long SMS uses one unit per part, and a call one per started minute.
+- **It is charged to the top reseller**, the one FireFlo gave money to, at that
+  reseller's price for the recipient's country. The sender's wallet doesn't move, and
+  nor does a sub-reseller's.
+- **A message the channel refuses gives its unit back**, and the money where it was
+  charged.
+
+## When something runs out
+
+- **No units of a kind:** that account's sends of that kind are refused, with the units
+  held and needed. A broadcast pauses and carries on by itself when units arrive. Other
+  kinds carry on.
+- **The reseller's money runs out:** sends on that channel pause for every account below
+  it, whatever units they hold. They carry on when money arrives.
+- **The reseller's money no longer covers the units given out:** its Customers page warns
+  it. Nothing is taken back.
+
+## Prices never change units
+
+Units are message counts. When FireFlo changes a reseller's price, every unit balance
+below it stays as it is. Only what each later message costs the reseller changes.
+
+## SMS below a reseller
+
+Accounts below a reseller send SMS under the reseller's own account on FireFlo's SMS
+gateway, so the gateway charges the reseller at the reseller's price.
+
+An account may also send SMS straight to the gateway over its own SMPP login. That login is
+**switched off** when the units of the kind it sends run out. SMS sent over the login is
+counted from the gateway's records shortly after it is sent, so a few messages sent just
+before the login is switched off can take the balance below zero; they are still charged
+to the reseller. When new units arrive, a **new login** is made, with a new system ID. Its
+password has to be reset before it can be used: ask your provider.
+
+## Unit history
+
+Every movement of units is listed, newest first, with the units moved and the balance
+after:
+
+| Line | What it is |
+| :--- | :--- |
+| **Received** | Units given to this account by the one above it. |
+| **Transferred down** | Units this account gave to one below it. |
+| **Taken back** | Unused units taken back by the account above. |
+| **Used** | Units messages used, grouped like the money ledger. |
+| **Returned** | Units given back for messages the channel refused. |
+
+Resellers see it under **Unit history** on [Customers](/using/resellers), and for each
+customer on its **Units** tab. A customer sees its own under **Billing → Unit history**.

@@ -1,28 +1,50 @@
 ---
 title: "Resellers"
-description: "How a reseller sets up customers, puts them on a plan, funds them, sets its markup and suspends them."
+description: "How a reseller sets up customers, puts them on a plan, gives them units to send with, limits where they send, and suspends them."
 ---
 
-Resellers answers **"who are my customers, and how are they set up?"** A reseller runs
+Customers answers **"who are my customers, and what can they send?"** A reseller runs
 OMNI for businesses of its own. Each customer is a full OMNI account, under the
-reseller's [brand](/using/branding), funded from the reseller's balance.
+reseller's [brand](/using/branding). It sends with [units](/using/units) the reseller
+gives it; each message is charged to the reseller at the reseller's price.
 
 **Who can use it:** the **Owner** or **Reseller** role.
 
 **Plan:** the account must be a reseller. FireFlo turns this on; until it does, the
 screen explains that the account isn't set up as a reseller.
 
+<Note>
+  Resellers set no prices and no markup. FireFlo gives a reseller money and a price list;
+  the reseller gives its customers units. What it charges them for those units is between
+  them.
+</Note>
+
 ## Your customers
 
-The screen opens with three figures:
+At the top of the page:
 
-- **Your balance**, to fund customers with;
-- **Held by this page's customers**, the credit already allocated;
-- **Customers**, and how many are suspended.
+- **You sell units**: 1 unit = 1 message, per channel and product type.
+- **Your pockets pay**: the money that pays for every message your customers send, at your
+  prices. For SMS on FireFlo's connection, that is your SMS balance at the gateway.
+- **Units you can still give**: worked out from that money and your price in your home
+  country, after the units already with customers.
 
-The table lists each customer with its product (plan), status, balance, your markup and
-when it joined. Filter by status (*Trial*, *Active*, *Payment due*, *Suspended*) or
-search by name.
+If your money runs out on a channel, the page says that every customer's sends there are
+paused. If it no longer covers the units your customers hold at your current prices, it
+warns you. Nothing is taken back.
+
+**Unit history** lists the units you gave and took back, and the units you used yourself.
+
+The table lists each customer with its status, one column for each kind of unit any of
+them holds (**OK**, **Low** or **None · sends paused**), and its **Fee wallet**: the money
+that pays its plan and battery fees. Filter by status (*Pending approval*, *Trial*,
+*Active*, *Payment due*, *Suspended*, *Low balance*) or search by name.
+
+### As a sub-reseller
+
+A sub-reseller sees **Your units · received from your provider** instead: for each kind,
+what it **passed to customers** and what **you hold**. It can pass on only what it holds,
+and asks its own provider for more. It has no pockets and no prices.
 
 ## Set up a customer
 
@@ -32,23 +54,55 @@ search by name.
   </Step>
   <Step title="Who they are">
     Enter the **company**, and the **owner's email** and **name**. The owner is the first
-    person who can sign in.
+    person who can sign in, and is emailed a link to set a password.
   </Step>
   <Step title="What they are on">
     Pick the **product** (plan), the **trial** in days before they owe anything (0 for
-    none), and an optional **opening credit** from your balance.
+    none), and an optional **opening credit** from your balance. Opening credit goes into
+    their fee wallet, for plan and battery fees.
   </Step>
   <Step title="How they send SMS">
     Decide whether they **may connect their own SMS gateway**. If not, SMS goes through
-    the gateway you sell them, and the choice is hidden from them.
+    the gateway you sell them, and the choice is hidden from them. Where your SMS runs on
+    FireFlo's connection, the choice isn't offered: an SMS login is made for the customer
+    by itself.
+  </Step>
+  <Step title="A reseller of its own?">
+    Turn on **A reseller: passes units on to customers of its own** to make the customer a
+    sub-reseller.
   </Step>
   <Step title="Create">
-    Choose **Create customer**.
+    Choose **Create customer**. They send with the units you give them afterwards.
   </Step>
 </Steps>
 
 Anyone who signs up at your own web address also becomes your customer. See
 [Branding](/using/branding).
+
+## Give units
+
+<Steps>
+  <Step title="Open Give units">
+    Select **Give units** on the customer's row, or on its **Units** tab.
+  </Step>
+  <Step title="Choose the kind and amount">
+    Choose the **Channel** and **Product type**, and enter the **Units**. Add a **Note**
+    if you like, such as an invoice number; your customer sees it.
+  </Step>
+  <Step title="Give">
+    Select **Give N units**. The panel beside it says what the customer holds now and
+    after, and how many you can still give.
+  </Step>
+</Steps>
+
+No money moves when you give units. Each message the customer sends uses one unit and is
+charged to your money then.
+
+**Take back unused units**, in the same window, takes back units the customer hasn't
+used. You can't take back more than it holds.
+
+You can't give units for a kind that has no price for you yet. Units can't be used for
+another channel or product type.
 
 ## One customer
 
@@ -56,18 +110,27 @@ Open a customer to manage them.
 
 <Tabs>
   <Tab title="Overview">
-    - **What they're on**: change their product, and see their balance, when their
+    - **What they're on**: change their product, and see their fee wallet, when their
       trial ends and how many people they have.
-    - **How they send**: allow or stop their own SMS gateway.
+    - **How they send**: allow or stop their own SMS gateway, and make them a sub-reseller.
     - **Suspend**: nobody at the customer can sign in until you **let them back in**.
   </Tab>
-  <Tab title="Credit">
-    - **Add credit** moves credit from your balance to theirs. Give an amount and a
-      reference; the reference shows on both ledgers. **Goes to** chooses their wallet
-      or one of their pockets: into a pocket, it lands in their wallet and moves straight on in
-      the same transaction.
-    - **Your terms**: the **markup** you add on top of your prices (0 to 1000 percent),
-      and notes for yourself.
+  <Tab title="Units">
+    **Their units**, each kind with its status, **Give units**, and **Their unit history**.
+  </Tab>
+  <Tab title="Sending">
+    **Allowed countries**: where they may send, on every channel. Choose **Every country
+    you can send to**, or **Only these countries**. You can choose only from the countries
+    your own account may send to. A message to a number anywhere else is refused before
+    it is sent, and isn't charged.
+  </Tab>
+  <Tab title="Fee wallet">
+    - **Add credit** moves credit from your balance to their fee wallet, which pays their
+      plan and battery fees. Give an amount and a reference; the reference shows on both
+      ledgers.
+    - **Low-balance warnings**: the line below which they and you are told their wallet
+      is running low.
+    - **Your terms**: a note only you see, and whether they can sign in.
   </Tab>
   <Tab title="Team">
     **Their people**: who can sign in, their roles, when they last signed in, and
@@ -82,8 +145,8 @@ allocated*, and on theirs as *Credit received*.
 
 - A customer runs its own account: its team, contacts, channels and messages.
 - A customer can never do more than you can. Its roles are limited to what your account
-  may do.
-- A customer can't have customers of its own.
+  may do, and its allowed countries to yours.
+- A customer sees its units, not your prices.
 
 FireFlo's side of running resellers is described in
 [For operators: Resellers](/operators/resellers).

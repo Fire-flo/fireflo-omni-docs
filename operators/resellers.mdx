@@ -1,16 +1,28 @@
 ---
 title: "Resellers"
-description: "How resellers work from the operator's side: turning an account into one, funding it, and what it can do for its own customers with credit, markup, products and suspension."
+description: "How resellers work from the operator's side: turning an account into one, giving it money and a price list, and how its customers send with units charged to it."
 ---
 
 A **reseller** is one of your customers that sells OMNI on to customers of its own. Its
-customers are ordinary OMNI accounts that sit **under** the reseller. The reseller sets
-them up, funds them from its own balance, and sets the markup they pay on top of your
-prices. With a [domain of its own](/operators/domains-and-email#domains), it can present
-the panel under its own brand.
+customers are ordinary OMNI accounts that sit **under** the reseller. With a
+[domain of its own](/operators/domains-and-email#domains), it can present the panel under
+its own brand.
 
 This page is the operator's view. For what a reseller sees, see
-[Resellers](/using/resellers).
+[Resellers](/using/resellers); for how units work, see [Units](/using/units).
+
+## How a reseller is billed
+
+- **You give the reseller money and a price list.** Its wallet and pockets, topped up
+  from its page like any customer's, and the [price list](/operators/pricing) it pays.
+  Those are the only prices in its world.
+- **The reseller gives its customers units.** One unit is one message of one channel and
+  product type. Staff never give units.
+- **Each message is charged to the reseller.** A customer's message uses one of its units
+  and is charged to the reseller's money at the reseller's price for that country.
+- **Resellers set no prices and no markup.** Its customers have no prices and no message
+  pockets. Each keeps a wallet for its plan and battery fees only, which the reseller
+  funds with credit.
 
 ## Make an account a reseller
 
@@ -22,20 +34,63 @@ This page is the operator's view. For what a reseller sees, see
     On **Overview**, select **Edit**, tick **They resell to their own customers** and
     select **Save**.
   </Step>
+  <Step title="Give it money and prices">
+    Top up its wallet, or the pocket of each channel it resells, from **Billing**. Choose
+    the list it pays on its **Reseller** tab. For SMS on your gateway, use the gateway's
+    currency.
+  </Step>
 </Steps>
 
 The account now shows a **Reseller** badge. Its people with the **Owner** or
-**Reseller** role get a **Customers** page in their menu. Those roles carry the
-permissions to manage customer accounts and to give them credit.
+**Reseller** role get a **Customers** page in their menu.
 
-You can't turn reselling off while the account still has customers of its own. A
-reseller's customers can't run customers of their own.
+You can't turn reselling off while the account still has customers of its own.
 
-## Fund a reseller
+### Sub-resellers
 
-A reseller funds its customers by moving credit from its own wallet. It can't create
-credit itself. Only staff add credit to a wallet. Top up the reseller's wallet from
-**Billing → Wallet** on its page. See [Customers](/operators/customers#billing).
+A reseller can make one of its own customers a **sub-reseller**, with customers of its
+own. A tree can go up to ten levels below you. A sub-reseller holds the units it received
+and passes on only those. Every message anywhere in the tree is charged to the top
+reseller, the one you gave money to.
+
+## The Reseller tab
+
+A top-level reseller's page has a **Reseller** tab:
+
+- **Price list the reseller pays**. A change waits to apply on the SMS gateway like any
+  other price change.
+- **Pockets that pay for its customers**, with its wallet. Money held at the SMS gateway
+  is marked so.
+- **On the SMS gateway**: its customers' SMS logins sit under its own gateway account, so
+  the gateway charges the reseller's balance at the reseller's price.
+- **Its customers · units and what they cost the reseller**: every account in its tree,
+  with units left and used, what their messages have cost the reseller, their SMS logins,
+  and a status such as **No units given**, **SMS units low**, **No units** or **No units ·
+  login off**. **Export** downloads the table.
+
+A warning shows when the reseller's money has run out on a channel, which pauses sends for
+its whole tree, or when its money no longer covers the units outstanding below it at its
+current prices. Units are read-only here.
+
+## When something runs out
+
+- **A customer has no units** of a kind: its sends of that kind are refused, and a broadcast
+  pauses until units arrive.
+- **The reseller's money runs out** on a channel: sends on that channel pause for every
+  account below it, whatever units they hold, and carry on when money arrives.
+- **A price changes**: units never change. Only what each later message costs the
+  reseller does.
+
+## SMS below a reseller
+
+Accounts below a reseller send SMS under the reseller's own account on your SMS gateway.
+The gateway charges the reseller, at the reseller's price; OMNI counts the messages
+against each sender's units.
+
+When an account below a reseller sends straight to the gateway over its own SMPP login,
+OMNI switches that login off once the units of the kind it sends run out. The gateway has
+no way to switch a login back on, so when new units arrive OMNI makes a new login, with a
+new system ID. Reset its password under the customer's **Modules** tab and pass it on.
 
 ## See a reseller's customers
 
@@ -44,42 +99,36 @@ credit itself. Only staff add credit to a wallet. Top up the reseller's wallet f
   **Any reseller** narrows the list to one reseller's customers.
 - The **Resellers** chip lists every reseller.
 
-A reseller's customer is a full account on its own page. You can change it, top it up or
-suspend it like any other.
+A reseller's customer is a full account on its own page. Its **Billing** tab shows its
+units, its plan and its fee wallet; it has no prices. You can change it, top up its fee
+wallet or suspend it like any other.
 
 ## What a reseller does for its customers
 
 From its **Customers** page, a reseller can:
 
-- **Set up a customer.** It enters the company, the owner's email and name, the
-  product, the trial length (0 for none) and an opening credit. The owner is invited by
-  email. Opening credit comes from the reseller's balance.
+- **Set up a customer**, with its product, trial and an opening credit for its fee
+  wallet. The owner is invited by email.
 - **Put a customer on a product.** Resellers can choose any of your active products,
   including hidden ones, at your price. When a reseller moves a customer to a dearer
   product, time already paid for is worth less of it, so the paid-until date moves in to
   match.
-- **Add credit**, moving it from the reseller's balance to the customer's wallet, or
-  straight into one of the customer's pockets. It can't move more than it holds.
-- **Set the markup and a note** for each customer, under **Your terms**.
+- **Give units** and **take back** unused ones.
+- **Add credit** to the customer's fee wallet, from the reseller's own balance.
+- **Narrow where it sends**, choosing allowed countries from the reseller's own.
 - **Decide about SMS** (see below).
 - **Suspend** a customer, and let them back in.
 
 The customer runs its own team. The reseller can see who can sign in, but can't change
 them.
 
-### Markup
-
-The markup is a percentage, from 0 to 1,000%, set per customer. It is added to every
-per-message price the customer's [price list](/operators/pricing) gives. A reseller's
-customer with a 20% markup pays 1.20 where a price list says 1.00. Your prices and the
-customer's list decide the base. The reseller decides only the markup.
-
 ### Their own SMS gateway
 
 When it sets a customer up, and later on that customer's page, a reseller decides whether
 the customer **May connect their own SMS gateway**. Turned off, the customer stays on the
-SMS connection the reseller provides, and can't connect a gateway of their own. Other
-channels aren't affected.
+SMS connection the reseller provides. Where the reseller's SMS runs on your connection,
+the choice isn't offered: the customer gets a login under the reseller's gateway account.
+Other channels aren't affected.
 
 ### Suspension
 
