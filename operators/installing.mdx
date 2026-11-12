@@ -329,6 +329,40 @@ sudo -u postgres pg_dump -Fc omni > /root/omni-before-upgrade-$(date +%F).dump
 
 `sudo fireflo-omni status` shows what runs, and `sudo fireflo-omni logs` its recent logs.
 
+### Upgrading to 1.5.4
+
+Release 1.5.4 brings price history, the [country directory](/operators/countries), SMS
+prices applied by staff, allowed countries and [units](/using/units) for resellers'
+customers. After `./upgrade.sh`, run its two setup commands once:
+
+```bash
+sudo fireflo-omni manage countries_seed           # fills the country directory
+sudo fireflo-omni manage pricing_record_opening   # records today's prices as opening prices
+```
+
+Both are safe to run again: the first adds only countries the directory lacks and never
+changes one staff edited, and the second skips any price that already has history.
+
+What changes for you after the upgrade:
+
+- **Prices no longer reach the SMS gateway by themselves.** A saved or imported price,
+  a change of price list and the nightly check all wait under **Waiting to apply** on
+  **Platform → Pricing** until staff review and apply them. See
+  [Pricing](/operators/pricing#apply-sms-prices-to-the-gateway).
+- **Resellers' customers send with units.** Resellers no longer set prices or a markup,
+  and their customers no longer have message pockets or prices. A reseller's existing
+  customers can't send until the reseller gives them units. See
+  [Resellers](/operators/resellers).
+- **Import previews live in the shared cache.** A price import's preview is kept in
+  OMNI's cache until it is confirmed. The installer's Redis cache serves this; if you run
+  the API on more than one server, point them all at the same cache, or a confirm can
+  land where the preview isn't.
+- **An install whose message history was partitioned online:** run
+  `sudo fireflo-omni manage partition_messages` once more. It removes leftover links from
+  the old copy of the history that stopped contacts with old messages being deleted. On
+  an install never partitioned, don't run it: there is nothing to fix, and it would start
+  partitioning.
+
 ## ARM servers
 
 The ARM release carries the panel ready to build rather than built, because the panel's
