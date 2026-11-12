@@ -1,6 +1,6 @@
 ---
 title: "Billing"
-description: "Your wallet and the pockets set aside from it, your plan and add-ons, what each channel costs, and every movement on the ledger."
+description: "Your wallet and the pockets set aside from it, your plan and add-ons, what each channel costs, the units you send with below a reseller, and every movement on the ledger."
 ---
 
 Billing answers **"how much do we have, and what does sending cost?"**
@@ -30,7 +30,8 @@ At the top, on every tab, is the **wallet**:
   never tops itself up. For a reseller's customer, credit comes from the reseller. It also
   shows your plan's next renewal, and **How to pay** opens your [Plan](/using/plan-and-modules).
 
-Below it are four tabs.
+Below it are four tabs. An account below a reseller sees a different screen: see
+[Accounts below a reseller](#accounts-below-a-reseller).
 
 ### Pockets
 
@@ -73,13 +74,47 @@ the wallet after it. **All transactions** opens the full ledger.
 
 ### Prices
 
-What each message costs, per channel and country, for the channels your account has. Until
-prices are published for your account, this tab says so.
+**Your prices**: what each message costs you, per channel, country and product type, for
+the channels your account has. Each price shows since when it applies, and your own
+country is marked **your default**.
+
+- **Find a country, IN or +91** finds a country by name, two-letter code or calling code.
+- **All product types** narrows the list to one product type.
+- **Export CSV** downloads the prices as a file.
+
+An SMS price marked **Waiting to apply** is a new price FireFlo has saved that the SMS
+gateway doesn't charge yet. Until it is applied, messages are charged the previous price.
+
+Until prices are published for your account, this tab says so. Accounts sending through
+their own gateway or Meta account are never charged here.
+
+## Accounts below a reseller
+
+When your account is a customer of a reseller, you send with **units** your reseller gives
+you, not with money. See [Units](/using/units).
+
+At the top, in place of the wallet summary:
+
+- **Units left**: how many units you hold, across how many kinds, from your provider.
+- **Wallet · plan and battery fees**: the money that pays your plan and battery fees.
+  Messages use units, not this wallet.
+
+The tabs are **Units**, **Plan & add-ons**, **Unit history** and **Allocations**. There
+are no pockets and no prices.
+
+- **Units** lists each channel and product type with the **Units left** and a status:
+  **OK**, **Low**, or **None · sends paused** with **Ask your provider**. One unit is one
+  message: an SMS part, a WhatsApp message, a call minute.
+- **Unit history** lists units received from your provider, used by your messages, and
+  given back when a message was refused.
+- **Plan & add-ons** and **Allocations** work as described above. Your wallet is funded by
+  your reseller.
 
 ## How sends are charged
 
 Each message and call that goes through **FireFlo's connections** is charged to the
-balance as it goes, at your prices for the recipient's country:
+balance as it goes, at your prices for the recipient's country. (Below a reseller, it
+uses one of your [units](/using/units) instead, and is charged to your reseller.)
 
 | Channel | Charged per | Priced as |
 | :--- | :--- | :--- |
@@ -101,8 +136,20 @@ balance as it goes, at your prices for the recipient's country:
   wallet; one already under way finishes, and may take it a little below zero.
 - **Not priced, not charged.** A channel or country with no price on your list costs
   nothing.
+- **Only countries you can send to.** A message to a number outside your
+  [allowed countries](#countries-you-can-send-to) is refused before it is sent, and isn't
+  charged.
 
 The wallet shows what has been charged this month, and the Pockets tab what each module spent.
+
+## Countries you can send to
+
+**Settings** shows **Countries you can send to**, on every channel: every country, or a
+list. FireFlo sets it, or your reseller if you have one; you can read it but not change
+it. Ask them to add a country.
+
+A message to a number anywhere else is refused before it is sent, with the country the
+number was read as, and isn't charged. A broadcast lists the rows it left out, by country.
 
 ## Batteries
 
@@ -147,6 +194,10 @@ The **Wallet and pockets** filter narrows the ledger to the wallet's own lines o
 
 Usage is grouped so the ledger stays readable: a line grows while nothing else happens
 on the account, for up to an hour, and the next movement starts a new one.
+
+On a reseller's ledger, what its customers' WhatsApp, RCS and Voice messages cost shows as
+**Usage** lines named after each customer. Their SMS is charged by the SMS gateway, from
+the reseller's SMS balance there.
 
 ## Paying
 

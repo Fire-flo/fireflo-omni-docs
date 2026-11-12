@@ -1,6 +1,6 @@
 ---
 title: "Customers"
-description: "How to find any customer account, read where it stands, and change its product, trial, price, wallet, modules and status."
+description: "How to find any customer account, read where it stands, and change its product, trial, prices, wallet, modules, allowed countries and status."
 ---
 
 **Platform → Customers** lists every account on your service, including the customers of
@@ -90,6 +90,12 @@ tab is for reading.
 A reseller's page has a **Customers** tab listing the accounts under it, in the same
 table as the main list. See [Resellers](/operators/resellers).
 
+### Reseller (top-level resellers only)
+
+The price list the reseller pays, the pockets that pay for its customers' messages, and
+every account in its tree with its units left and used and what its messages cost the
+reseller. See [Resellers → The Reseller tab](/operators/resellers#the-reseller-tab).
+
 ### Modules
 
 The channels, batteries and pluggable modules (such as the OMNI API) this account has,
@@ -163,7 +169,37 @@ wallet or a pocket), the figure after it, and why.
 
 **Prices** sets which per-message prices this customer pays. Leave it on **Their product's
 list**, or choose another [price list](/operators/pricing) when this customer has negotiated
-prices of their own.
+prices of their own. For SMS, the new list reaches the gateway only when staff
+[apply it](/operators/pricing#apply-sms-prices-to-the-gateway).
+
+**An account below a reseller** has no pockets and no prices. Its Billing tab shows its
+**Units**, **Plan & add-ons**, its wallet for plan and battery fees, and **Allocations**.
+Its units come from its reseller; the whole tree is on the top-level reseller's
+[Reseller tab](/operators/resellers#the-reseller-tab).
+
+### Sending
+
+**Allowed countries**: where this account may send, on every channel. Choose **All
+countries**, or **Only these countries** and type each country or its code. For a
+reseller's customer, you can choose only from the countries its reseller may send to.
+Narrowing a reseller's list narrows its customers' lists to fit.
+
+A message to a number in any other country is refused before it is sent, on every
+channel, and isn't charged. A broadcast lists the rows it left out, by country. The
+account sees the list, read-only, under **Settings**.
+
+For SMS, a change waits to apply on the gateway like a price change: the account's gateway
+prices then cover its allowed countries only.
+
+<Note>
+  SMS an account sends straight to the gateway over its own SMPP login, not through OMNI,
+  is not checked against this list by OMNI. The gateway refuses it only when it is set to
+  refuse messages no rate prices and has no default rate covering those countries. See
+  [Pricing](/operators/pricing#allowed-countries-and-sms-sent-straight-to-the-gateway).
+</Note>
+
+A country switched off in the [country directory](/operators/countries) is closed to every
+account, whatever its list says.
 
 ### Usage
 
