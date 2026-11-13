@@ -54,9 +54,11 @@ as each one arrives.
 
 <Steps>
   <Step title="To">
-    Type numbers, pick contacts, or pick segments. Up to 500 numbers and contacts at a
-    time; for more, upload a file in a [broadcast](/using/broadcasts). Picking a segment
-    makes the send a broadcast, sent in the background.
+    Type numbers, pick contacts, pick segments, or **Upload a file** (CSV, XLSX or XLS).
+    Typed numbers and contacts go up to 500 at a time. With a file, OMNI picks the column
+    that holds the numbers (you can change it) and shows the first rows. A file is the
+    only source for that send. With [Customer data](/batteries/customer-data) on, saved
+    audiences are offered beside segments.
   </Step>
   <Step title="From">
     Pick one of your approved sender IDs. Where your provider doesn't require approved
@@ -65,11 +67,21 @@ as each one arrives.
   <Step title="Message">
     **Use a template** and fill in its blanks, or **Write a message**. When your account
     sends approved templates only, the page says so and offers templates alone.
+
+    With a file, a segment or an audience in To, each blank offers **Type a value** or a
+    field: a column of the file, or Name, Number and your contact fields. Each person
+    then gets their own value. A written message has chips that insert a field. The
+    preview steps through the rows.
   </Step>
   <Step title="Check and send">
     Under the message, OMNI shows the encoding (GSM-7 or Unicode), the length, the number
     of segments, and how many messages that makes for everyone you picked. A preview
     shows the message as it will arrive. Confirm to send.
+
+    A send from a file, a segment or an audience opens a **review** first: how many will
+    be sent, how many are skipped and why (with the skipped rows as a CSV), and about how
+    many message parts. A row whose value doesn't fit a blank, such as letters in a
+    digits-only blank, is skipped. The send then runs as a [broadcast](/using/broadcasts).
   </Step>
 </Steps>
 

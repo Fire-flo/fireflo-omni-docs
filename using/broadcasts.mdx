@@ -32,53 +32,53 @@ ones your team starts, and can be paused, resumed or canceled from either side.
 
 ## Starting a campaign
 
-Choose **New campaign**. One wizard serves every channel; the channel you pick supplies
-the parts it needs.
+Choose **New campaign**. The **New broadcast** page has three steps, the same for every
+channel; the channel you pick supplies the parts it needs.
 
-<Frame caption="The new campaign wizard: channel, audience, message, schedule and preview.">
-  <img src="/images/using/broadcast-new.png" alt="The new campaign wizard on its first step" />
+<Frame caption="New broadcast: choose the channel, compose on one page, then review.">
+  <img src="/images/using/broadcast-new.png" alt="New broadcast on its first step" />
 </Frame>
 
 <Steps>
   <Step title="Channel">
     Pick the channel to send on. Channels that aren't connected can't be picked.
   </Step>
-  <Step title="Audience">
-    Either **upload a file** (CSV or Excel, up to ten lakh rows) or choose **contact
-    segments**. A file goes straight to the server; nothing is sent until you start the
-    campaign. For a file, say which column is the number, and match other columns to
-    the fields your message uses. Batteries can add audiences of their own, such as
-    saved audiences from [Customer data](/batteries/customer-data).
-  </Step>
-  <Step title="Message">
-    Write or choose the message in the form the channel needs: an approved template on
-    WhatsApp or RCS, a sender ID and (in India) a registered template on SMS. Each
-    channel's page explains its rules: see [Channels](/channels/overview).
-  </Step>
-  <Step title="Schedule">
+  <Step title="Compose">
+    One page, with a live preview beside it:
+
+    - **Campaign name.**
+    - **To**: **upload a file** (CSV or Excel, up to ten lakh rows) or choose **contact
+      segments**. For a file, check the column that holds the numbers. You can also save
+      the file's other columns to contact profiles. Batteries can add audiences of their
+      own, such as saved audiences from [Customer data](/batteries/customer-data).
+    - **From** and, on SMS, the **message type**. Say whether it is **marketing** (skips
+      people who stopped offers) or **an update they expect** (skips only people who
+      stopped everything).
+    - **Message**, in the form the channel needs: an approved template on WhatsApp or
+      RCS, a sender ID and (in India) a registered template on SMS. Each blank can be
+      typed, or filled from a column or contact field so each person gets their own
+      value. The preview steps through the rows. See [Channels](/channels/overview).
+    - **When should it go?**
+
     | Choice | When it sends |
     | --- | --- |
-    | **Send now** | As soon as you confirm. |
-    | **At a time** | One time for everyone, from a few minutes to 30 days ahead. |
-    | **By a date column** | Each row on its own date, from a date column in an uploaded sheet, at the time you choose. |
+    | **Now** | As soon as you confirm. |
+    | **Later** | One date and time for everyone, from a few minutes to 30 days ahead. |
+    | **Each row on its own date** | From a date column in an uploaded sheet, at the time you choose. |
 
     Times use your account's timezone (Settings). Rows whose date is blank, unreadable,
     past, or more than 30 days away are skipped.
   </Step>
-  <Step title="Preview">
-    See how many messages **will send**, how many are **skipped** and why, and, for SMS,
-    how many parts. Look through the rows, or only the skipped ones, and download the
-    skipped rows.
-
-    Say what kind of message this is:
-
-    - **marketing** skips people who stopped offers;
-    - **an update they expect** skips only people who stopped everything.
-
-    When an uploaded file brought new values, you can save them to contact profiles.
-    Then **Start** (or **Schedule**) the campaign.
+  <Step title="Review">
+    See how many messages **will be sent**, how many are **skipped** and why, and, for
+    SMS, about how many parts. Download the skipped rows, or go back to compose. Nothing
+    is sent or scheduled until you confirm here.
   </Step>
 </Steps>
+
+The channel's own send page ([Send SMS](/channels/sms), Send WhatsApp, Send RCS) does
+the same for a file, a segment or an audience, without the campaign name and the
+per-row dates.
 
 ### Why rows are skipped
 

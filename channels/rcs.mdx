@@ -77,17 +77,20 @@ RCS sends approved templates only — never typed text. See
 
 ## Send RCS
 
-**RCS → Send RCS** sends one approved template to people you type in.
+**RCS → Send RCS** sends one approved template to numbers, contacts, segments or a file.
 
 <Steps>
   <Step title="Template">
     Choose a template approved by at least one of your bots.
   </Step>
   <Step title="To">
-    Enter numbers, up to 500. Each goes through the bot its country routes to.
+    Enter numbers or pick contacts (up to 500), pick segments, or **Upload a file** (CSV,
+    XLSX or XLS). Each number goes through the bot its country routes to.
   </Step>
   <Step title="Fill the variables">
-    Give a value for each `{{variable}}` in the template, then send.
+    Give a value for each `{{variable}}` in the template, then send. With a file or a
+    segment in To, a variable can take a field instead, and the send is reviewed first
+    and runs as a [broadcast](/using/broadcasts).
   </Step>
 </Steps>
 
