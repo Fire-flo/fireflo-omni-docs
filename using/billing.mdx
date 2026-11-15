@@ -24,7 +24,8 @@ At the top, on every tab, is the **wallet**:
   zero, and it is also in the side menu of every screen. **Warn me** sets the amount below
   which you're told it's running low.
 - **Charged in** this month: what messages and calls have cost so far this month, with the
-  number of messages under it.
+  number of messages under it. A message can cost less than a paisa or a cent, so this
+  figure shows up to four decimal places when it needs them.
 - **In pockets**: the money set aside in pockets, and how many are open.
 - **Add money**: credit is added by your provider when a payment is received; an account
   never tops itself up. For a reseller's customer, credit comes from the reseller. It also
@@ -176,6 +177,11 @@ date. See [Paying](#paying).
 
 Every movement on the balance, newest first: when, what kind, the amount and the
 balance after it. Search the descriptions, and filter by kind:
+
+An amount is shown with two decimal places when it is a whole number of paise or cents, and
+with up to four when it is not: a message priced at 0.0012 is charged 0.0012, and its line says
+so. The balance beside it stays in two places, rounded down: what is left below a paisa or a
+cent is kept and still pays for messages, but it isn't shown until it adds up.
 
 | Kind | What it is |
 | --- | --- |

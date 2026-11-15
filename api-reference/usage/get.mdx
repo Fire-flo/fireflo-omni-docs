@@ -91,6 +91,7 @@ console.log(response.status, await response.json());
     "messages": 2016
   },
   "charged": {
+    "amount": "4182.5036",
     "amount_minor": 418250,
     "currency": "INR"
   },
@@ -120,6 +121,12 @@ console.log(response.status, await response.json());
   ]
 }
 ```
+
+`charged.amount` is what sends cost in the period, net of refunds, as a decimal string with four
+places: a message can cost less than a paisa or a cent, so the total can carry a fraction of one.
+`charged.amount_minor` is the same figure in whole minor units, rounded half up. Use `amount` for
+anything you add up or reconcile; `amount_minor` is kept for integrations that already read it.
+`balance.amount_minor` is in whole minor units, rounded down.
 
 ## Errors
 
