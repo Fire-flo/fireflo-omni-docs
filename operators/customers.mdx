@@ -131,6 +131,21 @@ An **override** bends the product for this one account. It doesn't change the pr
 To undo an override, select **Follow the plan**. The account goes back to whatever its
 product says. A withdrawn module can't be switched on for one customer.
 
+#### SMS message types
+
+Under **Gateways**, the SMS row lists the message types the customer's gateway offers.
+Tick the ones this customer may send and select **Save types**.
+
+- A new customer has **no type switched on**. Until you tick one they can't send SMS,
+  and the row says **No type on — can't send SMS**.
+- Customers you had before OMNI 1.5.9 keep every type their gateway offered at the
+  upgrade. Untick the ones they shouldn't have.
+- A gateway that offers no types, and a customer sending through a gateway of their
+  own, are not affected.
+
+A customer chooses among their types on each send. Each type is
+[priced](/operators/pricing) on its own.
+
 ### Billing
 
 This tab holds the customer's money, laid out like the customer's own [Billing](/using/billing)
