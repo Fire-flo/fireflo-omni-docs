@@ -73,10 +73,14 @@ spends from the wallet.
 - **Sync** reads the gateway again now and shows the time the figure was read. The page
   also reads it each time it loads; Sync is for when you have just sent, or money was just
   added at the gateway. It moves no money.
-- Under the figure, **on OMNI's book** is what OMNI's own records say the pocket should
-  hold. The two differ by what you have sent since the pocket was last reconciled, and by
-  anything added or taken at the gateway itself. Your provider's staff can reconcile the
-  two; the row says when that was last done.
+- Under the figure is how it came about: **Moved in** (what was put into the pocket),
+  **Moved back** (what returned to the wallet), **At the gateway** (anything added or
+  taken at the gateway itself), **Spent**, and **Left**. Spent is counted from the
+  pocket's first reconcile on; before that it reads "known once reconciled". If the lines
+  don't add up, the row says how much is not accounted for yet; your provider's staff can
+  reconcile it, and the row says when that was last done.
+- **about ₹…**: your SMS gateway is an older version that can't say the exact figure. It
+  may read slightly high, by what the gateway has set aside for sending.
 - The row says where top-ups of the wallet go: on to this pocket, or staying in the wallet
   until you move them. Change it under **SMS → Settings**.
 - **At the gateway, not in a pocket**: before OMNI 1.5.10 your wallet was copied to the SMS

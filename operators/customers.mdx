@@ -109,7 +109,15 @@ and why. Each row is badged:
 | **Not in plan** | Their product doesn't include it. |
 | **Withdrawn** | It is switched off for everyone under [Modules](/operators/modules). |
 
-An **override** bends the product for this one account. It doesn't change the product.
+**Channels** are one row each, with a switch. Off, the customer can't send on that
+channel and it is no longer listed to them (it does not show as something to buy). On,
+for a channel their product doesn't include, gives it to this account alone. The row
+says who set the switch: you, or the customer's reseller. **Follow the product again**
+removes the switch; **Reason or limit…** records why; **Set up** jumps to the channel's
+gateway below. A reseller can't change a switch you set.
+
+For batteries and modules, an **override** bends the product for this one account. It
+doesn't change the product.
 
 <Steps>
   <Step title="Open the override">
@@ -173,9 +181,17 @@ module's pocket (for SMS on FireFlo's connection the money goes on to the gatewa
 comes back from it). No money can go into the pocket of a module the customer doesn't have.
 
 **Sync and Reconcile (SMS on FireFlo's connection).** The SMS pocket shows what the
-gateway holds now, and under it what **OMNI's book** says. OMNI's book records only what
-OMNI moved in and out, so it drifts from the gateway as the customer sends, and whenever
-money is added or taken at the gateway itself.
+gateway holds now, and under it a statement: moved in, moved back, at the gateway, spent,
+left. OMNI's own records hold only what OMNI moved in and out, so they drift from the
+gateway as the customer sends, and whenever money is added or taken at the gateway itself;
+a reconcile brings them together.
+
+<Note>
+  The exact figure needs FireFlo gateway 0.15.12 or newer. An older gateway's figure is
+  shown as "about" (it may count what is set aside for sending twice), and Reconcile is
+  refused against it, so that an inexact figure is never written into the customer's
+  records.
+</Note>
 
 - **Sync** reads the gateway again and shows the time. It moves no money.
 - **⋯ → Reconcile with gateway…** compares the two line by line. Opening it writes
@@ -197,6 +213,11 @@ money is added or taken at the gateway itself.
 - The **first reconcile** of a pocket does not go through history: it takes the gateway's
   figure as the start and writes the one difference. Later ones compare line by line from
   that moment.
+
+- **Start again from the gateway's figure** is offered when a reconcile leaves an amount
+  nothing accounts for. It writes one line for the difference and compares from that
+  moment on. Use it where the records were set wrong: a first reconcile made on OMNI
+  1.5.13 could read the gateway's figure high by what was set aside for sending.
 
 Nothing reconciles by itself. The row says when a pocket was last reconciled and by whom.
 
