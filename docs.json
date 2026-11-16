@@ -112,7 +112,7 @@
               },
               {
                 "group": "SMS",
-                "pages": ["channels/sms", "channels/sms-sender-ids-and-dlt"]
+                "pages": ["channels/sms", "channels/sms-sender-ids-and-stamps"]
               },
               {
                 "group": "WhatsApp",

@@ -20,11 +20,12 @@ Send SMS, Sender IDs, Templates and Settings.
   </Step>
   <Step title="Set your default country">
     Under **Numbers**, the **Default country** is used for numbers typed without a
-    country code — `IN` for India.
+    country code: its two-letter code, such as `AU`.
   </Step>
-  <Step title="Turn on DLT if you send to India">
-    Under **DLT (India)**, switch on **We send to India under DLT** and enter your **DLT
-    entity ID**. See [Sender IDs and DLT](/channels/sms-sender-ids-and-dlt).
+  <Step title="Switch stamping on if your messages need stamps">
+    Under **Stamps**, switch on **Stamp SMS with TLVs** when a provider, a regulator or a
+    carrier asks for tagged parameters on your messages. See
+    [Sender IDs, templates and stamps](/channels/sms-sender-ids-and-stamps#stamps).
   </Step>
   <Step title="Request a sender ID and add templates">
     Under **Sender IDs** and **Templates**, request the names and wording you will send.
@@ -32,7 +33,7 @@ Send SMS, Sender IDs, Templates and Settings.
   </Step>
 </Steps>
 
-<Frame caption="SMS settings: connection, callback URLs, numbers, delivery reports and DLT on one page.">
+<Frame caption="SMS settings: connection, callback URLs, numbers, delivery reports and stamps on one page.">
   <img src="/images/channels/sms-settings.png" alt="The SMS settings page with its sections listed on the left" />
 </Frame>
 
@@ -150,7 +151,7 @@ samples. For sending from your own software, most integrations use the
   SMS alone, or SMS marketing alone.
 - When your provider enforces approval, a message from an unapproved sender ID, or one
   that matches no approved template, is refused. See
-  [Sender IDs and DLT](/channels/sms-sender-ids-and-dlt).
+  [Sender IDs, templates and stamps](/channels/sms-sender-ids-and-stamps).
 
 ## What batteries add on SMS
 

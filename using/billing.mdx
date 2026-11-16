@@ -41,7 +41,8 @@ from that pocket: when the pocket is empty, sends on that channel pause until yo
 money in, however much the wallet holds. A channel with no pocket spends from the wallet.
 
 Each row shows what is in the pocket, what the module spent this month, and its state:
-**OK**, **Low**, **Empty — sends paused**, or **Uses wallet** when it has no pocket.
+**OK**, **Low**, **Empty — sends paused**, or **Uses wallet** when it has no pocket
+(for SMS on FireFlo's connection, see below).
 
 - **Create pocket** opens a pocket with a first amount; **Move money** moves money either way
   between the wallet and the pocket.
@@ -54,9 +55,21 @@ Each row shows what is in the pocket, what the module spent this month, and its 
 - Owners and the Billing role may move money, and may move it back to the wallet even
   while a payment is due.
 
-The SMS pocket works one way when SMS runs on FireFlo's connection: money moved into it
-goes on to your SMS gateway and is spent on SMS. It does not come back to the wallet, and
-the row says so.
+#### SMS on FireFlo's connection
+
+When SMS runs on FireFlo's connection it is paid for from its pocket **only**; it never
+spends from the wallet.
+
+- **No pocket — can't send**: create the SMS pocket and move money in. Until then nothing
+  can be sent on SMS, however much the wallet holds.
+- The pocket works one way: money moved into it goes on to your SMS gateway and is spent
+  on SMS. It does not come back to the wallet, and the row says so.
+- The pocket shows **what is left at your SMS gateway**, so it goes down as you send, with
+  what was moved in beside it.
+- **At the gateway, not in a pocket**: before OMNI 1.5.10 your wallet was copied to the SMS
+  gateway, so some of it is already there. **Create pocket** shows that amount and opens
+  the pocket with it — it moves out of the wallet and nothing more is sent. Leave the
+  amount empty to open with just that, or add an amount from what the wallet has left.
 
 ### Plan & add-ons
 

@@ -1,6 +1,6 @@
 ---
-title: "Sender IDs and DLT"
-description: "How to request SMS sender IDs and templates, how a message is matched against a template, how optional stamps are added by sender ID and template, and how India's DLT identifiers are added."
+title: "Sender IDs, templates and stamps"
+description: "How to request SMS sender IDs and templates, how a message is matched against a template, and how optional stamps are switched on, set by sender ID and template, and changed for a single send."
 ---
 
 Before an SMS goes out, your provider may check two things: that it comes from an
@@ -128,65 +128,65 @@ export has exactly the columns an import reads, so a downloaded list is a workin
 After an import, OMNI says how many rows were submitted and how many refused, and lets
 you download the refused rows with their reasons.
 
-## DLT (India)
-
-India's DLT registry gives every business an **entity ID**, and every registered
-template a **template ID**. Messages to India carry them.
-
-<Steps>
-  <Step title="Switch DLT on">
-    In **SMS → Settings → Stamps and DLT**, turn on **We send to India under DLT**.
-  </Step>
-  <Step title="Enter your DLT entity ID">
-    Issued once per business by the DLT registry. It goes with every send.
-  </Step>
-  <Step title="Add the DLT template ID to each template">
-    The template and sender ID forms now show **DLT template ID** and **DLT entity ID**
-    fields. Enter the DLT template ID from your DLT portal — it is numeric. A sender ID or
-    template can carry its own entity ID; it defaults to the one in SMS settings.
-  </Step>
-</Steps>
-
-With DLT off, these DLT fields don't appear. The identifiers travel as stamps (below):
-**0x1400** for the entity ID and **0x1402** for the template ID, unless your provider uses
-other tags, which you can change in the same settings.
-
 ## Stamps
 
 A **stamp** is an extra value an SMS carries alongside its text: a tagged parameter, such
-as a registration reference your provider or a carrier asks for. Stamps are entirely
-optional. A sender ID, template or account with none sends its messages without any.
+as a registration reference a provider, a regulator or a carrier asks for. Stamps are
+entirely optional.
+
+### Switch stamping on
+
+Stamping is one switch: **SMS → Settings → Stamps → Stamp SMS with TLVs**.
+
+- **Off** (the default): no stamp is added to any SMS, including stamps saved on sender IDs
+  and templates. They stay saved and are simply not sent.
+- **On**: every SMS carries the stamps that apply to it.
+
+### Where stamps are set
 
 | Where you set it | It goes on |
 | :--- | :--- |
-| **SMS → Settings → Stamps and DLT → Add a stamp to every SMS** | every SMS from your account |
+| **SMS → Settings → Stamps → Stamp on every SMS** | every SMS from your account |
 | A sender ID's **Stamps** | every SMS sent from that sender ID |
 | A template's **Stamps** | every SMS sent with that template |
 
 To add one, open the sender ID or template, choose **Add a stamp**, and enter a **tag**
-and a **value**. **Remove stamp** takes one off; with none left, nothing is stamped. The
-Sender IDs and Templates lists show each one's stamps in a **Stamps** column.
+and a **value**. **Remove stamp** takes one off. The Sender IDs and Templates lists show
+each one's stamps in a **Stamps** column.
+
+If a registry gives you identifiers to send with each message — an ID for your business,
+an ID for each registered template — add them as stamps under the tags your provider
+names: the business's on each sender ID (or on every SMS), the template's on each template.
 
 - **Sender ID and template stamps apply once they're approved.** A request still waiting
   for approval shows its stamps with **Applied once approved**. Changing stamps doesn't
   send an approved sender ID or template back for approval.
-- **Every SMS, however it's sent, carries them.** That covers the Send page, scheduled
-  sends, broadcasts, Inbox replies, AI agents, fallback from other channels, verification
-  codes and the OMNI API.
-- **The every-SMS stamp works with DLT on or off.**
+- **Every SMS, however it's sent, carries them** while stamping is on: the Send page,
+  scheduled sends, broadcasts, Inbox replies, AI agents, fallback from other channels and
+  verification codes.
 - **The most specific value wins.** When two sources set the same tag, the template's
-  value beats the sender ID's, which beats your account's. A stamp set on a single send
-  through the OMNI API beats them all.
-- **The Send page and New broadcast show what a message will carry.** They list
-  each stamp, saying whether it comes from your account, the sender ID or the template.
+  value beats the sender ID's, which beats your account's.
+
+### Change the stamps of one send
+
+With stamping on, **Send SMS** and **New broadcast** show **Stamps on this send**: the
+stamps the message will carry, from your settings, the sender ID and the template. For
+that one send you can change a value, remove a stamp or add one. **Reset to the saved
+stamps** undoes your changes. Nothing saved in settings, on the sender ID or on the
+template is changed.
+
+With stamping off, the send pages show no stamps and the message carries none.
+
+Through the OMNI API, the stamps you name on a request are your own and are sent whether
+stamping is on or off.
 
 **Tags and values:**
 
 - Write a tag in hex, like `0x1501` (at most `0xFFFF`). A bare number such as `5120` is
   refused, with the hex to use instead (`0x1400`).
-- On a sender ID or a template, the tag is plain hex. The every-SMS stamp can also name a
-  type, such as `name_0x1600:Int4`, and then its value must be a whole number that fits
-  that type.
+- On a sender ID or a template, the tag is plain hex. The every-SMS stamp, and a stamp
+  edited on a send, can also name a type, such as `name_0x1600:Int4`, and then its value
+  must be a whole number that fits that type.
 - A value is up to 255 characters.
 
 <Note>
@@ -209,6 +209,7 @@ and [templates](/api-reference/sms/list-templates), with the same rules.
 
 Requesting, editing and withdrawing sender IDs and templates needs the permission to
 **manage sender IDs and template registrations** — the **Owner** and **Admin** roles by
-default; the same permission sets their stamps. Switching DLT on, setting the entity ID
-and the every-SMS stamp is in SMS settings, which needs the permission to **configure
-channel modules** (Owner and Admin by default).
+default; the same permission sets their stamps. Switching stamping on and setting the
+every-SMS stamp is in SMS settings, which needs the permission to **configure channel
+modules** (Owner and Admin by default). Anyone who may send SMS may change the stamps of
+a send they make.

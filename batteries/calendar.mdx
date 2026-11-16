@@ -138,13 +138,13 @@ How reminders go on each channel:
 | Channel | How it works |
 |---|---|
 | **WhatsApp** | Inside WhatsApp's 24-hour window, the message comes with **Confirm**, **Reschedule** and **Cancel** buttons, and a tap changes the appointment. Outside the window, OMNI uses your approved reminder template. The settings show that template's status and let you submit it to WhatsApp. WhatsApp can also show a list of times that are really free; a tap books one. |
-| **SMS** | Sent when the text matches one of your DLT templates. See [SMS sender IDs and DLT](/channels/sms-sender-ids-and-dlt). |
+| **SMS** | Sent when the text matches one of your approved templates. See [SMS sender IDs and templates](/channels/sms-sender-ids-and-stamps). |
 
 Calendar does not send on RCS or Voice.
 
 With the [OMNI API](/developers/overview) in your deployment, a message to a contact that
 isn't **delivered** within 15 minutes goes on the next channel — a reminder WhatsApp took
-but couldn't deliver goes out as SMS, if its text matches a DLT template. A reminder no
+but couldn't deliver goes out as SMS, if its text matches an approved template. A reminder no
 channel delivers before the appointment starts shows as failed, with why. Each reminder
 shows the channel it finally went on.
 
