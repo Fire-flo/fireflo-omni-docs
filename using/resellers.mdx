@@ -35,9 +35,18 @@ warns you. Nothing is taken back.
 
 **Unit history** lists the units you gave and took back, and the units you used yourself.
 
-The table lists each customer with its status, one column for each kind of unit any of
-them holds (**OK**, **Low** or **None · sends paused**), and its **Fee wallet**: the money
-that pays its plan and battery fees. Filter by status (*Pending approval*, *Trial*,
+The table lists each customer on one row: its status, its units by channel (for example
+*SMS 1,499 · WhatsApp 1,200*, with **Low** or **None** on a channel that needs units), and
+its **Fee wallet**: the money that pays its plan and battery fees.
+
+Open a row with the arrow beside the name, or use **Expand all**, to see a block for each
+channel: every kind of unit with what is **left** and what was **used**, and **Give units**
+for that channel.
+
+Under SMS the block also says where the customer sends from. A customer of yours has no
+account of its own at the SMS gateway: it sends under your gateway account, and its units
+are counted in OMNI. Giving units therefore changes nothing at the gateway, and that is
+expected. If the customer sends over SMPP, its login is named there too. Filter by status (*Pending approval*, *Trial*,
 *Active*, *Payment due*, *Suspended*, *Low balance*) or search by name.
 
 ### As a sub-reseller

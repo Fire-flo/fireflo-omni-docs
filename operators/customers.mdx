@@ -169,8 +169,36 @@ positive amount adds credit. A minus sign takes credit away, and only this kind 
 correction may take a wallet below zero.
 
 **Pockets**: **Move money** and **Create pocket** move money between the wallet and a
-module's pocket (SMS on FireFlo's connection is one-way: money moved in goes to the
-gateway). No money can go into the pocket of a module the customer doesn't have.
+module's pocket (for SMS on FireFlo's connection the money goes on to the gateway, and
+comes back from it). No money can go into the pocket of a module the customer doesn't have.
+
+**Sync and Reconcile (SMS on FireFlo's connection).** The SMS pocket shows what the
+gateway holds now, and under it what **OMNI's book** says. OMNI's book records only what
+OMNI moved in and out, so it drifts from the gateway as the customer sends, and whenever
+money is added or taken at the gateway itself.
+
+- **Sync** reads the gateway again and shows the time. It moves no money.
+- **⋯ → Reconcile with gateway…** compares the two line by line. Opening it writes
+  nothing. It shows:
+  - **Matched**: a movement both sides have, under the same reference.
+  - **Only at the gateway**: a credit or debit made at the gateway. Reconciling adds each
+    one to OMNI's book as its own line.
+  - **Not at the gateway**: money OMNI moved into the pocket that the gateway never
+    received. Reconciling sends it again under the same reference, so it can't be credited
+    twice.
+  - **Spent on SMS since the last reconcile**: written as one usage line.
+  - **Too recent to compare**: the gateway hands its ledger out about two minutes behind.
+    A movement inside that window waits for the next reconcile.
+  - **Unexplained**: whatever the groups above don't account for. It is shown and never
+    written; check the gateway's own ledger for the account, then reconcile again.
+- **Reconcile** writes what was shown. If anything changed since you looked, it refuses
+  and asks you to look again. The wallet is never changed, and the lines it writes are not
+  sent to the gateway.
+- The **first reconcile** of a pocket does not go through history: it takes the gateway's
+  figure as the start and writes the one difference. Later ones compare line by line from
+  that moment.
+
+Nothing reconciles by itself. The row says when a pocket was last reconciled and by whom.
 
 **Plan & add-ons**: for each battery you can type a **Monthly fee** for this customer alone
 — leave it blank to follow their price list — tick **Included** to grant the battery

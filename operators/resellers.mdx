@@ -87,6 +87,11 @@ Accounts below a reseller send SMS under the reseller's own account on your SMS 
 The gateway charges the reseller, at the reseller's price; OMNI counts the messages
 against each sender's units.
 
+So an account below a reseller has **no account of its own on the gateway**, and the units
+a reseller gives it are never sent there. This is by design. On the customer's **Modules**
+tab the SMS gateway row says so, naming the reseller and the gateway account it sends
+under; the reseller sees the same on its own customer list.
+
 When an account below a reseller sends straight to the gateway over its own SMPP login,
 OMNI switches that login off once the units of the kind it sends run out. The gateway has
 no way to switch a login back on, so when new units arrive OMNI makes a new login, with a
