@@ -20,9 +20,12 @@ This page is the operator's view. For what a reseller sees, see
   product type. Staff never give units.
 - **Each message is charged to the reseller.** A customer's message uses one of its units
   and is charged to the reseller's money at the reseller's price for that country.
-- **Resellers set no prices and no markup.** Its customers have no prices and no message
-  pockets. Each keeps a wallet for its plan and battery fees only, which the reseller
-  funds with credit.
+- **Resellers set no prices and no markup.** Its customers have no prices, no pockets
+  and no money at all: below a reseller only units move.
+- **The reseller pays its customers' plans and add-ons.** They are charged to the
+  top-level reseller's wallet, on lines that name the customer. A reseller below a
+  reseller holds no money either, so everything it sets up is unit-based and it can pass
+  on only the units it holds.
 
 ## Make an account a reseller
 
@@ -105,21 +108,23 @@ new system ID. Reset its password under the customer's **Modules** tab and pass 
 - The **Resellers** chip lists every reseller.
 
 A reseller's customer is a full account on its own page. Its **Billing** tab shows its
-units, its plan and its fee wallet; it has no prices. You can change it, top up its fee
-wallet or suspend it like any other.
+units and its plan; it has no prices and holds no money. You can change its product or
+suspend it like any other; what it costs is charged to its top-level reseller.
 
 ## What a reseller does for its customers
 
 From its **Customers** page, a reseller can:
 
-- **Set up a customer**, with its product, trial and an opening credit for its fee
-  wallet. The owner is invited by email.
+- **Set up a customer**, with its product and trial. The owner is invited by email.
 - **Put a customer on a product.** Resellers can choose any of your active products,
   including hidden ones, at your price. When a reseller moves a customer to a dearer
   product, time already paid for is worth less of it, so the paid-until date moves in to
   match.
 - **Give units** and **take back** unused ones.
-- **Add credit** to the customer's fee wallet, from the reseller's own balance.
+- **Pay for the customer's plan and add-ons.** These are charged to the reseller's
+  wallet, on lines that name the customer; the reseller adds or stops an add-on. If its
+  wallet can't cover a charge, that customer is paused until it can, and a top-up tries
+  again at once.
 - **Narrow where it sends**, choosing allowed countries from the reseller's own.
 - **Decide about SMS** (see below).
 - **Suspend** a customer, and let them back in.

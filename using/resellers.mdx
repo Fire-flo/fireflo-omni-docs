@@ -37,7 +37,11 @@ warns you. Nothing is taken back.
 
 The table lists each customer on one row: its status, its units by channel (for example
 *SMS 1,499 · WhatsApp 1,200*, with **Low** or **None** on a channel that needs units), and
-its **Fee wallet**: the money that pays its plan and battery fees.
+what **you pay monthly** for it: its plan and any add-ons.
+
+Your customers hold no money. Their plans and add-ons are charged to your wallet, and
+they send with the units you give them. Each message a customer sends takes one of its
+units and is charged to your money at your price, at the moment it is sent.
 
 Open a row with the arrow beside the name, or use **Expand all**, to see a block for each
 channel: every kind of unit with what is **left** and what was **used**, and **Give units**
@@ -72,9 +76,8 @@ and asks its own provider for more. It has no pockets and no prices.
     person who can sign in, and is emailed a link to set a password.
   </Step>
   <Step title="What they are on">
-    Pick the **product** (plan), the **trial** in days before they owe anything (0 for
-    none), and an optional **opening credit** from your balance. Opening credit goes into
-    their fee wallet, for plan and battery fees.
+    Pick the **product** (plan) and the **trial** in days before anything is owed (0 for
+    none). When the trial ends, the plan is charged to your wallet each month.
   </Step>
   <Step title="How they send SMS">
     Decide whether they **may connect their own SMS gateway**. If not, SMS goes through
@@ -125,8 +128,13 @@ Open a customer to manage them.
 
 <Tabs>
   <Tab title="Overview">
-    - **What they're on**: change their product, and see their fee wallet, when their
-      trial ends and how many people they have.
+    - **What they're on**: change their product, and see what you pay monthly, when
+      their trial ends and how many people they have.
+    - **What you pay for them**: their plan and each add-on (battery), with its fee and
+      next charge. **Add** an add-on, **Stop renewing** one, or **Pay now** for one that
+      was paused because your wallet couldn't cover it. Only you can change these: they
+      are charged to your wallet.
+    - **Your terms**: a note only you see, and whether they can sign in.
     - **How they send**: allow or stop their own SMS gateway, and make them a sub-reseller.
     - **Suspend**: nobody at the customer can sign in until you **let them back in**.
   </Tab>
@@ -138,14 +146,6 @@ Open a customer to manage them.
     you can send to**, or **Only these countries**. You can choose only from the countries
     your own account may send to. A message to a number anywhere else is refused before
     it is sent, and isn't charged.
-  </Tab>
-  <Tab title="Fee wallet">
-    - **Add credit** moves credit from your balance to their fee wallet, which pays their
-      plan and battery fees. Give an amount and a reference; the reference shows on both
-      ledgers.
-    - **Low-balance warnings**: the line below which they and you are told their wallet
-      is running low.
-    - **Your terms**: a note only you see, and whether they can sign in.
   </Tab>
   <Tab title="Team">
     **Their people**: who can sign in, their roles, when they last signed in, and
