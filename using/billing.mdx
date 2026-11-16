@@ -62,10 +62,16 @@ spends from the wallet.
 
 - **No pocket — can't send**: create the SMS pocket and move money in. Until then nothing
   can be sent on SMS, however much the wallet holds.
-- The pocket works one way: money moved into it goes on to your SMS gateway and is spent
-  on SMS. It does not come back to the wallet, and the row says so.
+- Money moved into it goes on to your SMS gateway and is spent on SMS.
 - The pocket shows **what is left at your SMS gateway**, so it goes down as you send, with
-  what was moved in beside it.
+  what was moved in beside it. The figure counts what the gateway has set aside for
+  sending; the row says how much that is.
+- **Move money → Pocket → wallet** brings money back. The gateway hands back what it set
+  aside, then gives the money back; if it has less than you ask for, nothing moves. You can
+  take back up to what was moved in. (With an older gateway the pocket works one way, and
+  the row says so.)
+- The row says where top-ups of the wallet go: on to this pocket, or staying in the wallet
+  until you move them. Change it under **SMS → Settings**.
 - **At the gateway, not in a pocket**: before OMNI 1.5.10 your wallet was copied to the SMS
   gateway, so some of it is already there. **Create pocket** shows that amount and opens
   the pocket with it — it moves out of the wallet and nothing more is sent. Leave the
@@ -82,6 +88,10 @@ spends from the wallet.
   offered.
 
 ### Allocations
+
+Every movement has a **Reference** of its own, with a copy button. For money moved to or
+from your SMS gateway it is the same reference the gateway records, so the two can be
+matched.
 
 The latest changes to the wallet and pockets, each with when, what it was, the amount and
 the wallet after it. **All transactions** opens the full ledger.
