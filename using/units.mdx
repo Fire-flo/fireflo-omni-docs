@@ -74,15 +74,29 @@ below it stays as it is. Only what each later message costs the reseller changes
 
 ## SMS below a reseller
 
-Accounts below a reseller send SMS under the reseller's own account on FireFlo's SMS
-gateway, so the gateway charges the reseller at the reseller's price.
+Each SMS an account below a reseller sends is charged to its reseller, at the reseller's
+price, on FireFlo's SMS gateway.
 
-An account may also send SMS straight to the gateway over its own SMPP login. That login is
-**switched off** when the units of the kind it sends run out. SMS sent over the login is
-counted from the gateway's records shortly after it is sent, so a few messages sent just
-before the login is switched off can take the balance below zero; they are still charged
-to the reseller. When new units arrive, a **new login** is made, with a new system ID. Its
-password has to be reset before it can be used: ask your provider.
+**Counted at the gateway.** On a gateway at 0.16.0 or newer, the account's SMS units are
+held and counted at the gateway itself, one unit per message part. Sends from OMNI, over
+the API and over the account's own SMPP login are all counted in the same place, as they
+are sent. [Billing](/using/billing#accounts-below-a-reseller) shows the gateway's figures
+and when they were read. With no units of an SMS type left, a send is refused with
+a message such as *No Transactional units left. Ask Northwind for more.*, naming the
+SMS type and your provider, and nothing is charged; over SMPP
+the login is answered status `0x403`. Sending carries on as soon as units arrive: the
+login stays the same.
+
+When SMS units run low, the account's people and its provider's are emailed, and again at
+zero.
+
+**On an older gateway**, units are counted in OMNI. An account may also send SMS straight
+to the gateway over its own SMPP login. That login is **switched off** when the units of
+the kind it sends run out. SMS sent over the login is counted from the gateway's records
+shortly after it is sent, so a few messages sent just before the login is switched off can
+take the balance below zero; they are still charged to the reseller. When new units
+arrive, a **new login** is made, with a new system ID. Its password has to be reset before
+it can be used: ask your provider.
 
 ## Unit history
 

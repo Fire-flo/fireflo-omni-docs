@@ -86,19 +86,30 @@ current prices. Units are read-only here.
 
 ## SMS below a reseller
 
-Accounts below a reseller send SMS under the reseller's own account on your SMS gateway.
-The gateway charges the reseller, at the reseller's price; OMNI counts the messages
-against each sender's units.
+What happens depends on the gateway's version.
 
-So an account below a reseller has **no account of its own on the gateway**, and the units
-a reseller gives it are never sent there. This is by design. On the customer's **Modules**
-tab the SMS gateway row says so, naming the reseller and the gateway account it sends
-under; the reseller sees the same on its own customer list.
+**Gateway 0.16.0 or newer (OMNI 1.6.0).** Every account below a reseller gets a **units
+account** on the gateway for each SMS type it holds, under the top-level reseller's gateway
+account. A units account holds units and no money. The gateway counts one unit per message
+part, for sends from OMNI, the API and the account's own SMPP logins alike, and charges
+each part to the reseller at the reseller's price. Giving, taking back and passing on units
+in OMNI moves them at the gateway; the figures OMNI shows are the gateway's. With no units
+left a send is refused and nothing is charged; over SMPP the login is answered status
+`0x403`. A sub-reseller's customers also sit directly under the top-level reseller's
+gateway account: the gateway has two levels, whatever the depth of the tree in OMNI.
 
-When an account below a reseller sends straight to the gateway over its own SMPP login,
-OMNI switches that login off once the units of the kind it sends run out. The gateway has
-no way to switch a login back on, so when new units arrive OMNI makes a new login, with a
-new system ID. Reset its password under the customer's **Modules** tab and pass it on.
+The upgrade to OMNI 1.6.0 creates the units accounts, gives them the SMS units each account
+holds in OMNI, and makes a **new SMPP login for each existing one**. Pass the new logins
+on. The old logins keep working but are not counted against the account's units; when
+every customer has moved, switch them off with
+`fireflo-omni manage sms_units_accounts --switch-off-old`.
+
+**An older gateway.** Accounts below a reseller send under the reseller's own gateway
+account and have **no account of their own on the gateway**; OMNI counts the messages
+against each sender's units. When such an account sends over its own SMPP login, OMNI
+switches that login off once the units of the kind it sends run out. The gateway has no
+way to switch a login back on, so when new units arrive OMNI makes a new login, with a new
+system ID. Reset its password under the customer's **Modules** tab and pass it on.
 
 ## See a reseller's customers
 

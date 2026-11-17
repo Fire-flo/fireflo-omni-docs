@@ -53,10 +53,14 @@ doesn't include, lets them use it. You can only switch on a channel your own acc
 and a switch your provider set is theirs to change. The same switches are on the
 customer's own page, under **Channels**.
 
-Under SMS the block also says where the customer sends from. A customer of yours has no
-account of its own at the SMS gateway: it sends under your gateway account, and its units
-are counted in OMNI. Giving units therefore changes nothing at the gateway, and that is
-expected. If the customer sends over SMPP, its login is named there too. Filter by status (*Pending approval*, *Trial*,
+Under SMS the block also says where the customer sends from. On FireFlo's connection with
+a gateway at 0.16.0 or newer, the customer's SMS units are **counted at the SMS gateway**:
+it has a units account there for each SMS type, under your gateway account, and the figures
+you see are the gateway's, with when they were read and a **Sync** button. Messages the
+customer sends from OMNI, over the API and over its own SMPP login are all counted there.
+The units account holds no money: each message is still charged to you. On an older
+gateway the customer sends under your gateway account and its units are counted in OMNI.
+If the customer sends over SMPP, its login is named there too. Filter by status (*Pending approval*, *Trial*,
 *Active*, *Payment due*, *Suspended*, *Low balance*) or search by name.
 
 ### As a sub-reseller
@@ -140,6 +144,17 @@ Open a customer to manage them.
   </Tab>
   <Tab title="Units">
     **Their units**, each kind with its status, **Give units**, and **Their unit history**.
+
+    For SMS units counted at the gateway you can also set:
+
+    - **Warn below**: the number of units at which the customer's people and yours are
+      emailed, and the kind shows **Low**. Left empty, the line is 10% of the last amount
+      you gave. Everyone is told again at zero.
+    - **Speed limit**: messages a second the customer may send, set separately for SMPP
+      and for sends through OMNI and the HTTP API. It applies to each of its SMS types and
+      comes on top of your own account's limit. Over it, SMPP is answered status `0x58`
+      (throttled) and the HTTP API `429`; OMNI waits and tries again. Empty or 0 means no
+      limit of the customer's own.
   </Tab>
   <Tab title="Sending">
     **Allowed countries**: where they may send, on every channel. Choose **Every country
