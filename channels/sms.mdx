@@ -115,6 +115,29 @@ You can also start an SMS from a contact's page with **Send SMS**.
   characters — many non-Latin scripts and emoji — make segments shorter.
 </Tip>
 
+### Unicode
+
+OMNI picks the alphabet for you. A message whose every character is in the standard SMS
+alphabet (GSM-7) holds 160 characters, or 153 in each part of a longer one. A message with
+any other character — text in Hindi, Arabic or another script, an emoji, a curly quote
+pasted from a document — is sent as **Unicode**, which holds 70 characters, or 67 in each
+part. An emoji takes two of those.
+
+One such character is enough to make the whole message Unicode. When only one or two
+characters are what did it, a line under the counter names them, for example *Sent as
+Unicode because of “’”: 70 characters a part instead of 160.* Replace the character with a
+plain one to bring the message back to the longer limit.
+
+In a broadcast each person's message gets the alphabet its own text needs, so one name in
+another script does not shorten everyone else's.
+
+<Note>
+  Before OMNI 1.6.1 a Unicode message was sent in the standard alphabet: it arrived as
+  question marks and was counted as fewer parts than it really was. From 1.6.1 it arrives
+  readable and is counted correctly, so long Unicode messages take more parts than they
+  appeared to before.
+</Note>
+
 ## The SMS dashboard
 
 **SMS → Dashboard** shows what the gateway reports live and what OMNI logged, over the
