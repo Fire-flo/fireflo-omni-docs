@@ -152,7 +152,7 @@
             "groups": [
               {
                 "group": "Analytics",
-                "pages": ["analytics/reports", "analytics/schedules"]
+                "pages": ["analytics/reports", "analytics/usage", "analytics/schedules"]
               }
             ]
           },

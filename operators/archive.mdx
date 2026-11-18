@@ -234,6 +234,12 @@ The periods kept by the records with their own schedule are deployment settings 
 `MESSAGE_RETENTION_MONTHS`, `EVENT_RETENTION_MONTHS`, `AGENT_EVENT_RETENTION_DAYS` and
 `ACTIVITY_RETENTION_DAYS`.
 
+[Usage](/analytics/usage) keeps its own counts of messages, apart from the messages
+themselves: `USAGE_SLICE_KEEP_HOURS` (how long five-minute counts are kept, 48 unless
+set) and `USAGE_HOUR_KEEP_DAYS` (hourly counts, 100 unless set). Daily counts are kept for
+good. `USAGE_SLICE_SETTLE_MINUTES` (30 unless set) is how far back each minute's count
+looks again for delivery reports that arrived late.
+
 ## Messages are stored by month
 
 The messages table is stored **by month**, which keeps each month's part of it, and its
