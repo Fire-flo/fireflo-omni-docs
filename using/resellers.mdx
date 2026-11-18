@@ -120,6 +120,9 @@ Anyone who signs up at your own web address also becomes your customer. See
 No money moves when you give units. Each message the customer sends uses one unit and is
 charged to your money then.
 
+Giving units of an SMS type also **switches that type on** for the customer, so they can
+send what you gave them. Taking units back switches nothing off.
+
 **Take back unused units**, in the same window, takes back units the customer hasn't
 used. You can't take back more than it holds.
 
@@ -128,12 +131,33 @@ another channel or product type.
 
 ## One customer
 
-Open a customer to manage them.
+Open a customer to manage them. The top of the page tells you where they stand:
+
+- **Badges** beside the name: *Waiting for your approval*, *Suspended*, *Sub-reseller*,
+  *Payment due*, and when a trial ends.
+- **Who and when**: the owner's email, when they signed up, and when anyone there last
+  signed in.
+- **Approve**, for a customer who signed up at your own web address and is waiting, and
+  **Give units**.
+- **Four figures**: units left (and whether a type is low or has run out), messages sent
+  in the last 30 days with the share delivered, how many people can sign in, and what you
+  pay for them each month.
+
+If a channel isn't ready for the customer to send on, a notice above the tabs says why:
+it is still being set up, the gateway refused it (with the gateway's reason), or no SMS
+type is switched on. Where trying again can help, the notice has **Set up again**.
 
 <Tabs>
   <Tab title="Overview">
+    - **Needs your attention**: a sign-up waiting for approval, a channel that isn't set
+      up, units running low or gone, a payment due, a trial about to end. Each has a link
+      to where you act on it.
     - **What they're on**: change their product, and see what you pay monthly, when
       their trial ends and how many people they have.
+    - **Channels**: a switch for each channel. Under SMS, a switch for each **SMS type**
+      the customer may send. A type must be on before they can send it. Giving units of
+      a type switches it on; you can also switch on any type you have yourself, and
+      switch any type off.
     - **What you pay for them**: their plan and each add-on (battery), with its fee and
       next charge. **Add** an add-on, **Stop renewing** one, or **Pay now** for one that
       was paused because your wallet couldn't cover it. Only you can change these: they
@@ -156,6 +180,18 @@ Open a customer to manage them.
       (throttled) and the HTTP API `429`; OMNI waits and tries again. Empty or 0 means no
       limit of the customer's own.
   </Tab>
+  <Tab title="Usage">
+    What they sent in the last 30 days: a total for each channel and a bar for each day.
+  </Tab>
+  <Tab title="Broadcasts">
+    Their broadcasts, newest first: the name, the channel, where it stands, and how many
+    were sent to, delivered and failed. You see names and counts only, never the message
+    text or the numbers it went to.
+  </Tab>
+  <Tab title="Modules">
+    Which modules they have, and whether each comes with their product. To change that,
+    change their product or switch a channel under **Overview**.
+  </Tab>
   <Tab title="Sending">
     **Allowed countries**: where they may send, on every channel. Choose **Every country
     you can send to**, or **Only these countries**. You can choose only from the countries
@@ -164,7 +200,14 @@ Open a customer to manage them.
   </Tab>
   <Tab title="Team">
     **Their people**: who can sign in, their roles, when they last signed in, and
-    invitations still pending. They run their own team.
+    invitations still pending. They run their own team. You can send someone a link to
+    set a password: **Send invitation again** for a person who never set one, **Send
+    password link** for a person who forgot theirs. If the email can't be sent, the link
+    is shown so you can pass it on.
+  </Tab>
+  <Tab title="Customers">
+    Only for a sub-reseller: its own customers, with their product, people and status.
+    The sub-reseller manages them; you see who they are.
   </Tab>
 </Tabs>
 
@@ -176,7 +219,8 @@ allocated*, and on theirs as *Credit received*.
 - A customer runs its own account: its team, contacts, channels and messages.
 - A customer can never do more than you can. Its roles are limited to what your account
   may do, and its allowed countries to yours.
-- A customer sees its units, not your prices.
+- A customer sees its units, not your prices, and never your balance. On its SMS
+  dashboard, its SMS settings and in its API it sees the units it holds of each SMS type.
 
 FireFlo's side of running resellers is described in
 [For operators: Resellers](/operators/resellers).

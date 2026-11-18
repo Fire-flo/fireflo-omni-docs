@@ -1,9 +1,13 @@
 ---
 title: "GET /v1/channels/sms/balance"
-description: "Your own SMS gateway's balance."
+description: "Your own SMS balance: money on your gateway account, or the units you hold of each SMS type."
 ---
 
-The balance on your own SMS gateway account. On FireFlo's shared gateway there is none of yours to show: `own_gateway` is false and the figures null — see [GET /v1/usage](/api-reference/usage/get) for your account's balance.
+What your account holds to send SMS with, and only your own. `kind` says which:
+
+- `"currency"`: your account has a gateway account of its own. `balance` is what it holds.
+- `"units"`: your provider gives you units to send with. You hold no money; `units` lists
+  what you hold of each SMS type, and `balance` is null.
 
 <Note>Needs the `sms.balance:read` scope.</Note>
 
@@ -41,13 +45,30 @@ console.log(response.status, await response.json());
 
 ## Response
 
-`200 OK` — `balance` and `sms_count` are the gateway's own figures. `balance` can be the string `"ND"`: the gateway doesn't enforce a balance on this account, which is not the same as zero.
+`200 OK`. For a `"currency"` account, `balance` and `sms_count` are the gateway's own figures. `balance` can be the string `"ND"`: the gateway doesn't enforce a balance on this account, which is not the same as zero.
 
 ```json
 {
+  "kind": "currency",
   "balance": 12480.5,
   "sms_count": 83203,
-  "own_gateway": true
+  "own_gateway": true,
+  "units": null
+}
+```
+
+For a `"units"` account, each row is one SMS type: `units` is what you hold of it, and `on` is false for a type that isn't switched on for you yet (its units can't be sent until it is).
+
+```json
+{
+  "kind": "units",
+  "balance": null,
+  "sms_count": null,
+  "own_gateway": false,
+  "units": [
+    { "type": "transactional", "label": "Transactional", "units": 4200, "on": true },
+    { "type": "promotional", "label": "Promotional", "units": 0, "on": true }
+  ]
 }
 ```
 
