@@ -26,7 +26,9 @@ when its DNS was last checked, any DNS error, and a status:
 Until a domain is live, the page shows the two DNS records the reseller must add, ready to
 copy:
 
-- a **CNAME**, which points the address at the panel;
+- a **CNAME**, which points the address at the panel. It names the address of the
+  reseller above when that reseller has a live address of its own, otherwise your main
+  panel's address. An A record to the same server passes the check as well;
 - a **TXT** record, which proves the domain is the reseller's. Without it, anyone could
   point an address at the panel and claim someone else's brand.
 
@@ -52,7 +54,21 @@ Once a domain is live:
 - the reseller and its customers can sign in at that address, which shows the reseller's
   name, logo and colour;
 - emails to them link to that address and carry the reseller's name;
-- anyone who signs up at that address becomes the reseller's customer.
+- you can allow sign-up on it (below).
+
+### Allow sign-up on a reseller's address
+
+Sign-up on a reseller's address is off until you allow it. On a live domain, select
+**Allow sign-up**; the reseller then switches it on from its Branding page. The badge
+shows where it stands: *Sign-up not allowed*, *allowed · reseller has it off*, or
+*allowed · on*.
+
+Anyone who signs up there becomes that reseller's customer and waits for that reseller's
+approval. **Stop sign-up** closes it again and keeps the reseller's own choice, so
+allowing it later brings it back as it was.
+
+Self-signup on the platform (under Email, below) is the master switch: while it is off,
+no address takes sign-ups.
 
 Select **Take it off** to undo this. The address stops serving the reseller's brand, and
 links go back to your own panel's address.
@@ -91,7 +107,8 @@ untested again. Send another test afterwards.
 
 ### Self-signup
 
-Turn on **Let new customers sign up** to open the signup page. New customers pick a
+Turn on **Let new customers sign up** to open the signup page on your own address, and
+on each reseller address where you have [allowed sign-up](#allow-sign-up-on-a-resellers-address). New customers pick a
 product that's [offered at signup](/operators/products-and-plans), confirm their email
 and start a trial.
 
